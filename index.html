@@ -14,7 +14,6 @@
     button { background-color: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
     button:hover { background-color: #0056b3; }
     
-    /* Style Tambahan untuk Filter Box */
     .filter-row { display: flex; gap: 10px; margin-bottom: 8px; }
     .filter-row select { flex: 1; background-color: #f8f9fa; }
     .search-box { margin-bottom: 8px; background-color: #fff; font-weight: 500; }
@@ -43,7 +42,6 @@
 
     <div class="form-group">
       <label>Pilih Kunci / Ruangan:</label>
-      
       <div class="filter-row">
         <select id="filterLantai" onchange="saringKunci()">
           <option value="">-- Semua Lantai --</option>
@@ -52,9 +50,7 @@
           <option value="">-- Semua Zona --</option>
         </select>
       </div>
-      
       <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci untuk mencari...">
-      
       <select id="kunci" name="kunci" required>
         <option value="">-- Memuat data kunci... --</option>
       </select>
@@ -86,39 +82,29 @@
   const btnAmbilFoto = document.getElementById('btnAmbilFoto');
   const btnFotoUlang = document.getElementById('btnFotoUlang');
 
-  // Variabel lokal untuk menyimpan salinan data kunci dari server
   let semuaDataKunci = [];
 
-  // 1. Ambil Kunci Tersedia dan Buat List Filter Unik
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_tersedia`)
       .then(res => res.json())
       .then(data => {
         semuaDataKunci = data;
-        
-        // Ambil daftar Lantai dan Zona unik untuk pilihan filter
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
         
-        // Isi dropdown Filter Lantai
         const selectLantai = document.getElementById("filterLantai");
         listLantai.forEach(lantai => {
           const opt = document.createElement("option");
-          opt.value = lantai;
-          opt.textContent = lantai;
+          opt.value = lantai; opt.textContent = lantai;
           selectLantai.appendChild(opt);
         });
         
-        // Isi dropdown Filter Zona
         const selectZona = document.getElementById("filterZona");
         listZona.forEach(zona => {
           const opt = document.createElement("option");
-          opt.value = zona;
-          opt.textContent = "Zona " + zona;
+          opt.value = zona; opt.textContent = "Zona " + zona;
           selectZona.appendChild(opt);
         });
-
-        // Tampilkan semua kunci di awal
         saringKunci();
       })
       .catch(() => {
@@ -126,7 +112,6 @@
       });
   }
 
-  // 2. Logika Utama Penyaringan (Filter Lantai, Zona, dan Kolom Pencarian)
   function saringKunci() {
     const lantaiDipilih = document.getElementById("filterLantai").value.toLowerCase();
     const zonaDipilih = document.getElementById("filterZona").value.toLowerCase();
@@ -135,23 +120,18 @@
     
     selectKunci.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
     
-    // Lakukan filter data secara real-time
     const hasilSaring = semuaDataKunci.filter(kunci => {
       const cocokLantai = !lantaiDipilih || (kunci.lantai && kunci.lantai.toLowerCase() === lantaiDipilih);
       const cocokZona = !zonaDipilih || (kunci.zona && kunci.zona.toLowerCase() === zonaDipilih);
-      
       const teksGabungan = `${kunci.id} ${kunci.nama}`.toLowerCase();
       const cocokKataKunci = teksGabungan.includes(kataKunciCari);
-      
       return cocokLantai && cocokZona && cocokKataKunci;
     });
     
-    // Masukkan hasil saring ke dalam dropdown utama
     if (hasilSaring.length === 0) {
       selectKunci.innerHTML = '<option value="">❌ Kunci tidak ditemukan / tidak tersedia</option>';
       return;
     }
-    
     hasilSaring.forEach(k => {
       const opt = document.createElement("option");
       opt.value = k.id;
@@ -160,12 +140,11 @@
     });
   }
 
-  // 3. Akses Kamera Berjalan Otomatis
+  // Memaksa penggunaan kamera belakang ('environment') dan memunculkan preview video
   navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     .then(stream => { video.srcObject = stream; })
-    .catch(() => alert("Gagal mengakses kamera. Pastikan izin kamera aktif."));
+    .catch(() => alert("Gagal mengakses kamera belakang. Pastikan izin kamera aktif."));
 
-  // 4. Logika Ambil Foto Jepretan Canvas
   btnAmbilFoto.addEventListener('click', () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -188,18 +167,13 @@
     btnFotoUlang.style.display = 'none';
   });
 
-  // 5. Submit Data ke Google Sheets
   document.getElementById('formPinjam').addEventListener('submit', function(e) {
     e.preventDefault();
     if (!fotoInput.value) { alert("Anda wajib mengambil foto dokumentasi!"); return; }
-    
     const btnSubmit = document.getElementById('btnSubmit');
     btnSubmit.disabled = true;
     btnSubmit.textContent = "Memproses Peminjaman...";
-
-    const formData = new FormData(this);
-    
-    fetch(scriptUrl, { method: 'POST', body: formData })
+    fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
       .then(res => res.json())
       .then(res => {
         if (res.status === 'success') {
