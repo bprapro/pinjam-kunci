@@ -78,6 +78,10 @@
                 </div>
                 
                 <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
+                
+                <div class="text-center mt-3">
+                    <a href="kembali.html" class="text-decoration-none text-danger fw-bold">🔄 Ingin mengembalikan kunci? Klik di sini</a>
+                </div>
             </form>
         </div>
     </div>
@@ -89,7 +93,6 @@
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
         
-        // Elemen Kamera
         const video = document.getElementById('camera-preview');
         const photoPreview = document.getElementById('taken-photo');
         const startCameraButton = document.getElementById('start-camera');
@@ -100,7 +103,6 @@
         
         let stream;
 
-        // Ambil data kunci dari Spreadsheet
         window.addEventListener('DOMContentLoaded', () => {
             fetch(scriptURL)
                 .then(response => response.json())
@@ -124,114 +126,49 @@
                 });
         });
 
-        // Fungsi Membuka Kamera Berdasarkan Pilihan (Depan/Belakang)
         async function openCamera() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-
-            const selectedMode = cameraSourceSelect.value; // Ambil nilai 'user' atau 'environment'
-            
+            if (stream) { stream.getTracks().forEach(track => track.stop()); }
+            const selectedMode = cameraSourceSelect.value;
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: { ideal: selectedMode } } 
-                });
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: selectedMode } } });
                 video.srcObject = stream;
-                
-                startCameraButton.style.display = 'none';
-                video.style.display = 'block';
-                takePhotoButton.style.display = 'inline-block';
-                photoPreview.style.display = 'none';
-                retakePhotoButton.style.display = 'none';
-                fotoDataInput.value = ''; 
-            } catch (error) {
-                alert('Gagal mengakses jenis kamera yang dipilih. Pastikan izin kamera diberikan.');
-                console.error('Error kamera:', error);
-            }
+                startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = ''; 
+            } catch (error) { alert('Gagal mengakses kamera.'); }
         }
 
-        // Event handler ketika tombol Buka Kamera diklik
         startCameraButton.addEventListener('click', openCamera);
+        cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') { openCamera(); } });
 
-        // Jika user mengubah pilihan kamera saat kamera sedang aktif, otomatis muat ulang kameranya
-        cameraSourceSelect.addEventListener('change', () => {
-            if (video.style.display === 'block') {
-                openCamera();
-            }
-        });
-
-        // Ambil Foto
         takePhotoButton.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = 600;
+            canvas.height = (video.videoHeight / video.videoWidth) * 600;
             const ctx = canvas.getContext('2d');
-            
-            // Kompresi otomatis (lebar 600px, kualitas 60%) agar hemat ruang Google Drive
-            const max_width = 600;
-            const scaleSize = max_width / canvas.width;
-            canvas.width = max_width;
-            canvas.height = canvas.height * scaleSize;
-            
             ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
-            
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-            
-            photoPreview.src = compressedBase64;
-            photoPreview.style.display = 'block';
-            video.style.display = 'none';
-            
-            fotoDataInput.value = compressedBase64;
-            
-            takePhotoButton.style.display = 'none';
-            retakePhotoButton.style.display = 'inline-block';
-            
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            photoPreview.src = compressedBase64; photoPreview.style.display = 'block'; video.style.display = 'none';
+            fotoDataInput.value = compressedBase64; takePhotoButton.style.display = 'none'; retakePhotoButton.style.display = 'inline-block';
+            if (stream) { stream.getTracks().forEach(track => track.stop()); }
         });
 
-        // Foto Ulang
         retakePhotoButton.addEventListener('click', openCamera);
 
-        // Submit Form
         form.addEventListener('submit', e => {
             e.preventDefault();
-            
-            if (!fotoDataInput.value) {
-                alert('Silakan ambil foto dokumentasi terlebih dahulu.');
-                return;
-            }
-            
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Mengunggah Data & Foto ke Sistem...';
-
+            if (!fotoDataInput.value) { alert('Silakan ambil foto dokumentasi terlebih dahulu.'); return; }
+            btnSubmit.disabled = true; btnSubmit.innerText = 'Mengompres Gambar & Menyimpan...';
             const formData = new FormData();
             formData.append('nama', document.getElementById('nama').value);
             formData.append('nohp', document.getElementById('nohp').value);
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
-
-            fetch(scriptURL, { 
-                method: 'POST', 
-                body: formData
-            })
+            fetch(scriptURL, { method: 'POST', body: formData })
             .then(response => response.json())
             .then(res => {
-                if(res.status === 'success') {
-                    alert('Peminjaman Berhasil! Foto dokumentasi telah tersimpan aman di Google Drive.');
-                    window.location.reload();
-                } else {
-                    alert('Gagal menyimpan: ' + res.message);
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerText = 'Pinjam Kunci';
-                }
+                if(res.status === 'success') { alert('Peminjaman Berhasil!'); window.location.reload(); }
+                else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; }
             })
-            .catch(error => {
-                alert('Terjadi kesalahan sistem: ' + error.message);
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'Pinjam Kunci';
-            });
+            .catch(error => { alert('Error: ' + error.message); btnSubmit.disabled = false; });
         });
     </script>
 </body>
