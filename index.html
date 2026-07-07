@@ -135,7 +135,6 @@
     .btn-buka-cam { background-color: #475569; color: white; border: none; }
     .btn-buka-cam:hover { background-color: #334155; }
     
-    /* Tombol Ambil dan Ulang disembunyikan di awal lewat CSS */
     .btn-ambil-foto { background-color: var(--success); color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
     .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
 
@@ -326,7 +325,9 @@
   </div>
 
 <script>
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
+  // ⚠️ PASTIKAN MENGGANTI LINK DI BAWAH INI DENGAN URL WEB APP TERBARU ANDA (DARI DEPLOYMENT KODE.GS YANG BARU)
+  const scriptUrl = "https://script.google.com/macros/s/PASTE_URL_WEB_APP_BARU_DI_SINI/exec";
+  
   let semuaDataKunci = [];
   let dataMonitorTerpinjam = [];
   let streamKameraAktif = null;
@@ -366,6 +367,8 @@
         selectZona.innerHTML = '<option value="">-- Semua Zona --</option>';
         listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
         saringKunci();
+      }).catch(err => {
+        document.getElementById("kunci_pinjam").innerHTML = '<option value="">❌ Gagal memuat data. Periksa kembali Web App URL.</option>';
       });
   }
 
