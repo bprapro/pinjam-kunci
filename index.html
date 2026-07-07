@@ -18,9 +18,15 @@
     .filter-row select { flex: 1; background-color: #f8f9fa; }
     .search-box { margin-bottom: 8px; background-color: #fff; font-weight: 500; }
     
+    /* MODIFIKASI: Sembunyikan elemen video kamera secara default di CSS */
+    #video { display: none; width: 100%; max-width: 400px; border-radius: 4px; background: #222; margin-top: 10px; }
     #canvas { display: none; width: 100%; max-width: 400px; border-radius: 4px; margin-top: 10px; }
-    #video { width: 100%; max-width: 400px; border-radius: 4px; background: #222; }
     .foto-container { text-align: center; margin-top: 10px; }
+    
+    /* Tombol Buka Kamera */
+    #btnBukaKamera { background-color: #28a745; margin-top: 5px; }
+    #btnAmbilFoto { background-color: #007bff; margin-top: 5px; display: none; }
+    #btnFotoUlang { background-color: #6c757d; margin-top: 5px; display: none; }
   </style>
 </head>
 <body>
@@ -63,10 +69,16 @@
 
     <div class="form-group foto-container">
       <label>Dokumentasi Foto Ambil Kunci:</label>
+      
+      <button type="button" id="btnBukaKamera">📸 Buka Kamera</button>
+      
       <video id="video" autoplay playsinline></video>
+      
       <canvas id="canvas"></canvas>
-      <button type="button" id="btnAmbilFoto" style="background-color: #28a745; margin-top: 5px;">📸 Ambil Foto</button>
-      <button type="button" id="btnFotoUlang" style="background-color: #6c757d; margin-top: 5px; display: none;">🔄 Foto Ulang</button>
+      
+      <button type="button" id="btnAmbilFoto">📸 Ambil Foto</button>
+      <button type="button" id="btnFotoUlang">🔄 Foto Ulang</button>
+      
       <input type="hidden" id="foto" name="foto" required>
     </div>
 
@@ -79,11 +91,14 @@
   const video = document.getElementById('video');
   const canvas = document.getElementById('canvas');
   const fotoInput = document.getElementById('foto');
+  
+  const btnBukaKamera = document.getElementById('btnBukaKamera');
   const btnAmbilFoto = document.getElementById('btnAmbilFoto');
   const btnFotoUlang = document.getElementById('btnFotoUlang');
 
   let semuaDataKunci = [];
 
+  // 1. Ambil Data Kunci & Opsi Filter
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_tersedia`)
       .then(res => res.json())
@@ -94,22 +109,18 @@
         
         const selectLantai = document.getElementById("filterLantai");
         listLantai.forEach(lantai => {
-          const opt = document.createElement("option");
-          opt.value = lantai; opt.textContent = lantai;
+          const opt = document.createElement("option"); opt.value = lantai; opt.textContent = lantai;
           selectLantai.appendChild(opt);
         });
         
         const selectZona = document.getElementById("filterZona");
         listZona.forEach(zona => {
-          const opt = document.createElement("option");
-          opt.value = zona; opt.textContent = "Zona " + zona;
+          const opt = document.createElement("option"); opt.value = zona; opt.textContent = "Zona " + zona;
           selectZona.appendChild(opt);
         });
         saringKunci();
       })
-      .catch(() => {
-        document.getElementById("kunci").innerHTML = '<option value="">Gagal memuat data dari server</option>';
-      });
+      .catch(() => { document.getElementById("kunci").innerHTML = '<option value="">Gagal memuat data kunci</option>'; });
   }
 
   function saringKunci() {
@@ -128,67 +139,94 @@
       return cocokLantai && cocokZona && cocokKataKunci;
     });
     
-    if (hasilSaring.length === 0) {
-      selectKunci.innerHTML = '<option value="">❌ Kunci tidak ditemukan / tidak tersedia</option>';
-      return;
-    }
     hasilSaring.forEach(k => {
-      const opt = document.createElement("option");
-      opt.value = k.id;
+      const opt = document.createElement("option"); opt.value = k.id;
       opt.textContent = `${k.id} - ${k.nama} [${k.lantai} - ${k.zona}]`;
       selectKunci.appendChild(opt);
     });
   }
 
-  // Memaksa penggunaan kamera belakang ('environment') dan memunculkan preview video
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-    .then(stream => { video.srcObject = stream; })
-    .catch(() => alert("Gagal mengakses kamera belakang. Pastikan izin kamera aktif."));
+  // =========================================================================
+  // LOGIKA MODIFIKASI KAMERA TERSEMBUNYI DI AWAL (REQUEST USER)
+  // =========================================================================
 
+  // A. Tombol Buka Kamera diklik
+  btnBukaKamera.addEventListener('click', () => {
+    // Jalankan akses kamera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => { 
+        video.srcObject = stream; 
+        
+        // Tampilkan video preview kamera dan tombol Ambil Foto
+        video.style.display = 'block'; 
+        btnAmbilFoto.style.display = 'block';
+        
+        // Sembunyikan tombol "Buka Kamera"
+        btnBukaKamera.style.display = 'none';
+        
+        // Pastikan canvas dan tombol Foto Ulang sembunyi
+        canvas.style.display = 'none';
+        btnFotoUlang.style.display = 'none';
+        fotoInput.value = ""; 
+      })
+      .catch(() => alert("Gagal mengakses kamera. Mohon berikan izin kamera."));
+  });
+
+  // B. Tombol Ambil Foto diklik (Jepret)
   btnAmbilFoto.addEventListener('click', () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
     
     const dataUrl = canvas.toDataURL('image/jpeg');
-    fotoInput.value = dataUrl;
+    fotoInput.value = dataUrl; // Simpan teks gambar base64
     
-    video.style.display = 'none';
-    canvas.style.display = 'block';
-    btnAmbilFoto.style.display = 'none';
+    // Tampilkan canvas hasil jepretan, sembunyikan video kamera
+    canvas.style.display = 'block'; 
+    video.style.display = 'none'; 
+    
+    // Tampilkan tombol Foto Ulang, sembunyikan tombol Ambil Foto
     btnFotoUlang.style.display = 'block';
+    btnAmbilFoto.style.display = 'none';
   });
 
+  // C. Tombol Foto Ulang diklik (Reset Kamera)
   btnFotoUlang.addEventListener('click', () => {
+    // Reset input foto dan canvas
     fotoInput.value = "";
-    video.style.display = 'block';
-    canvas.style.display = 'none';
+    
+    // Tampilkan video preview kamera kembali
+    video.style.display = 'block'; 
+    canvas.style.display = 'none'; 
+    
+    // Tampilkan tombol Ambil Foto, sembunyikan tombol Foto Ulang
     btnAmbilFoto.style.display = 'block';
     btnFotoUlang.style.display = 'none';
   });
 
+  // 5. Submit Data ke Google Sheets
   document.getElementById('formPinjam').addEventListener('submit', function(e) {
     e.preventDefault();
     if (!fotoInput.value) { alert("Anda wajib mengambil foto dokumentasi!"); return; }
+    
     const btnSubmit = document.getElementById('btnSubmit');
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "Memproses Peminjaman...";
-    fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
+    btnSubmit.disabled = true; btnSubmit.textContent = "Memproses Peminjaman...";
+
+    const formData = new FormData(this);
+    
+    fetch(scriptUrl, { method: 'POST', body: formData })
       .then(res => res.json())
       .then(res => {
         if (res.status === 'success') {
-          alert("Peminjaman berhasil dicatat!");
-          window.location.reload();
+          alert("Peminjaman berhasil dicatat!"); window.location.reload();
         } else {
           alert("Eror Server: " + res.message);
-          btnSubmit.disabled = false;
-          btnSubmit.textContent = "Kirim Data Peminjaman";
+          btnSubmit.disabled = false; btnSubmit.textContent = "Kirim Data Peminjaman";
         }
       })
       .catch(() => {
-        alert("Terjadi masalah koneksi ke server Google Sheets.");
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = "Kirim Data Peminjaman";
+        alert("Masalah koneksi ke server.");
+        btnSubmit.disabled = false; btnSubmit.textContent = "Kirim Data Peminjaman";
       });
   });
 
