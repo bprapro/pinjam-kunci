@@ -6,14 +6,13 @@
     <title>Sistem Peminjaman Kunci</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Gaya untuk pratinjau kamera */
         #camera-preview {
             width: 100%;
             max-width: 400px;
             height: auto;
             border: 2px solid #ddd;
             border-radius: 8px;
-            display: none; /* Disembunyikan saat awal */
+            display: none;
             margin-bottom: 15px;
         }
         #taken-photo {
@@ -22,11 +21,12 @@
             height: auto;
             border: 2px solid #4caf50;
             border-radius: 8px;
-            display: none; /* Disembunyikan sebelum foto diambil */
+            display: none;
             margin-bottom: 15px;
         }
         .camera-controls {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 15px;
         }
@@ -57,6 +57,13 @@
                 <div class="mb-3">
                     <label class="form-label">Dokumentasi (Ambil Foto Kunci/Peminjam Langsung)</label>
                     
+                    <div id="camera-select-container" class="mb-2" style="max-width: 200px;">
+                        <select id="camera-source" class="form-select form-select-sm">
+                            <option value="environment">Kamera Belakang</option>
+                            <option value="user">Kamera Depan (Selfie)</option>
+                        </select>
+                    </div>
+
                     <video id="camera-preview" autoplay playsinline></video>
                     <img id="taken-photo" alt="Foto yang Diambil">
                     
@@ -67,7 +74,7 @@
                     </div>
                     
                     <input type="hidden" id="foto-data" name="foto-data" required>
-                    <small class="text-muted">Gunakan tombol di atas untuk mengambil foto secara langsung.</small>
+                    <small class="text-muted">Pilih jenis kamera terlebih dahulu, lalu klik Buka Kamera.</small>
                 </div>
                 
                 <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
@@ -76,7 +83,6 @@
     </div>
 
     <script>
-        // TAUTAN GOOGLE APPS SCRIPT ANDA
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
         
         const form = document.getElementById('formPinjam');
@@ -90,10 +96,11 @@
         const takePhotoButton = document.getElementById('take-photo');
         const retakePhotoButton = document.getElementById('retake-photo');
         const fotoDataInput = document.getElementById('foto-data');
+        const cameraSourceSelect = document.getElementById('camera-source');
         
-        let stream; // Untuk menyimpan aliran kamera
+        let stream;
 
-        // Mengambil data kunci saat web dibuka
+        // Ambil data kunci dari Spreadsheet
         window.addEventListener('DOMContentLoaded', () => {
             fetch(scriptURL)
                 .then(response => response.json())
@@ -117,91 +124,80 @@
                 });
         });
 
-        // Logika Kamera
-        
-        // 1. Membuka Kamera
-        startCameraButton.addEventListener('click', async () => {
+        // Fungsi Membuka Kamera Berdasarkan Pilihan (Depan/Belakang)
+        async function openCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            const selectedMode = cameraSourceSelect.value; // Ambil nilai 'user' atau 'environment'
+            
             try {
-                // Minta izin akses kamera belakang (environment)
-                stream = await navigator.mediaDevices.getUserMedia({ video: { faccingMode: "environment" } });
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: { ideal: selectedMode } } 
+                });
                 video.srcObject = stream;
                 
-                // Atur tampilan tombol
                 startCameraButton.style.display = 'none';
                 video.style.display = 'block';
                 takePhotoButton.style.display = 'inline-block';
                 photoPreview.style.display = 'none';
                 retakePhotoButton.style.display = 'none';
-                fotoDataInput.value = ''; // Reset data foto
-                
+                fotoDataInput.value = ''; 
             } catch (error) {
-                alert('Gagal mengakses kamera. Pastikan Anda memberikan izin akses kamera.');
+                alert('Gagal mengakses jenis kamera yang dipilih. Pastikan izin kamera diberikan.');
                 console.error('Error kamera:', error);
+            }
+        }
+
+        // Event handler ketika tombol Buka Kamera diklik
+        startCameraButton.addEventListener('click', openCamera);
+
+        // Jika user mengubah pilihan kamera saat kamera sedang aktif, otomatis muat ulang kameranya
+        cameraSourceSelect.addEventListener('change', () => {
+            if (video.style.display === 'block') {
+                openCamera();
             }
         });
 
-        // 2. Mengambil Foto
+        // Ambil Foto
         takePhotoButton.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Kompresi otomatis (lebar 600px, kualitas 60%) agar hemat penyimpanan Drive
+            // Kompresi otomatis (lebar 600px, kualitas 60%) agar hemat ruang Google Drive
             const max_width = 600;
             const scaleSize = max_width / canvas.width;
             canvas.width = max_width;
             canvas.height = canvas.height * scaleSize;
             
-            // Gambar ulang pada canvas yang lebih kecil
             ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
             
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
             
-            // Tampilkan foto yang diambil dan sembunyikan video
             photoPreview.src = compressedBase64;
             photoPreview.style.display = 'block';
             video.style.display = 'none';
             
-            // Simpan data foto ke input tersembunyi
             fotoDataInput.value = compressedBase64;
             
-            // Atur tampilan tombol
             takePhotoButton.style.display = 'none';
             retakePhotoButton.style.display = 'inline-block';
             
-            // Matikan aliran kamera
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
         });
 
-        // 3. Mengambil Foto Ulang
-        retakePhotoButton.addEventListener('click', async () => {
-            // Membuka kembali kamera (ulangi langkah 1)
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                video.srcObject = stream;
-                
-                startCameraButton.style.display = 'none';
-                video.style.display = 'block';
-                takePhotoButton.style.display = 'inline-block';
-                photoPreview.style.display = 'none';
-                retakePhotoButton.style.display = 'none';
-                fotoDataInput.value = ''; // Reset data foto
-                
-            } catch (error) {
-                alert('Gagal membuka kembali kamera.');
-                console.error('Error kamera ulang:', error);
-            }
-        });
+        // Foto Ulang
+        retakePhotoButton.addEventListener('click', openCamera);
 
-        // Proses Submit Formulir
+        // Submit Form
         form.addEventListener('submit', e => {
             e.preventDefault();
             
-            // Validasi: Pastikan foto sudah diambil
             if (!fotoDataInput.value) {
                 alert('Silakan ambil foto dokumentasi terlebih dahulu.');
                 return;
@@ -214,7 +210,7 @@
             formData.append('nama', document.getElementById('nama').value);
             formData.append('nohp', document.getElementById('nohp').value);
             formData.append('kunci', selectKunci.value);
-            formData.append('foto', fotoDataInput.value); // Data foto dari input tersembunyi
+            formData.append('foto', fotoDataInput.value);
 
             fetch(scriptURL, { 
                 method: 'POST', 
