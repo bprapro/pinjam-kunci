@@ -5,60 +5,138 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Manajemen Kunci Terpadu</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; color: #333; }
-    .container { max-width: 600px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: auto; }
-    .monitor-container { max-width: 1000px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 30px auto; overflow-x: auto; }
+    :root {
+      --primary: #0066cc;
+      --danger: #df2c3e;
+      --success: #22c55e;
+      --dark: #1e293b;
+      --bg-body: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --text-muted: #64748b;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      margin: 0; 
+      padding: 30px 15px;
+      background-color: var(--bg-body); 
+      color: var(--dark); 
+      line-height: 1.5;
+    }
+
+    /* Container Card */
+    .container, .monitor-container { 
+      max-width: 600px; 
+      background: var(--card-bg); 
+      padding: 30px; 
+      border-radius: 16px; 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.03); 
+      margin: 0 auto 30px auto; 
+      border: 1px solid var(--border-color);
+    }
+
+    .monitor-container { 
+      max-width: 1000px; 
+      overflow-x: auto;
+    }
     
-    h2 { text-align: center; margin-top: 0; }
-    h2.pinjam-title { color: #007bff; }
-    h2.kembali-title { color: #dc3545; }
-    h2.monitor-title { color: #232f3e; }
+    h2 { text-align: center; margin-top: 0; font-weight: 700; font-size: 24px; letter-spacing: -0.5px; }
+    h2.pinjam-title { color: var(--primary); }
+    h2.kembali-title { color: var(--danger); }
+    h2.monitor-title { color: var(--dark); margin-bottom: 20px; }
     
-    .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-    .tab-btn { flex: 1; padding: 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: 0.3s; background-color: #e2e8f0; color: #4a5568; }
-    .tab-btn.active-pinjam { background-color: #007bff; color: white; }
-    .tab-btn.active-kembali { background-color: #dc3545; color: white; }
+    /* Segmented Control Tab (ala iOS/Modern SaaS) */
+    .nav-tabs { 
+      display: flex; 
+      background-color: #f1f5f9; 
+      padding: 6px; 
+      border-radius: 12px; 
+      margin-bottom: 30px; 
+      border: 1px solid var(--border-color);
+    }
+    .tab-btn { 
+      flex: 1; 
+      padding: 10px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: all 0.25s ease; 
+      background-color: transparent; 
+      color: var(--text-muted); 
+    }
+    .tab-btn.active-pinjam { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(0,102,204,0.25); }
+    .tab-btn.active-kembali { background-color: var(--danger); color: white; box-shadow: 0 4px 12px rgba(223,44,62,0.25); }
     
     .form-section { display: none; }
     .form-section.active { display: block; }
     
-    .success-screen { display: none; text-align: center; padding: 40px 20px; }
-    .success-screen h3 { color: #28a745; font-size: 26px; margin-bottom: 10px; }
-    .success-screen p { color: #555; font-size: 16px; margin-bottom: 20px; }
-    .btn-kembali-form { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; display: inline-block; }
+    /* Layar Sukses / Terima Kasih */
+    .success-screen { display: none; text-align: center; padding: 20px 10px; }
+    .success-screen h3 { color: var(--success); font-size: 28px; margin-bottom: 12px; font-weight: 700; }
+    .success-screen p { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; }
     
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    /* Form & Input Fields */
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #334155; }
+    input, select, button { 
+      width: 100%; 
+      padding: 12px 16px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 8px; 
+      box-sizing: border-box; 
+      font-size: 15px;
+      transition: all 0.2s;
+      background-color: #f8fafc;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgba(0,102,204,0.1);
+    }
     
-    .btn-submit-pinjam { background-color: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
-    .btn-submit-pinjam:hover { background-color: #0056b3; }
-    .btn-submit-kembali { background-color: #dc3545; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
-    .btn-submit-kembali:hover { background-color: #bd2130; }
+    /* Tombol Aksi */
+    .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form { 
+      border: none; font-size: 15px; cursor: pointer; font-weight: 600; padding: 14px; border-radius: 8px; transition: opacity 0.2s;
+    }
+    .btn-submit-pinjam { background-color: var(--primary); color: white; }
+    .btn-submit-kembali { background-color: var(--danger); color: white; }
+    .btn-kembali-form { background-color: #64748b; color: white; width: auto; display: inline-block; padding: 12px 24px; }
+    .btn-submit-pinjam:hover, .btn-submit-kembali:hover, .btn-kembali-form:hover { opacity: 0.9; }
     
-    .filter-row { display: flex; gap: 10px; margin-bottom: 8px; }
-    .filter-row select { flex: 1; background-color: #f8f9fa; }
-    .search-box { margin-bottom: 8px; background-color: #fff; font-weight: 500; }
+    .filter-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .search-box { margin-bottom: 10px; background-color: #fff; }
     
-    video, canvas { display: none; width: 100%; max-width: 450px; border-radius: 4px; background: #222; margin: 10px auto 0 auto; }
-    .foto-container { text-align: center; margin-top: 10px; }
-    
-    .btn-buka-cam { background-color: #28a745; color: white; margin-top: 5px; }
-    .btn-ambil-foto { background-color: #007bff; color: white; margin-top: 5px; display: none; }
-    .btn-foto-ulang { background-color: #6c757d; color: white; margin-top: 5px; display: none; }
+    /* Kamera Dokumentasi */
+    video, canvas { display: none; width: 100%; max-width: 100%; border-radius: 12px; background: #0f172a; margin: 12px auto 0 auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .foto-container { text-align: center; margin-top: 10px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+    .btn-buka-cam { background-color: #475569; color: white; border: none; }
+    .btn-buka-cam:hover { background-color: #334155; }
+    .btn-ambil-foto { background-color: var(--success); color: white; border: none; }
+    .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; }
 
+    /* Desain Minimalis Tabel Monitor */
     table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
-    th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-    th { background-color: #232f3e; color: white; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; color: white; display: inline-block; }
-    .bg-dipinjam { background-color: #dc3545; }
-    .btn-refresh { background-color: #4a5568; color: white; padding: 8px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; float: right; width: auto; }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { font-size: 14px; color: #334155; }
     
-    .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; }
-    .btn-page { background-color: #f8f9fa; border: 1px solid #ccc; padding: 6px 12px; font-weight: bold; cursor: pointer; width: auto; border-radius: 4px; }
-    .btn-page:disabled { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
-    #infoHalaman { font-weight: bold; }
-    .hint-text { font-size: 12px; color: #6c757d; margin-top: 4px; display: block; }
+    .badge { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: white; display: inline-block; }
+    .bg-dipinjam { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
+    
+    .btn-refresh { background-color: white; color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; float: right; width: auto; }
+    .btn-refresh:hover { background-color: #f1f5f9; color: var(--dark); }
+    
+    /* Navigasi Paginasi */
+    .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); }
+    .btn-page { background-color: white; border: 1px solid var(--border-color); padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; width: auto; border-radius: 8px; color: #475569; }
+    .btn-page:hover:not(:disabled) { background-color: #f8fafc; border-color: #cbd5e1; }
+    .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
+    #infoHalaman { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .hint-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: block; }
   </style>
 </head>
 <body>
@@ -121,8 +199,8 @@
           <label for="nama_kembali">Nama Pengembali:</label>
           <input type="text" id="nama_kembali" name="nama" list="listPeminjamAktif" required placeholder="Ketik min. 3 huruf nama Anda..." autocomplete="off" oninput="cekMinimalKarakterNama(this.value)">
           <datalist id="listPeminjamAktif"></datalist>
-          <span class="hint-text">Rekomendasi nama otomatis muncul berdasarkan peminjam aktif.</span>
-          <button type="button" id="btnCariKunci" style="background-color: #17a2b8; color:white; margin-top: 8px; font-size: 14px; padding: 8px; cursor:pointer; border:none; border-radius:4px;">🔍 Cari Kunci Saya</button>
+          <span class="hint-text">Rekomendasi nama otomatis muncul berdasarkan daftar peminjam aktif.</span>
+          <button type="button" id="btnCariKunci" style="background-color: #17a2b8; color:white; margin-top: 10px; font-size: 14px; padding: 10px; cursor:pointer; border:none; border-radius:6px; font-weight:600;">🔍 Cari Kunci Saya</button>
         </div>
         <div class="form-group">
           <label for="kunci_kembali">Kunci yang Dikembalikan:</label>
@@ -146,7 +224,7 @@
 
     <div id="screenSukses" class="success-screen">
       <h3>✨ Terima Kasih!</h3>
-      <p id="pesanSukses">Aktivitas penyerahan kunci Anda telah berhasil direkam oleh sistem.</p>
+      <p id="pesanSukses">Aktivitas Anda telah berhasil direkam ke dalam sistem database.</p>
       <button type="button" class="btn-kembali-form" onclick="resetKeHalamanForm()">Kembali ke Formulir</button>
     </div>
   </div>
@@ -168,7 +246,7 @@
       </thead>
       <tbody id="bodyTabel">
         <tr>
-          <td colspan="7" style="text-align: center; padding: 20px;">Memuat status transaksi aktif...</td>
+          <td colspan="7" style="text-align: center; padding: 25px;">Memuat status transaksi aktif...</td>
         </tr>
       </tbody>
     </table>
@@ -244,6 +322,7 @@
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
+        // HANYA menampilkan status kunci yang sedang "Dipinjam"
         dataMonitorTerpinjam = data.filter(item => item.status === "Dipinjam");
         halamanSekarang = 1;
         tampilkanHalamanMonitor();
@@ -262,7 +341,7 @@
     const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
     if (dataHalamanIni.length === 0) {
-      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: #28a745; font-weight: bold; padding: 25px;">✅ Seluruh kunci saat ini berada di rak (Tidak ada yang dipinjam).</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--success); font-weight: bold; padding: 25px;">✅ Seluruh kunci saat ini berada di rak (Tidak ada yang dipinjam).</td></tr>';
       document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
       document.getElementById("btnPrev").disabled = true;
       document.getElementById("btnNext").disabled = true;
@@ -271,7 +350,6 @@
 
     dataHalamanIni.forEach(item => {
       const tr = document.createElement("tr");
-      tr.style.backgroundColor = "#fff0f0";
       tr.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
@@ -292,6 +370,7 @@
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
+  // Logika Rekomendasi Auto-complete Nama Minimal 3 Huruf Peminjam Aktif
   function cekMinimalKarakterNama(nilaiInput) {
     const datalist = document.getElementById("listPeminjamAktif");
     datalist.innerHTML = ""; 
@@ -310,6 +389,7 @@
     });
   }
 
+  // Pencarian Kunci Terpinjam Saja Berdasarkan Nama
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const nama = document.getElementById('nama_kembali').value.trim();
     if (!nama) { alert("Masukkan nama Anda!"); return; }
@@ -335,6 +415,7 @@
       });
   });
 
+  // Kamera Engine Universal
   function aturKamera(suffix) {
     const video = document.getElementById('video' + suffix);
     const canvas = document.getElementById('canvas' + suffix);
@@ -395,12 +476,13 @@
             muatKunciTersedia();
             muatMonitorData();
             
+            // Sembunyikan form dan tab navigasi
             document.getElementById('navTabsContainer').style.display = 'none';
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             
             const teksPesan = (konteksAksi === 'pinjam') 
               ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
-              : "Terima Kasih! Kunci telah dikembalikan dan status ruangan telah diperbarui.";
+              : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
             
             document.getElementById('pesanSukses').textContent = teksPesan;
             document.getElementById('screenSukses').style.display = 'block';
@@ -412,11 +494,11 @@
     });
   }
 
-  // UPDATE UTAMA: Mengatur ulang tujuan akhir ke tab pinjam
+  // Kembali ke halaman formulir, selalu dialihkan khusus ke form PINJAM KUNCI
   function resetKeHalamanForm() {
     document.getElementById('screenSukses').style.display = 'none';
     document.getElementById('navTabsContainer').style.display = 'flex';
-    gantiTab('pinjam'); // Otomatis mengarahkan ke tab pinjam kunci
+    gantiTab('pinjam'); 
   }
 
   window.onload = () => {
