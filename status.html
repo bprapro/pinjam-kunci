@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Status Kunci</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .badge-tersedia { bg-color: #d1e7dd; color: #0f5132; }
+        .badge-dipinjam { bg-color: #f8d7da; color: #842029; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container my-5" style="max-width: 800px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📊 Monitor Status Kunci</h2>
+            <button onclick="muatStatusKunci()" class="btn btn-outline-primary btn-sm">🔄 Segarkan Data</button>
+        </div>
+
+        <div class="card p-4 shadow-sm bg-white">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID Kunci</th>
+                            <th>Nama Kunci / Ruangan</th>
+                            <th>Status</th>
+                            <th>Peminjam Saat Ini</th>
+                            <th>Estimasi Pengembalian</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-status">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Memuat data status kunci...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 gap-2 d-flex justify-content-center">
+            <a href="index.html" class="btn btn-primary btn-sm">🔑 Form Peminjaman</a>
+            <a href="kembali.html" class="btn btn-danger btn-sm">🔄 Form Pengembalian</a>
+        </div>
+    </div>
+
+    <script>
+        // Ganti URL ini dengan URL Web App Google Apps Script Anda jika berbeda
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
+
+        function muatStatusKunci() {
+            const tbody = document.getElementById('tabel-status');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Sedang memperbarui data...</td></tr>';
+
+            fetch(scriptURL + '?aksi=ambil_status_lengkap')
+                .then(response => response.json())
+                .then(data => {
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada data kunci terdaftar.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        
+                        // Set warna badge berdasarkan ketersediaan
+                        let badgeClass = item.status === 'Tersedia' ? 'badge bg-success' : 'badge bg-danger';
+                        let rowPeminjam = item.peminjam;
+                        let rowEstimasi = item.estimasi;
+
+                        tr.innerHTML = `
+                            <td><strong>${item.id}</strong></td>
+                            <td>${item.nama}</td>
+                            <td><span class="${badgeClass}">${item.status}</span></td>
+                            <td class="${item.status === 'Dipinjam' ? 'fw-bold text-secondary' : 'text-muted'}">${rowPeminjam}</td>
+                            <td class="${item.status === 'Dipinjam' ? 'text-danger fw-bold' : 'text-muted'}">${rowEstimasi}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data dari server Google Sheets.</td></tr>';
+                });
+        }
+
+        // Jalankan otomatis saat halaman pertama kali dibuka
+        window.addEventListener('DOMContentLoaded', muatStatusKunci);
+    </script>
+</body>
+</html>
