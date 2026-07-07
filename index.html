@@ -351,11 +351,14 @@
     }
   }
 
+  // DIUBAH: Menggunakan 'ambil_status_lengkap' agar sesuai dengan Code.gs baru
   function muatKunciTersedia() {
-    fetch(`${scriptUrl}?aksi=ambil_tersedia`)
+    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        semuaDataKunci = data;
+        // Saring hanya yang berstatus "Tersedia" untuk menu dropdown formulir peminjaman
+        semuaDataKunci = data.filter(k => k.status.toLowerCase() === 'tersedia');
+        
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
         
