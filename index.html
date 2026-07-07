@@ -1,22 +1,149 @@
-function ambilKunci() {
-  const url = "URL_WEB_APP_APPS_SCRIPT_ANDA?aksi=ambil_tersedia";
-  
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const selectKunci = document.getElementById("kunci");
-      selectKunci.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
-      
-      data.forEach(kunci => {
-        const option = document.createElement("option");
-        option.value = kunci.id;
-        // Menampilkan ID, Nama, Lantai, dan Zona sekaligus di pilihan drop-down
-        option.textContent = `${kunci.id} - ${kunci.nama} [${kunci.lantai} - ${kunci.zona}]`;
-        selectKunci.appendChild(option);
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir Peminjaman Kunci</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+    .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: auto; }
+    h2 { color: #007bff; text-align: center; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { background-color: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
+    button:hover { background-color: #0056b3; }
+    #canvas { display: none; width: 100%; max-width: 400px; border-radius: 4px; margin-top: 10px; }
+    #video { width: 100%; max-width: 400px; border-radius: 4px; background: #222; }
+    .foto-container { text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🔑 Formulir Peminjaman Kunci</h2>
+  <form id="formPinjam">
+    <input type="hidden" name="aksi" value="pinjam">
+    
+    <div class="form-group">
+      <label for="nama">Nama Peminjam:</label>
+      <input type="text" id="nama" name="nama" required placeholder="Masukkan nama lengkap">
+    </div>
+
+    <div class="form-group">
+      <label for="nohp">Nomor HP (WhatsApp):</label>
+      <input type="tel" id="nohp" name="nohp" required placeholder="Contoh: 08123456789">
+    </div>
+
+    <div class="form-group">
+      <label for="kunci">Pilih Kunci / Ruangan:</label>
+      <select id="kunci" name="kunci" required>
+        <option value="">-- Memuat data kunci... --</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="estimasi_tgl">Estimasi Tanggal Pengembalian:</label>
+      <input type="date" id="estimasi_tgl" name="estimasi_tgl" required>
+    </div>
+
+    <div class="form-group foto-container">
+      <label>Dokumentasi Foto Ambil Kunci:</label>
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+      <button type="button" id="btnAmbilFoto" style="background-color: #28a745; margin-top: 5px;">📸 Ambil Foto</button>
+      <button type="button" id="btnFotoUlang" style="background-color: #6c757d; margin-top: 5px; display: none;">🔄 Foto Ulang</button>
+      <input type="hidden" id="foto" name="foto" required>
+    </div>
+
+    <button type="submit" id="btnSubmit" style="margin-top: 15px;">Kirim Data Peminjaman</button>
+  </form>
+</div>
+
+<script>
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const fotoInput = document.getElementById('foto');
+  const btnAmbilFoto = document.getElementById('btnAmbilFoto');
+  const btnFotoUlang = document.getElementById('btnFotoUlang');
+
+  // 1. Ambil Kunci Tersedia Secara Otomatis
+  function muatKunciTersedia() {
+    fetch(`${scriptUrl}?aksi=ambil_tersedia`)
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById("kunci");
+        select.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
+        data.forEach(k => {
+          const opt = document.createElement("option");
+          opt.value = k.id;
+          opt.textContent = `${k.id} - ${k.nama} [${k.lantai} - ${k.zona}]`;
+          select.appendChild(opt);
+        });
+      })
+      .catch(() => alert("Gagal mengambil data list kunci dari server."));
+  }
+
+  // 2. Akses Kamera Berjalan Otomatis
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(stream => { video.srcObject = stream; })
+    .catch(() => alert("Gagal mengakses kamera. Pastikan izin kamera aktif."));
+
+  // 3. Logika Ambil Foto Jepretan Canvas
+  btnAmbilFoto.addEventListener('click', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    const dataUrl = canvas.toDataURL('image/jpeg');
+    fotoInput.value = dataUrl;
+    
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+    btnAmbilFoto.style.display = 'none';
+    btnFotoUlang.style.display = 'block';
+  });
+
+  btnFotoUlang.addEventListener('click', () => {
+    fotoInput.value = "";
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    btnAmbilFoto.style.display = 'block';
+    btnFotoUlang.style.display = 'none';
+  });
+
+  // 4. Submit Data ke Google Sheets via Fetch POST API
+  document.getElementById('formPinjam').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!fotoInput.value) { alert("Anda wajib mengambil foto dokumentasi!"); return; }
+    
+    const btnSubmit = document.getElementById('btnSubmit');
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Memproses Peminjaman...";
+
+    const formData = new FormData(this);
+    
+    fetch(scriptUrl, { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === 'success') {
+          alert("Peminjaman berhasil dicatat!");
+          window.location.reload();
+        } else {
+          alert("Eror Server: " + res.message);
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = "Kirim Data Peminjaman";
+        }
+      })
+      .catch(() => {
+        alert("Terjadi masalah koneksi ke server Google Sheets.");
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Kirim Data Peminjaman";
       });
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("Gagal mengambil data kunci tersedia.");
-    });
-}
+  });
+
+  window.onload = muatKunciTersedia;
+</script>
+</body>
+</html>
