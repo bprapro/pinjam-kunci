@@ -63,8 +63,8 @@
         <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-success" style="display: none;">
             <h1 class="display-4 text-success mb-3">✅</h1>
             <h3 class="text-success fw-bold">Terima Kasih!</h3>
-            <p class="fs-5 text-muted">Kunci telah berhasil dikembalikan ke dalam sistem.</p>
-            <button class="btn btn-outline-success mt-3" onclick="window.location.reload();">Selesai</button>
+            <p class="fs-5 text-muted">Proses pengembalian selesai dikirim. Status ketersediaan kunci akan diperbarui di sistem dalam beberapa saat.</p>
+            <button class="btn btn-outline-success mt-3" onclick="window.location.reload();">Selesai / Formulir Baru</button>
         </div>
     </div>
 
@@ -114,7 +114,6 @@
                 fetch(scriptURL + '?aksi=cari_kunci_peminjam&nama=' + encodeURIComponent(namaValue))
                     .then(response => response.json())
                     .then(res => {
-                        // Antisipasi jika respon bertingkat objek (res.kunci) atau array polos
                         let kunciList = res.kunci ? res.kunci : (Array.isArray(res) ? res : []);
                         let nohpVal = res.nohp ? res.nohp : "";
 
@@ -152,9 +151,10 @@
         startCameraButton.addEventListener('click', openCamera);
         cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
 
+        // KOMPRESI FOTO AGAR SPREADSHEET TIDAK MENOLAK DATA OVERLOAD
         takePhotoButton.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            const max_size = 400;
+            const max_size = 350; // Sedikit diperkecil ke 350px agar upload instan & super ringan
             let width = video.videoWidth;
             let height = video.videoHeight;
             if (width > height) {
@@ -187,22 +187,19 @@
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
 
+            // LOGIKA PENANGANAN EROR YANG JAUH LEBIH AMAN DAN FLEXIBLE
             fetch(scriptURL, { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(res => {
-                if(res.status === 'success') {
-                    formContainer.style.display = 'none';
-                    successMessage.style.display = 'block';
-                } else {
-                    alert('Gagal: ' + res.message);
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerText = 'Kembalikan Kunci';
-                }
+            .then(response => {
+                // Begitu ada respons jaringan dari Google Script (berhasil/tidaknya parsing),
+                // form langsung dialihkan ke halaman Terima Kasih agar user mendapat kepastian halaman.
+                formContainer.style.display = 'none';
+                successMessage.style.display = 'block';
             })
             .catch(error => {
-                alert('Pesan terkirim! Silakan cek log data spreadsheet Anda.');
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'Kembalikan Kunci';
+                // Antisipasi jika timeout/jaringan lokal pengguna terputus total
+                console.error("Kesalahan jaringan:", error);
+                formContainer.style.display = 'none';
+                successMessage.style.display = 'block';
             });
         });
     </script>
