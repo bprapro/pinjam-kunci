@@ -1,91 +1,63 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Status Kunci</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .badge-tersedia { bg-color: #d1e7dd; color: #0f5132; }
-        .badge-dipinjam { bg-color: #f8d7da; color: #842029; }
-    </style>
-</head>
-<body class="bg-light">
-    <div class="container my-5" style="max-width: 800px;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>📊 Monitor Status Kunci</h2>
-            <button onclick="muatStatusKunci()" class="btn btn-outline-primary btn-sm">🔄 Segarkan Data</button>
-        </div>
+<table id="tabelStatus" border="1" style="border-collapse: collapse; width: 100%; text-align: left;">
+  <thead>
+    <tr style="background-color: #222; color: white;">
+      <th>ID Kunci</th>
+      <th>Nama Kunci / Ruangan</th>
+      <th>Lantai</th>
+      <th>Zona</th>
+      <th>Status</th>
+      <th>Peminjam Saat Ini</th>
+      <th>Estimasi Pengembalian</th>
+    </tr>
+  </thead>
+  <tbody id="bodyTabel">
+    </tbody>
+</table>
 
-        <div class="card p-4 shadow-sm bg-white">
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Kunci</th>
-                            <th>Nama Kunci / Ruangan</th>
-                            <th>Status</th>
-                            <th>Peminjam Saat Ini</th>
-                            <th>Estimasi Pengembalian</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-status">
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">Memuat data status kunci...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="text-center mt-4 gap-2 d-flex justify-content-center">
-            <a href="index.html" class="btn btn-primary btn-sm">🔑 Form Peminjaman</a>
-            <a href="kembali.html" class="btn btn-danger btn-sm">🔄 Form Pengembalian</a>
-        </div>
-    </div>
-
-    <script>
-        // Ganti URL ini dengan URL Web App Google Apps Script Anda jika berbeda
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
-
-        function muatStatusKunci() {
-            const tbody = document.getElementById('tabel-status');
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Sedang memperbarui data...</td></tr>';
-
-            fetch(scriptURL + '?aksi=ambil_status_lengkap')
-                .then(response => response.json())
-                .then(data => {
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada data kunci terdaftar.</td></tr>';
-                        return;
-                    }
-
-                    data.forEach(item => {
-                        const tr = document.createElement('tr');
-                        
-                        // Set warna badge berdasarkan ketersediaan
-                        let badgeClass = item.status === 'Tersedia' ? 'badge bg-success' : 'badge bg-danger';
-                        let rowPeminjam = item.peminjam;
-                        let rowEstimasi = item.estimasi;
-
-                        tr.innerHTML = `
-                            <td><strong>${item.id}</strong></td>
-                            <td>${item.nama}</td>
-                            <td><span class="${badgeClass}">${item.status}</span></td>
-                            <td class="${item.status === 'Dipinjam' ? 'fw-bold text-secondary' : 'text-muted'}">${rowPeminjam}</td>
-                            <td class="${item.status === 'Dipinjam' ? 'text-danger fw-bold' : 'text-muted'}">${rowEstimasi}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(error => {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data dari server Google Sheets.</td></tr>';
-                });
+<script>
+function muatDataMonitor() {
+  const url = "URL_WEB_APP_APPS_SCRIPT_ANDA?aksi=ambil_status_lengkap";
+  const bodyTabel = document.getElementById("bodyTabel");
+  
+  bodyTabel.innerHTML = '<tr><td colspan="7" style="text-align:center;">Memuat data dari server...</td></tr>';
+  
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      bodyTabel.innerHTML = "";
+      if(data.length === 0) {
+        bodyTabel.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data kunci.</td></tr>';
+        return;
+      }
+      
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        
+        // Atur warna background baris berdasarkan statusnya
+        if (item.status === "Dipinjam") {
+          row.style.backgroundColor = "#ffe6e6"; // Merah muda jika dipinjam
+        } else {
+          row.style.backgroundColor = "#e6ffe6"; // Hijau muda jika tersedia
         }
+        
+        row.innerHTML = `
+          <td><b>${item.id}</b></td>
+          <td>${item.nama}</td>
+          <td>${item.lantai}</td>
+          <td>${item.zona}</td>
+          <td><span style="padding:4px 8px; border-radius:4px; font-weight:bold; color:white; background-color:${item.status === 'Dipinjam' ? '#d9534f' : '#5cb85c'}">${item.status}</span></td>
+          <td>${item.peminjam}</td>
+          <td>${item.estimasi}</td>
+        `;
+        bodyTabel.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      bodyTabel.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red; font-weight:bold;">Gagal memuat data dari server Google Sheets.</td></tr>';
+    });
+}
 
-        // Jalankan otomatis saat halaman pertama kali dibuka
-        window.addEventListener('DOMContentLoaded', muatStatusKunci);
-    </script>
-</body>
-</html>
+// Jalankan otomatis saat halaman dibuka
+window.onload = muatDataMonitor;
+</script>
