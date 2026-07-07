@@ -6,30 +6,10 @@
     <title>Sistem Peminjaman Kunci</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        #camera-preview {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            display: none;
-            margin-bottom: 15px;
-        }
-        #taken-photo {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            border: 2px solid #4caf50;
-            border-radius: 8px;
-            display: none;
-            margin-bottom: 15px;
-        }
-        .camera-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+        #camera-preview, #taken-photo { width: 100%; max-width: 400px; height: auto; border-radius: 8px; display: none; margin-bottom: 15px; }
+        #camera-preview { border: 2px solid #ddd; }
+        #taken-photo { border: 2px solid #4caf50; }
+        .camera-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
     </style>
 </head>
 <body class="bg-light">
@@ -48,6 +28,17 @@
                     <input type="tel" id="nohp" class="form-control" required placeholder="Contoh: 08123456789">
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Estimasi Durasi Peminjaman</label>
+                    <select id="durasi" class="form-select" required>
+                        <option value="">-- Pilih Durasi --</option>
+                        <option value="1 Jam">1 Jam</option>
+                        <option value="2 Jam">2 Jam</option>
+                        <option value="半 Hari (Aktivitas Kerja)">Setengah Hari</option>
+                        <option value="1 Hari penuh">1 Hari penuh</option>
+                        <option value="Lainnya / Hingga Selesai">Hingga Selesai Aktivitas</option>
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Pilih Kunci</label>
                     <select id="kunci" class="form-select" required>
                         <option value="">Memuat daftar kunci...</option>
@@ -56,25 +47,20 @@
                 
                 <div class="mb-3">
                     <label class="form-label">Dokumentasi (Ambil Foto Kunci/Peminjam Langsung)</label>
-                    
                     <div id="camera-select-container" class="mb-2" style="max-width: 200px;">
                         <select id="camera-source" class="form-select form-select-sm">
                             <option value="environment">Kamera Belakang</option>
                             <option value="user">Kamera Depan (Selfie)</option>
                         </select>
                     </div>
-
                     <video id="camera-preview" autoplay playsinline></video>
                     <img id="taken-photo" alt="Foto yang Diambil">
-                    
                     <div class="camera-controls">
                         <button type="button" id="start-camera" class="btn btn-outline-primary btn-sm">Buka Kamera</button>
                         <button type="button" id="take-photo" class="btn btn-primary btn-sm" style="display: none;">Ambil Foto</button>
                         <button type="button" id="retake-photo" class="btn btn-outline-secondary btn-sm" style="display: none;">Foto Ulang</button>
                     </div>
-                    
-                    <input type="hidden" id="foto-data" name="foto-data" required>
-                    <small class="text-muted">Pilih jenis kamera terlebih dahulu, lalu klik Buka Kamera.</small>
+                    <input type="hidden" id="foto-data" required>
                 </div>
                 
                 <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
@@ -92,7 +78,6 @@
         const form = document.getElementById('formPinjam');
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
-        
         const video = document.getElementById('camera-preview');
         const photoPreview = document.getElementById('taken-photo');
         const startCameraButton = document.getElementById('start-camera');
@@ -100,11 +85,10 @@
         const retakePhotoButton = document.getElementById('retake-photo');
         const fotoDataInput = document.getElementById('foto-data');
         const cameraSourceSelect = document.getElementById('camera-source');
-        
         let stream;
 
         window.addEventListener('DOMContentLoaded', () => {
-            fetch(scriptURL)
+            fetch(scriptURL + '?aksi=ambil_tersedia')
                 .then(response => response.json())
                 .then(data => {
                     selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
@@ -120,35 +104,30 @@
                     });
                     btnSubmit.disabled = false;
                 })
-                .catch(error => {
-                    selectKunci.innerHTML = '<option value="">Gagal memuat data kunci</option>';
-                    console.error('Error memuat kunci:', error);
-                });
+                .catch(error => { selectKunci.innerHTML = '<option value="">Gagal memuat data kunci</option>'; });
         });
 
         async function openCamera() {
             if (stream) { stream.getTracks().forEach(track => track.stop()); }
-            const selectedMode = cameraSourceSelect.value;
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: selectedMode } } });
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cameraSourceSelect.value } } });
                 video.srcObject = stream;
-                startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = ''; 
+                startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = '';
             } catch (error) { alert('Gagal mengakses kamera.'); }
         }
 
         startCameraButton.addEventListener('click', openCamera);
-        cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') { openCamera(); } });
+        cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
 
         takePhotoButton.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            canvas.width = 600;
-            canvas.height = (video.videoHeight / video.videoWidth) * 600;
+            canvas.width = 600; canvas.height = (video.videoHeight / video.videoWidth) * 600;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
             photoPreview.src = compressedBase64; photoPreview.style.display = 'block'; video.style.display = 'none';
             fotoDataInput.value = compressedBase64; takePhotoButton.style.display = 'none'; retakePhotoButton.style.display = 'inline-block';
-            if (stream) { stream.getTracks().forEach(track => track.stop()); }
+            if (stream) stream.getTracks().forEach(track => track.stop());
         });
 
         retakePhotoButton.addEventListener('click', openCamera);
@@ -156,17 +135,23 @@
         form.addEventListener('submit', e => {
             e.preventDefault();
             if (!fotoDataInput.value) { alert('Silakan ambil foto dokumentasi terlebih dahulu.'); return; }
-            btnSubmit.disabled = true; btnSubmit.innerText = 'Mengompres Gambar & Menyimpan...';
+            btnSubmit.disabled = true; btnSubmit.innerText = 'Menyimpan...';
+            
             const formData = new FormData();
+            formData.append('aksi', 'pinjam');
             formData.append('nama', document.getElementById('nama').value);
             formData.append('nohp', document.getElementById('nohp').value);
+            formData.append('durasi', document.getElementById('durasi').value);
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
+
             fetch(scriptURL, { method: 'POST', body: formData })
             .then(response => response.json())
             .then(res => {
-                if(res.status === 'success') { alert('Peminjaman Berhasil!'); window.location.reload(); }
-                else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; }
+                if(res.status === 'success') { 
+                    alert('Peminjaman Berhasil Dicatat! Terima kasih.'); 
+                    window.location.reload(); 
+                } else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; }
             })
             .catch(error => { alert('Error: ' + error.message); btnSubmit.disabled = false; });
         });
