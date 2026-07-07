@@ -20,18 +20,19 @@
             <h4 class="card-title mb-3 text-danger">Formulir Pengembalian</h4>
             <form id="formKembali">
                 <div class="mb-3">
-                    <label class="form-label">Nama Pengembali (Sesuai Saat Meminjam)</label>
-                    <input type="text" id="nama" class="form-control" required placeholder="Ketik nama Anda untuk mencari kunci">
-                    <small class="text-muted">Kunci yang Anda pinjam akan muncul otomatis setelah Anda mengetik nama.</small>
+                    <label class="form-label">Nama Pengembali (Ketik min. 3 huruf awal)</label>
+                    <input type="text" id="nama" class="form-control" autocomplete="off" list="list-peminjam" required placeholder="Masukkan nama Anda...">
+                    <datalist id="list-peminjam">
+                        </datalist>
+                    <small class="text-muted">Rekomendasi nama akan muncul otomatis setelah Anda mengetik 3 huruf.</small>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Nomor HP (WhatsApp)</label>
-                    <input type="tel" id="nohp" class="form-control" required placeholder="Contoh: 08123456789">
-                </div>
+
+                <input type="hidden" id="nohp">
+
                 <div class="mb-3">
                     <label class="form-label">Pilih Kunci yang Dikembalikan</label>
                     <select id="kunci" class="form-select" required disabled>
-                        <option value="">Silakan ketik nama terlebih dahulu...</option>
+                        <option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>
                     </select>
                 </div>
                 
@@ -77,6 +78,8 @@
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
         const inputNama = document.getElementById('nama');
+        const inputNoHP = document.getElementById('nohp');
+        const datalistPeminjam = document.getElementById('list-peminjam');
         
         const video = document.getElementById('camera-preview');
         const photoPreview = document.getElementById('taken-photo');
@@ -86,41 +89,59 @@
         const fotoDataInput = document.getElementById('foto-data');
         const cameraSourceSelect = document.getElementById('camera-source');
         let stream;
+        let semuaPeminjam = [];
 
-        // Mendeteksi ketikan pada input Nama (Debounce pencarian kunci)
-        let timerCari;
+        // Muat semua nama peminjam aktif saat halaman dibuka untuk pencarian cepat
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(scriptURL + '?aksi=ambil_semua_peminjam')
+                .then(response => response.json())
+                .then(data => {
+                    semuaPeminjam = data;
+                })
+                .catch(err => console.error("Gagal memuat rekomendasi nama"));
+        });
+
+        // Pantau input nama (Membuat rekomendasi list & mengambil data kunci)
         inputNama.addEventListener('input', () => {
-            clearTimeout(timerCari);
-            selectKunci.innerHTML = '<option value="">Mencari kunci yang Anda pinjam...</option>';
-            selectKunci.disabled = true;
-            btnSubmit.disabled = true;
+            var namaValue = inputNama.value.trim();
+            datalistPeminjam.innerHTML = ''; // Bersihkan list rekomendasi lama
+            
+            // 1. BUAT REKOMENDASI JIKA MINIMAL 3 HURUF TERCAPAI
+            if (namaValue.length >= 3) {
+                var filterNama = semuaPeminjam.filter(nama => nama.toLowerCase().includes(namaValue.toLowerCase()));
+                filterNama.forEach(nama => {
+                    const option = document.createElement('option');
+                    option.value = nama;
+                    datalistPeminjam.appendChild(option);
+                });
+            }
 
-            timerCari = setTimeout(() => {
-                var namaValue = inputNama.value.trim();
-                if(namaValue.length < 2) {
-                    selectKunci.innerHTML = '<option value="">Silakan ketik nama terlebih dahulu...</option>';
-                    return;
-                }
-                
+            // 2. JIKA NAMA YANG DIKETIK COCOK DENGAN DAFTAR, CARI KUNCINYA
+            if (semuaPeminjam.includes(namaValue)) {
+                selectKunci.innerHTML = '<option value="">Mencari kunci milik ' + namaValue + '...</option>';
                 fetch(scriptURL + '?aksi=cari_kunci_peminjam&nama=' + encodeURIComponent(namaValue))
                     .then(response => response.json())
-                    .then(data => {
-                        if (data.length === 0) {
-                            selectKunci.innerHTML = '<option value="">Nama tidak ditemukan atau tidak ada kunci aktif</option>';
-                        } else {
+                    .then(res => {
+                        if (res.kunci && res.kunci.length > 0) {
                             selectKunci.innerHTML = '<option value="">-- Pilih Kunci yang Dikembalikan --</option>';
-                            data.forEach(kunci => {
+                            res.kunci.forEach(kunci => {
                                 const option = document.createElement('option');
                                 option.value = kunci.id;
                                 option.textContent = kunci.nama;
                                 selectKunci.appendChild(option);
                             });
                             selectKunci.disabled = false;
+                            inputNoHP.value = res.nohp; // Salin nomor HP peminjam secara otomatis ke input tersembunyi
                             btnSubmit.disabled = false;
+                        } else {
+                            selectKunci.innerHTML = '<option value="">Tidak ada kunci aktif untuk nama ini</option>';
                         }
-                    })
-                    .catch(error => { selectKunci.innerHTML = '<option value="">Gagal mencari data kunci</option>'; });
-            }, 800); // Mencari otomatis 0.8 detik setelah user berhenti mengetik
+                    });
+            } else {
+                selectKunci.innerHTML = '<option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>';
+                selectKunci.disabled = true;
+                btnSubmit.disabled = true;
+            }
         });
 
         async function openCamera() {
@@ -158,7 +179,7 @@
             const formData = new FormData();
             formData.append('aksi', 'kembali'); 
             formData.append('nama', inputNama.value);
-            formData.append('nohp', document.getElementById('nohp').value);
+            formData.append('nohp', inputNoHP.value); // Mengirim nomor HP peminjaman lama
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
 
@@ -166,7 +187,6 @@
             .then(response => response.json())
             .then(res => {
                 if(res.status === 'success') {
-                    // SELESAI INPUT: Sembunyikan form dan tampilkan Ucapan Terima Kasih secara interaktif
                     formContainer.style.display = 'none';
                     successMessage.style.display = 'block';
                 } else {
