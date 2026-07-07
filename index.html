@@ -16,6 +16,11 @@
     <div class="container my-5" style="max-width: 600px;">
         <h2 class="text-center mb-4">🔑 Sistem Peminjaman Kunci</h2>
         
+        <div class="d-flex gap-2 justify-content-center mb-4">
+            <a href="status.html" class="btn btn-info text-white fw-bold shadow-sm w-50">📊 Cek Status Ketersediaan</a>
+            <a href="kembali.html" class="btn btn-outline-danger fw-bold shadow-sm w-50">🔄 Menu Pengembalian</a>
+        </div>
+
         <div class="card p-4 shadow-sm mb-4" id="formContainer">
             <h4 class="card-title mb-3">Formulir Peminjaman</h4>
             <form id="formPinjam">
@@ -58,17 +63,13 @@
                 </div>
                 
                 <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
-                
-                <div class="text-center mt-3">
-                    <a href="kembali.html" class="text-decoration-none text-danger fw-bold">🔄 Ingin mengembalikan kunci? Klik di sini</a>
-                </div>
             </form>
         </div>
 
         <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-primary" style="display: none;">
             <h1 class="display-4 text-primary mb-3">✅</h1>
             <h3 class="text-primary fw-bold">Peminjaman Berhasil!</h3>
-            <p class="fs-5 text-muted">Data peminjam dan dokumentasi telah berhasil dicatat ke dalam sistem.</p>
+            <p class="fs-5 text-muted">Data peminjam dan documentation telah berhasil dicatat ke dalam sistem.</p>
             <p class="text-muted small">Sistem pengingat otomatis telah diaktifkan untuk estimasi tanggal pengembalian yang Anda pilih.</p>
             <button class="btn btn-outline-primary mt-3" onclick="window.location.reload();">Selesai / Formulir Baru</button>
         </div>
@@ -158,7 +159,6 @@
             .then(response => response.json())
             .then(res => {
                 if(res.status === 'success') { 
-                    // SELESAI INPUT: Sembunyikan form dan tampilkan kotak Ucapan Terima Kasih secara interaktif
                     formContainer.style.display = 'none';
                     successMessage.style.display = 'block';
                 } else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; }
@@ -166,5 +166,3 @@
             .catch(error => { alert('Error: ' + error.message); btnSubmit.disabled = false; });
         });
     </script>
-</body>
-</html>
