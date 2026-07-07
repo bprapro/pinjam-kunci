@@ -292,18 +292,15 @@
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
-  // LOGIKA BARU: Rekomendasi nama otomatis saat mengetik minimal 3 huruf
   function cekMinimalKarakterNama(nilaiInput) {
     const datalist = document.getElementById("listPeminjamAktif");
-    datalist.innerHTML = ""; // Bersihkan list setiap mengetik
+    datalist.innerHTML = ""; 
     
     const teksCari = nilaiInput.trim().toLowerCase();
-    if (teksCari.length < 3) return; // Jalankan filter hanya jika sudah mengetik minimal 3 huruf
+    if (teksCari.length < 3) return; 
 
-    // Ambil daftar nama unik dari dataMonitorTerpinjam (yang statusnya sedang meminjam kunci)
     const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
     
-    // Saring nama yang cocok dengan ketikan user
     listNamaUnik.forEach(nama => {
       if (nama.toLowerCase().includes(teksCari)) {
         const option = document.createElement("option");
@@ -313,7 +310,6 @@
     });
   }
 
-  // Cari Kunci Aktif Pengembali
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const nama = document.getElementById('nama_kembali').value.trim();
     if (!nama) { alert("Masukkan nama Anda!"); return; }
@@ -339,7 +335,6 @@
       });
   });
 
-  // Kamera Universal
   function aturKamera(suffix) {
     const video = document.getElementById('video' + suffix);
     const canvas = document.getElementById('canvas' + suffix);
@@ -417,10 +412,11 @@
     });
   }
 
+  // UPDATE UTAMA: Mengatur ulang tujuan akhir ke tab pinjam
   function resetKeHalamanForm() {
     document.getElementById('screenSukses').style.display = 'none';
     document.getElementById('navTabsContainer').style.display = 'flex';
-    gantiTab(tabAktifSekarang);
+    gantiTab('pinjam'); // Otomatis mengarahkan ke tab pinjam kunci
   }
 
   window.onload = () => {
