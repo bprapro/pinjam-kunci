@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Peminjaman Kunci</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container my-5" style="max-width: 600px;">
+        <h2 class="text-center mb-4">🔑 Sistem Peminjaman Kunci</h2>
+        
+        <div class="card p-4 shadow-sm mb-4">
+            <h4 class="card-title mb-3">Formulir Peminjaman</h4>
+            <form id="formPinjam">
+                <div class="mb-3">
+                    <label class="form-label">Nama Peminjam</label>
+                    <input type="text" id="nama" class="form-control" required placeholder="Masukkan nama lengkap Anda">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pilih Kunci</label>
+                    <select id="kunci" class="form-select" required>
+                        <option value="">Memuat daftar kunci...</option>
+                    </select>
+                </div>
+                <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // TAUTKAN GOOGLE SPREADSHEET ANDA DI SINI
+        // Ganti teks di dalam tanda kutip dengan URL Web App dari Langkah 2 Nomor 9
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
+        
+        const form = document.getElementById('formPinjam');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const selectKunci = document.getElementById('kunci');
+
+        // SINKRONISASI OTOMATIS: Mengambil data dari cell Spreadsheet saat web dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(scriptURL)
+                .then(response => response.json())
+                .then(data => {
+                    // Kosongkan indikator memuat data
+                    selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
+                    
+                    if (data.length === 0) {
+                        selectKunci.innerHTML = '<option value="">Semua kunci sedang dipinjam</option>';
+                        return;
+                    }
+
+                    // Memasukkan data kunci aktif dari Google Sheets satu per satu ke dropdown web
+                    data.forEach(kunci => {
+                        const option = document.createElement('option');
+                        option.value = kunci.id;
+                        option.textContent = kunci.nama;
+                        selectKunci.appendChild(option);
+                    });
+
+                    // Aktifkan tombol submit setelah daftar kunci sukses dimuat
+                    btnSubmit.disabled = false;
+                })
+                .catch(error => {
+                    selectKunci.innerHTML = '<option value="">Gagal memuat data kunci</option>';
+                    console.error('Error memuat kunci:', error);
+                });
+        });
+
+        // PROSES PENGIRIMAN DATA: Mengirim formulir saat tombol diklik
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            // Beri feedback visual ke pengguna bahwa data sedang diproses
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'Menyimpan ke Google Sheets...';
+
+            const formData = new FormData();
+            formData.append('nama', document.getElementById('nama').value);
+            formData.append('kunci', selectKunci.value);
+
+            // POST data formulir ke Google Apps Script
+            fetch(scriptURL, { 
+                method: 'POST', 
+                body: formData
+            })
+            .then(response => {
+                alert('Peminjaman berhasil dicatat! Status kunci otomatis diperbarui.');
+                // Refresh halaman web agar pilihan kunci yang baru dipinjam langsung hilang dari daftar
+                window.location.reload();
+            })
+            .catch(error => {
+                alert('Terjadi kesalahan sistem: ' + error.message);
+                console.error('Error!', error.message);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Pinjam Kunci';
+            });
+        });
+    </script>
+</body>
+</html>
