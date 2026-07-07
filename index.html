@@ -3,102 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulir Peminjaman Kunci</title>
+  <title>Sistem Manajemen Kunci 3-in-1</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
-    .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: auto; }
-    h2 { color: #007bff; text-align: center; }
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; color: #333; }
+    .container { max-width: 600px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: auto; }
+    .monitor-container { max-width: 1000px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 30px auto; overflow-x: auto; }
+    
+    h2 { text-align: center; margin-top: 0; }
+    h2.pinjam-title { color: #007bff; }
+    h2.kembali-title { color: #dc3545; }
+    h2.monitor-title { color: #232f3e; }
+    
+    /* Navigasi Tab / Menu */
+    .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+    .tab-btn { flex: 1; padding: 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: 0.3s; background-color: #e2e8f0; color: #4a5568; }
+    .tab-btn.active-pinjam { background-color: #007bff; color: white; }
+    .tab-btn.active-kembali { background-color: #dc3545; color: white; }
+    
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+    
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 5px; font-weight: bold; }
     input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-    button { background-color: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
-    button:hover { background-color: #0056b3; }
+    
+    .btn-submit-pinjam { background-color: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
+    .btn-submit-pinjam:hover { background-color: #0056b3; }
+    .btn-submit-kembali { background-color: #dc3545; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
+    .btn-submit-kembali:hover { background-color: #bd2130; }
     
     .filter-row { display: flex; gap: 10px; margin-bottom: 8px; }
     .filter-row select { flex: 1; background-color: #f8f9fa; }
     .search-box { margin-bottom: 8px; background-color: #fff; font-weight: 500; }
     
-    /* MODIFIKASI: Sembunyikan elemen video kamera secara default di CSS */
-    #video { display: none; width: 100%; max-width: 400px; border-radius: 4px; background: #222; margin-top: 10px; }
-    #canvas { display: none; width: 100%; max-width: 400px; border-radius: 4px; margin-top: 10px; }
+    /* Kamera & Gambar */
+    video, canvas { display: none; width: 100%; max-width: 450px; border-radius: 4px; background: #222; margin: 10px auto 0 auto; }
     .foto-container { text-align: center; margin-top: 10px; }
     
-    /* Tombol Buka Kamera */
-    #btnBukaKamera { background-color: #28a745; margin-top: 5px; }
-    #btnAmbilFoto { background-color: #007bff; margin-top: 5px; display: none; }
-    #btnFotoUlang { background-color: #6c757d; margin-top: 5px; display: none; }
+    .btn-buka-cam { background-color: #28a745; color: white; margin-top: 5px; }
+    .btn-ambil-foto { background-color: #007bff; color: white; margin-top: 5px; display: none; }
+    .btn-foto-ulang { background-color: #6c757d; color: white; margin-top: 5px; display: none; }
+
+    /* Tabel Monitor */
+    table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
+    th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+    th { background-color: #232f3e; color: white; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; color: white; display: inline-block; }
+    .bg-tersedia { background-color: #28a745; }
+    .bg-dipinjam { background-color: #dc3545; }
+    .btn-refresh { background-color: #4a5568; color: white; padding: 8px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; float: right; width: auto; }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>🔑 Formulir Peminjaman Kunci</h2>
-  <form id="formPinjam">
-    <input type="hidden" name="aksi" value="pinjam">
-    
-    <div class="form-group">
-      <label for="nama">Nama Peminjam:</label>
-      <input type="text" id="nama" name="nama" required placeholder="Masukkan nama lengkap">
+  <div class="container">
+    <div class="nav-tabs">
+      <button type="button" id="tabPinjam" class="tab-btn active-pinjam" onclick="gantiTab('pinjam')">🔑 Pinjam Kunci</button>
+      <button type="button" id="tabKembali" class="tab-btn" onclick="gantiTab('kembali')">🔄 Kembalikan Kunci</button>
     </div>
 
-    <div class="form-group">
-      <label for="nohp">Nomor HP (WhatsApp):</label>
-      <input type="tel" id="nohp" name="nohp" required placeholder="Contoh: 08123456789">
+    <div id="sectionPinjam" class="form-section active">
+      <h2 class="pinjam-title">Formulir Peminjaman Kunci</h2>
+      <form id="formPinjam">
+        <input type="hidden" name="aksi" value="pinjam">
+        <div class="form-group">
+          <label for="nama_pinjam">Nama Peminjam:</label>
+          <input type="text" id="nama_pinjam" name="nama" required placeholder="Masukkan nama lengkap">
+        </div>
+        <div class="form-group">
+          <label for="nohp">Nomor HP (WhatsApp):</label>
+          <input type="tel" id="nohp" name="nohp" required placeholder="Contoh: 08123456789">
+        </div>
+        <div class="form-group">
+          <label>Pilih Kunci / Ruangan:</label>
+          <div class="filter-row">
+            <select id="filterLantai" onchange="saringKunci()">
+              <option value="">-- Semua Lantai --</option>
+            </select>
+            <select id="filterZona" onchange="saringKunci()">
+              <option value="">-- Semua Zona --</option>
+            </select>
+          </div>
+          <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
+          <select id="kunci_pinjam" name="kunci" required>
+            <option value="">-- Memuat data kunci... --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="estimasi_tgl">Estimasi Tanggal Pengembalian:</label>
+          <input type="date" id="estimasi_tgl" name="estimasi_tgl" required>
+        </div>
+        <div class="form-group foto-container">
+          <label>Dokumentasi Foto Ambil Kunci:</label>
+          <button type="button" id="btnBukaKameraP" class="btn-buka-cam">📸 Buka Kamera</button>
+          <video id="videoP" autoplay playsinline></video>
+          <canvas id="canvasP"></canvas>
+          <button type="button" id="btnAmbilFotoP" class="btn-ambil-foto">📸 Ambil Foto</button>
+          <button type="button" id="btnFotoUlangP" class="btn-foto-ulang">🔄 Foto Ulang</button>
+          <input type="hidden" id="fotoP" name="foto" required>
+        </div>
+        <button type="submit" id="btnSubmitPinjam" class="btn-submit-pinjam" style="margin-top: 15px;">Kirim Data Peminjaman</button>
+      </form>
     </div>
 
-    <div class="form-group">
-      <label>Pilih Kunci / Ruangan:</label>
-      <div class="filter-row">
-        <select id="filterLantai" onchange="saringKunci()">
-          <option value="">-- Semua Lantai --</option>
-        </select>
-        <select id="filterZona" onchange="saringKunci()">
-          <option value="">-- Semua Zona --</option>
-        </select>
-      </div>
-      <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci untuk mencari...">
-      <select id="kunci" name="kunci" required>
-        <option value="">-- Memuat data kunci... --</option>
-      </select>
+    <div id="sectionKembali" class="form-section">
+      <h2 class="kembali-title">Formulir Pengembalian Kunci</h2>
+      <form id="formKembali">
+        <input type="hidden" name="aksi" value="kembali">
+        <div class="form-group">
+          <label for="nama_kembali">Nama Pengembali:</label>
+          <input type="text" id="nama_kembali" name="nama" required placeholder="Ketik nama saat meminjam" autocomplete="off">
+          <button type="button" id="btnCariKunci" style="background-color: #17a2b8; color:white; margin-top: 5px; font-size: 14px; padding: 6px;">🔍 Cari Kunci Saya</button>
+        </div>
+        <div class="form-group">
+          <label for="kunci_kembali">Kunci yang Dikembalikan:</label>
+          <select id="kunci_kembali" name="kunci" required>
+            <option value="">-- Klik tombol 'Cari Kunci Saya' di atas --</option>
+          </select>
+        </div>
+        <input type="hidden" id="nohp_kembali" name="nohp">
+        <div class="form-group foto-container">
+          <label>Dokumentasi Foto Kembalikan Kunci:</label>
+          <button type="button" id="btnBukaKameraK" class="btn-buka-cam">📸 Buka Kamera</button>
+          <video id="videoK" autoplay playsinline></video>
+          <canvas id="canvasK"></canvas>
+          <button type="button" id="btnAmbilFotoK" class="btn-ambil-foto">📸 Ambil Foto</button>
+          <button type="button" id="btnFotoUlangK" class="btn-foto-ulang">🔄 Foto Ulang</button>
+          <input type="hidden" id="fotoK" name="foto" required>
+        </div>
+        <button type="submit" id="btnSubmitKembali" class="btn-submit-kembali" style="margin-top: 15px;">Proses Pengembalian Kunci</button>
+      </form>
     </div>
+  </div>
 
-    <div class="form-group">
-      <label for="estimasi_tgl">Estimasi Tanggal Pengembalian:</label>
-      <input type="date" id="estimasi_tgl" name="estimasi_tgl" required>
-    </div>
-
-    <div class="form-group foto-container">
-      <label>Dokumentasi Foto Ambil Kunci:</label>
-      
-      <button type="button" id="btnBukaKamera">📸 Buka Kamera</button>
-      
-      <video id="video" autoplay playsinline></video>
-      
-      <canvas id="canvas"></canvas>
-      
-      <button type="button" id="btnAmbilFoto">📸 Ambil Foto</button>
-      <button type="button" id="btnFotoUlang">🔄 Foto Ulang</button>
-      
-      <input type="hidden" id="foto" name="foto" required>
-    </div>
-
-    <button type="submit" id="btnSubmit" style="margin-top: 15px;">Kirim Data Peminjaman</button>
-  </form>
-</div>
+  <div class="monitor-container">
+    <button class="btn-refresh" onclick="muatMonitorData()">🔄 Segarkan Data</button>
+    <h2 class="monitor-title" style="text-align: left;">📊 Live Monitor Status Kunci</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID Kunci</th>
+          <th>Nama Kunci / Ruangan</th>
+          <th>Lantai</th>
+          <th>Zona</th>
+          <th>Status</th>
+          <th>Peminjam Saat Ini</th>
+          <th>Estimasi Kembali</th>
+        </tr>
+      </thead>
+      <tbody id="bodyTabel">
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 20px;">Memuat status kunci terbaru...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
 <script>
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const fotoInput = document.getElementById('foto');
-  
-  const btnBukaKamera = document.getElementById('btnBukaKamera');
-  const btnAmbilFoto = document.getElementById('btnAmbilFoto');
-  const btnFotoUlang = document.getElementById('btnFotoUlang');
-
   let semuaDataKunci = [];
+  let streamKameraAktif = null;
 
-  // 1. Ambil Data Kunci & Opsi Filter
+  // Logika Berpindah Tab Menu (Pinjam vs Kembali)
+  function gantiTab(tipe) {
+    matikanKamera(); // Tutup kamera jika user ganti halaman tengah jalan
+    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-pinjam', 'active-kembali'); });
+    
+    if (tipe === 'pinjam') {
+      document.getElementById('sectionPinjam').classList.add('active');
+      document.getElementById('tabPinjam').classList.add('active-pinjam');
+    } else {
+      document.getElementById('sectionKembali').classList.add('active');
+      document.getElementById('tabKembali').classList.add('active-kembali');
+    }
+  }
+
+  // Ambil Data Kunci & Opsi Filter untuk Form Pinjam
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_tersedia`)
       .then(res => res.json())
@@ -108,129 +189,148 @@
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
         
         const selectLantai = document.getElementById("filterLantai");
-        listLantai.forEach(lantai => {
-          const opt = document.createElement("option"); opt.value = lantai; opt.textContent = lantai;
-          selectLantai.appendChild(opt);
-        });
+        selectLantai.innerHTML = '<option value="">-- Semua Lantai --</option>';
+        listLantai.forEach(l => { selectLantai.innerHTML += `<option value="${l}">${l}</option>`; });
         
         const selectZona = document.getElementById("filterZona");
-        listZona.forEach(zona => {
-          const opt = document.createElement("option"); opt.value = zona; opt.textContent = "Zona " + zona;
-          selectZona.appendChild(opt);
-        });
+        selectZona.innerHTML = '<option value="">-- Semua Zona --</option>';
+        listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
         saringKunci();
-      })
-      .catch(() => { document.getElementById("kunci").innerHTML = '<option value="">Gagal memuat data kunci</option>'; });
+      });
   }
 
   function saringKunci() {
-    const lantaiDipilih = document.getElementById("filterLantai").value.toLowerCase();
-    const zonaDipilih = document.getElementById("filterZona").value.toLowerCase();
-    const kataKunciCari = document.getElementById("kotakCari").value.toLowerCase();
-    const selectKunci = document.getElementById("kunci");
+    const lantai = document.getElementById("filterLantai").value.toLowerCase();
+    const zona = document.getElementById("filterZona").value.toLowerCase();
+    const cari = document.getElementById("kotakCari").value.toLowerCase();
+    const select = document.getElementById("kunci_pinjam");
+    select.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
     
-    selectKunci.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
-    
-    const hasilSaring = semuaDataKunci.filter(kunci => {
-      const cocokLantai = !lantaiDipilih || (kunci.lantai && kunci.lantai.toLowerCase() === lantaiDipilih);
-      const cocokZona = !zonaDipilih || (kunci.zona && kunci.zona.toLowerCase() === zonaDipilih);
-      const teksGabungan = `${kunci.id} ${kunci.nama}`.toLowerCase();
-      const cocokKataKunci = teksGabungan.includes(kataKunciCari);
-      return cocokLantai && cocokZona && cocokKataKunci;
-    });
-    
-    hasilSaring.forEach(k => {
-      const opt = document.createElement("option"); opt.value = k.id;
-      opt.textContent = `${k.id} - ${k.nama} [${k.lantai} - ${k.zona}]`;
-      selectKunci.appendChild(opt);
+    semuaDataKunci.filter(k => {
+      return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
+             (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
+             (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
+    }).forEach(k => {
+      select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [${k.lantai} - ${k.zona}]</option>`;
     });
   }
 
-  // =========================================================================
-  // LOGIKA MODIFIKASI KAMERA TERSEMBUNYI DI AWAL (REQUEST USER)
-  // =========================================================================
-
-  // A. Tombol Buka Kamera diklik
-  btnBukaKamera.addEventListener('click', () => {
-    // Jalankan akses kamera
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      .then(stream => { 
-        video.srcObject = stream; 
-        
-        // Tampilkan video preview kamera dan tombol Ambil Foto
-        video.style.display = 'block'; 
-        btnAmbilFoto.style.display = 'block';
-        
-        // Sembunyikan tombol "Buka Kamera"
-        btnBukaKamera.style.display = 'none';
-        
-        // Pastikan canvas dan tombol Foto Ulang sembunyi
-        canvas.style.display = 'none';
-        btnFotoUlang.style.display = 'none';
-        fotoInput.value = ""; 
-      })
-      .catch(() => alert("Gagal mengakses kamera. Mohon berikan izin kamera."));
-  });
-
-  // B. Tombol Ambil Foto diklik (Jepret)
-  btnAmbilFoto.addEventListener('click', () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    fotoInput.value = dataUrl; // Simpan teks gambar base64
-    
-    // Tampilkan canvas hasil jepretan, sembunyikan video kamera
-    canvas.style.display = 'block'; 
-    video.style.display = 'none'; 
-    
-    // Tampilkan tombol Foto Ulang, sembunyikan tombol Ambil Foto
-    btnFotoUlang.style.display = 'block';
-    btnAmbilFoto.style.display = 'none';
-  });
-
-  // C. Tombol Foto Ulang diklik (Reset Kamera)
-  btnFotoUlang.addEventListener('click', () => {
-    // Reset input foto dan canvas
-    fotoInput.value = "";
-    
-    // Tampilkan video preview kamera kembali
-    video.style.display = 'block'; 
-    canvas.style.display = 'none'; 
-    
-    // Tampilkan tombol Ambil Foto, sembunyikan tombol Foto Ulang
-    btnAmbilFoto.style.display = 'block';
-    btnFotoUlang.style.display = 'none';
-  });
-
-  // 5. Submit Data ke Google Sheets
-  document.getElementById('formPinjam').addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (!fotoInput.value) { alert("Anda wajib mengambil foto dokumentasi!"); return; }
-    
-    const btnSubmit = document.getElementById('btnSubmit');
-    btnSubmit.disabled = true; btnSubmit.textContent = "Memproses Peminjaman...";
-
-    const formData = new FormData(this);
-    
-    fetch(scriptUrl, { method: 'POST', body: formData })
+  // Muat Live Monitor Data
+  function muatMonitorData() {
+    const body = document.getElementById("bodyTabel");
+    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
-      .then(res => {
-        if (res.status === 'success') {
-          alert("Peminjaman berhasil dicatat!"); window.location.reload();
-        } else {
-          alert("Eror Server: " + res.message);
-          btnSubmit.disabled = false; btnSubmit.textContent = "Kirim Data Peminjaman";
+      .then(data => {
+        body.innerHTML = "";
+        data.forEach(item => {
+          const tr = document.createElement("tr");
+          tr.style.backgroundColor = (item.status === "Dipinjam") ? "#fff0f0" : "#f0fff0";
+          tr.innerHTML = `
+            <td><b>${item.id}</b></td>
+            <td>${item.nama}</td>
+            <td>${item.lantai || '-'}</td>
+            <td>${item.zona || '-'}</td>
+            <td><span class="badge ${item.status === 'Dipinjam' ? 'bg-dipinjam' : 'bg-tersedia'}">${item.status}</span></td>
+            <td>${item.peminjam}</td>
+            <td>${item.estimasi}</td>
+          `;
+          body.appendChild(tr);
+        });
+      });
+  }
+
+  // Cari Kunci Aktif yang Sedang Dibawa User (Form Kembali)
+  document.getElementById('btnCariKunci').addEventListener('click', () => {
+    const nama = document.getElementById('nama_kembali').value.trim();
+    if (!nama) { alert("Masukkan nama Anda!"); return; }
+    document.getElementById('btnCariKunci').textContent = "Mencari...";
+    
+    fetch(`${scriptUrl}?aksi=cari_kunci_peminjam&nama=${encodeURIComponent(nama)}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('btnCariKunci').textContent = "🔍 Cari Kunci Saya";
+        const select = document.getElementById('kunci_kembali');
+        select.innerHTML = "";
+        if (!data.kunci || data.kunci.length === 0) {
+          select.innerHTML = '<option value="">-- Tidak ada kunci aktif --</option>';
+          alert("Sistem tidak menemukan kunci yang Anda pinjam.");
+          return;
         }
-      })
-      .catch(() => {
-        alert("Masalah koneksi ke server.");
-        btnSubmit.disabled = false; btnSubmit.textContent = "Kirim Data Peminjaman";
+        document.getElementById('nohp_kembali').value = data.nohp || "";
+        data.kunci.forEach(k => { select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; });
       });
   });
 
-  window.onload = muatKunciTersedia;
+  // Logika Kamera Universal Tanpa Preview Awal
+  function aturKamera(suffix) {
+    const video = document.getElementById('video' + suffix);
+    const canvas = document.getElementById('canvas' + suffix);
+    const input = document.getElementById('foto' + suffix);
+    const btnBuka = document.getElementById('btnBukaKamera' + suffix);
+    const btnAmbil = document.getElementById('btnAmbilFoto' + suffix);
+    const btnUlang = document.getElementById('btnFotoUlang' + suffix);
+
+    btnBuka.addEventListener('click', () => {
+      matikanKamera();
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
+        streamKameraAktif = stream;
+        video.srcObject = stream;
+        video.style.display = 'block'; btnAmbil.style.display = 'block'; btnBuka.style.display = 'none';
+        canvas.style.display = 'none'; btnUlang.style.display = 'none'; input.value = "";
+      }).catch(() => alert("Izin kamera ditolak."));
+    });
+
+    btnAmbil.addEventListener('click', () => {
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      input.value = canvas.toDataURL('image/jpeg');
+      canvas.style.display = 'block'; video.style.display = 'none';
+      btnUlang.style.display = 'block'; btnAmbil.style.display = 'none';
+    });
+
+    btnUlang.addEventListener('click', () => {
+      input.value = "";
+      video.style.display = 'block'; canvas.style.display = 'none';
+      btnAmbil.style.display = 'block'; btnUlang.style.display = 'none';
+    });
+  }
+
+  function matikanKamera() {
+    if (streamKameraAktif) {
+      streamKameraAktif.getTracks().forEach(track => track.stop());
+      streamKameraAktif = null;
+    }
+    document.querySelectorAll('video, canvas').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.btn-buka-cam').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
+  }
+
+  // Setup Submit Penanganan Form
+  function pasangSubmitForm(idForm, idBtn, textReset) {
+    document.getElementById(idForm).addEventListener('submit', function(e) {
+      e.preventDefault();
+      const inputFoto = this.querySelector('input[name="foto"]').value;
+      if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
+      
+      const btn = document.getElementById(idBtn);
+      btn.disabled = true; btn.textContent = "Memproses...";
+      
+      fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
+        .then(res => res.json()).then(res => {
+          if(res.status === 'success') { alert("Data sukses diproses!"); window.location.reload(); }
+          else { alert("Gagal: " + res.message); btn.disabled = false; btn.textContent = textReset; }
+        }).catch(() => { alert("Kendala Jaringan."); btn.disabled = false; btn.textContent = textReset; });
+    });
+  }
+
+  window.onload = () => {
+    muatKunciTersedia();
+    muatMonitorData();
+    aturKamera('P'); // Inisialisasi kamera form pinjam
+    aturKamera('K'); // Inisialisasi kamera form kembali
+    pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman');
+    pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci');
+  };
 </script>
 </body>
 </html>
