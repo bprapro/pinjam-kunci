@@ -18,10 +18,19 @@
                     <input type="text" id="nama" class="form-control" required placeholder="Masukkan nama lengkap Anda">
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Nomor HP (WhatsApp)</label>
+                    <input type="tel" id="nohp" class="form-control" required placeholder="Contoh: 08123456789">
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Pilih Kunci</label>
                     <select id="kunci" class="form-select" required>
                         <option value="">Memuat daftar kunci...</option>
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Dokumentasi (Ambil Foto Kunci/Peminjam)</label>
+                    <input type="file" id="foto" class="form-control" accept="image/*" required>
+                    <small class="text-muted">Foto otomatis dikompres oleh sistem agar hemat penyimpanan.</small>
                 </div>
                 <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
             </form>
@@ -29,35 +38,28 @@
     </div>
 
     <script>
-        // TAUTKAN GOOGLE SPREADSHEET ANDA DI SINI (SUDAH DIMASUKKAN)
+        // TAUTAN GOOGLE APPS SCRIPT ANDA
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
         
         const form = document.getElementById('formPinjam');
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
 
-        // SINKRONISASI OTOMATIS: Mengambil data dari cell Spreadsheet saat web dibuka
         window.addEventListener('DOMContentLoaded', () => {
             fetch(scriptURL)
                 .then(response => response.json())
                 .then(data => {
-                    // Kosongkan indikator memuat data
                     selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
-                    
                     if (data.length === 0) {
                         selectKunci.innerHTML = '<option value="">Semua kunci sedang dipinjam</option>';
                         return;
                     }
-
-                    // Memasukkan data kunci aktif dari Google Sheets satu per satu ke dropdown web
                     data.forEach(kunci => {
                         const option = document.createElement('option');
                         option.value = kunci.id;
                         option.textContent = kunci.nama;
                         selectKunci.appendChild(option);
                     });
-
-                    // Aktifkan tombol submit setelah daftar kunci sukses dimuat
                     btnSubmit.disabled = false;
                 })
                 .catch(error => {
@@ -66,34 +68,64 @@
                 });
         });
 
-        // PROSES PENGIRIMAN DATA: Mengirim formulir saat tombol diklik
         form.addEventListener('submit', e => {
             e.preventDefault();
             
-            // Beri feedback visual ke pengguna bahwa data sedang diproses
             btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Menyimpan ke Google Sheets...';
+            btnSubmit.innerText = 'Mengompres Gambar & Menyimpan...';
 
-            const formData = new FormData();
-            formData.append('nama', document.getElementById('nama').value);
-            formData.append('kunci', selectKunci.value);
+            const fileInput = document.getElementById('foto');
+            const file = fileInput.files[0];
 
-            // POST data formulir ke Google Apps Script
-            fetch(scriptURL, { 
-                method: 'POST', 
-                body: formData
-            })
-            .then(response => {
-                alert('Peminjaman berhasil dicatat! Status kunci otomatis diperbarui.');
-                // Refresh halaman web agar pilihan kunci yang baru dipinjam langsung hilang dari daftar
-                window.location.reload();
-            })
-            .catch(error => {
-                alert('Terjadi kesalahan sistem: ' + error.message);
-                console.error('Error!', error.message);
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'Pinjam Kunci';
-            });
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function () {
+                    // FITUR KOMPRESI: Mengecilkan gambar menggunakan elemen Canvas HTML5
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Batasi lebar maksimum gambar ke 800 pixel saja (Cukup jernih untuk dokumentasi sel)
+                    const max_width = 800;
+                    const scaleSize = max_width / img.width;
+                    canvas.width = max_width;
+                    canvas.height = img.height * scaleSize;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Ubah jadi base64 dengan kualitas 70% (Sangat menghemat ruang cell Google Sheet)
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                    const formData = new FormData();
+                    formData.append('nama', document.getElementById('nama').value);
+                    formData.append('nohp', document.getElementById('nohp').value);
+                    formData.append('kunci', selectKunci.value);
+                    formData.append('foto', compressedBase64);
+
+                    fetch(scriptURL, { 
+                        method: 'POST', 
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(res => {
+                        if(res.status === 'success') {
+                            alert('Peminjaman dan Dokumentasi Foto Berhasil Dicatat!');
+                            window.location.reload();
+                        } else {
+                            alert('Gagal menyimpan: ' + res.message);
+                            btnSubmit.disabled = false;
+                            btnSubmit.innerText = 'Pinjam Kunci';
+                        }
+                    })
+                    .catch(error => {
+                        alert('Terjadi kesalahan sistem: ' + error.message);
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerText = 'Pinjam Kunci';
+                    });
+                };
+            };
         });
     </script>
 </body>
