@@ -3,40 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pengembalian Kunci</title>
+    <title>Sistem Peminjaman Kunci</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         #camera-preview, #taken-photo { width: 100%; max-width: 400px; height: auto; border-radius: 8px; display: none; margin-bottom: 15px; }
         #camera-preview { border: 2px solid #ddd; }
-        #taken-photo { border: 2px solid #dc3545; }
-        .camera-controls { display: flex; gap: 10px; margin-bottom: 15px; }
+        #taken-photo { border: 2px solid #4caf50; }
+        .camera-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
     </style>
 </head>
 <body class="bg-light">
     <div class="container my-5" style="max-width: 600px;">
-        <h2 class="text-center mb-4">🔄 Sistem Pengembalian Kunci</h2>
+        <h2 class="text-center mb-4">🔑 Sistem Peminjaman Kunci</h2>
         
+        <div class="d-flex gap-2 justify-content-center mb-4">
+            <a href="status.html" class="btn btn-info text-white fw-bold shadow-sm w-50">📊 Cek Status Ketersediaan</a>
+            <a href="kembali.html" class="btn btn-outline-danger fw-bold shadow-sm w-50">🔄 Menu Pengembalian</a>
+        </div>
+
         <div class="card p-4 shadow-sm mb-4" id="formContainer">
-            <h4 class="card-title mb-3 text-danger">Formulir Pengembalian</h4>
-            <form id="formKembali">
+            <h4 class="card-title mb-3">Formulir Peminjaman</h4>
+            <form id="formPinjam">
                 <div class="mb-3">
-                    <label class="form-label">Nama Pengembali (Ketik min. 3 huruf awal)</label>
-                    <input type="text" id="nama" class="form-control" autocomplete="off" list="list-peminjam" required placeholder="Masukkan nama Anda...">
-                    <datalist id="list-peminjam"></datalist>
-                    <small class="text-muted">Rekomendasi nama akan muncul otomatis setelah Anda mengetik 3 huruf.</small>
+                    <label class="form-label">Nama Peminjam</label>
+                    <input type="text" id="nama" class="form-control" required placeholder="Masukkan nama lengkap Anda">
                 </div>
-
-                <input type="hidden" id="nohp">
-
                 <div class="mb-3">
-                    <label class="form-label">Pilih Kunci yang Dikembalikan</label>
-                    <select id="kunci" class="form-select" required disabled>
-                        <option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>
+                    <label class="form-label">Nomor HP / WhatsApp (Awali dengan 08/62)</label>
+                    <input type="tel" id="nohp" class="form-control" required placeholder="Contoh: 08123456789">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Estimasi Tanggal Pengembalian</label>
+                    <input type="date" id="estimasi_tgl" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pilih Kunci</label>
+                    <select id="kunci" class="form-select" required>
+                        <option value="">Memuat daftar kunci...</option>
                     </select>
                 </div>
                 
                 <div class="mb-3">
-                    <label class="form-label">Dokumentasi (Foto Kunci yang Dikembalikan)</label>
+                    <label class="form-label">Dokumentasi (Ambil Foto Kunci/Peminjam Langsung)</label>
                     <div class="mb-2" style="max-width: 200px;">
                         <select id="camera-source" class="form-select form-select-sm">
                             <option value="environment">Kamera Belakang</option>
@@ -44,27 +52,24 @@
                         </select>
                     </div>
                     <video id="camera-preview" autoplay playsinline></video>
-                    <img id="taken-photo" alt="Foto Pengembalian">
+                    <img id="taken-photo" alt="Foto yang Diambil">
                     <div class="camera-controls">
-                        <button type="button" id="start-camera" class="btn btn-outline-danger btn-sm">Buka Kamera</button>
-                        <button type="button" id="take-photo" class="btn btn-danger btn-sm" style="display: none;">Ambil Foto</button>
+                        <button type="button" id="start-camera" class="btn btn-outline-primary btn-sm">Buka Kamera</button>
+                        <button type="button" id="take-photo" class="btn btn-primary btn-sm" style="display: none;">Ambil Foto</button>
                         <button type="button" id="retake-photo" class="btn btn-outline-secondary btn-sm" style="display: none;">Foto Ulang</button>
                     </div>
                     <input type="hidden" id="foto-data" required>
                 </div>
                 
-                <button type="submit" id="btnSubmit" class="btn btn-danger w-100" disabled>Kembalikan Kunci</button>
-                <div class="text-center mt-3">
-                    <a href="index.html" class="text-decoration-none">← Kembali ke Form Peminjaman</a>
-                </div>
+                <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
             </form>
         </div>
-        
-        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-success" style="display: none;">
-            <h1 class="display-4 text-success mb-3">✅</h1>
-            <h3 class="text-success fw-bold">Terima Kasih!</h3>
-            <p class="fs-5 text-muted">Kunci telah berhasil dikembalikan ke dalam sistem dan statusnya kini tersedia kembali.</p>
-            <button class="btn btn-outline-success mt-3" onclick="window.location.reload();">Selesai</button>
+
+        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-primary" style="display: none;">
+            <h1 class="display-4 text-primary mb-3">✅</h1>
+            <h3 class="text-primary fw-bold">Peminjaman Berhasil!</h3>
+            <p class="fs-5 text-muted">Data peminjam dan dokumentasi telah berhasil dicatat ke dalam sistem.</p>
+            <button class="btn btn-outline-primary mt-3" onclick="window.location.reload();">Selesai / Formulir Baru</button>
         </div>
     </div>
 
@@ -73,13 +78,9 @@
         
         const formContainer = document.getElementById('formContainer');
         const successMessage = document.getElementById('successMessage');
-        const form = document.getElementById('formKembali');
+        const form = document.getElementById('formPinjam');
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
-        const inputNama = document.getElementById('nama');
-        const inputNoHP = document.getElementById('nohp');
-        const datalistPeminjam = document.getElementById('list-peminjam');
-        
         const video = document.getElementById('camera-preview');
         const photoPreview = document.getElementById('taken-photo');
         const startCameraButton = document.getElementById('start-camera');
@@ -88,53 +89,28 @@
         const fotoDataInput = document.getElementById('foto-data');
         const cameraSourceSelect = document.getElementById('camera-source');
         let stream;
-        let semuaPeminjam = [];
+
+        const tglInput = document.getElementById('estimasi_tgl');
+        tglInput.min = new Date().toISOString().split('T')[0];
 
         window.addEventListener('DOMContentLoaded', () => {
-            fetch(scriptURL + '?aksi=ambil_semua_peminjam')
+            fetch(scriptURL + '?aksi=ambil_tersedia')
                 .then(response => response.json())
-                .then(data => { semuaPeminjam = data; })
-                .catch(err => console.error("Gagal memuat rekomendasi nama"));
-        });
-
-        inputNama.addEventListener('input', () => {
-            var namaValue = inputNama.value.trim();
-            datalistPeminjam.innerHTML = '';
-            
-            if (namaValue.length >= 3) {
-                var filterNama = semuaPeminjam.filter(nama => nama.toLowerCase().includes(namaValue.toLowerCase()));
-                filterNama.forEach(nama => {
-                    const option = document.createElement('option');
-                    option.value = nama;
-                    datalistPeminjam.appendChild(option);
-                });
-            }
-
-            if (semuaPeminjam.includes(namaValue)) {
-                selectKunci.innerHTML = '<option value="">Mencari kunci milik ' + namaValue + '...</option>';
-                fetch(scriptURL + '?aksi=cari_kunci_peminjam&nama=' + encodeURIComponent(namaValue))
-                    .then(response => response.json())
-                    .then(res => {
-                        if (res.kunci && res.kunci.length > 0) {
-                            selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
-                            res.kunci.forEach(kunci => {
-                                const option = document.createElement('option');
-                                option.value = kunci.id;
-                                option.textContent = kunci.nama;
-                                selectKunci.appendChild(option);
-                            });
-                            selectKunci.disabled = false;
-                            inputNoHP.value = res.nohp;
-                            btnSubmit.disabled = false;
-                        } else {
-                            selectKunci.innerHTML = '<option value="">Tidak ada kunci aktif untuk nama ini</option>';
-                        }
+                .then(data => {
+                    selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
+                    if (data.length === 0) {
+                        selectKunci.innerHTML = '<option value="">Semua kunci sedang dipinjam</option>';
+                        return;
+                    }
+                    data.forEach(kunci => {
+                        const option = document.createElement('option');
+                        option.value = kunci.id;
+                        option.textContent = kunci.nama;
+                        selectKunci.appendChild(option);
                     });
-            } else {
-                selectKunci.innerHTML = '<option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>';
-                selectKunci.disabled = true;
-                btnSubmit.disabled = true;
-            }
+                    btnSubmit.disabled = false;
+                })
+                .catch(error => { selectKunci.innerHTML = '<option value="">Gagal memuat data kunci</option>'; });
         });
 
         async function openCamera() {
@@ -143,208 +119,26 @@
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cameraSourceSelect.value } } });
                 video.srcObject = stream;
                 startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = '';
-            } catch (error) { alert('Gagal membuka kamera.'); }
+            } catch (error) { alert('Gagal mengakses kamera.'); }
         }
 
         startCameraButton.addEventListener('click', openCamera);
         cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
 
-        // LOGIKA KOMPRESI AGRESIF AGAR CELL GOOGLE SHEETS TIDAK BERAT
         takePhotoButton.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            const max_size = 400; // Ukuran maksimum sisi terpanjang gambar
+            const max_size = 400;
             let width = video.videoWidth;
             let height = video.videoHeight;
-
             if (width > height) {
                 if (width > max_size) { height *= max_size / width; width = max_size; }
             } else {
                 if (height > max_size) { width *= max_size / height; height = max_size; }
             }
-
-            canvas.width = width; 
-            canvas.height = height;
-            
+            canvas.width = width; canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, width, height);
-            
-            // Kompresi kualitas gambar diturunkan menjadi 0.4 (40%)
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
-            
-            photoPreview.src = compressedBase64; 
-            photoPreview.style.display = 'block'; 
-            video.style.display = 'none';
-            fotoDataInput.value = compressedBase64; 
-            takePhotoButton.style.display = 'none'; 
-            retakePhotoButton.style.display = 'inline-block';
-            if (stream) stream.getTracks().forEach(track => track.stop());
-        });
-
-        retakePhotoButton.addEventListener('click', openCamera);
-
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            if (!fotoDataInput.value) { alert('Silakan ambil foto bukti pengembalian.'); return; }
-            
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Memproses Pengembalian...';
-
-            const formData = new FormData();
-            formData.append('aksi', 'kembali'); 
-            formData.append('nama', inputNama.value);
-            formData.append('nohp', inputNoHP.value); 
-            formData.append('kunci', selectKunci.value);
-            formData.append('foto', fotoDataInput.value);
-
-            fetch(scriptURL, { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(res => {
-                if(res.status === 'success') {
-                    formContainer.style.display = 'none';
-                    successMessage.style.display = 'block';
-                } else {
-                    alert('Gagal: ' + res.message);
-                    btnSubmit.disabled = false;
-                    btnSubmit.innerText = 'Kembalikan Kunci';
-                }
-            })
-            .catch(error => {
-                alert('Error: Koneksi server sibuk/terputus. Silakan coba klik kembali tombol simpan.');
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'Kembalikan Kunci';
-            });
-        });
-    </script>
-</body>
-</html>
-                </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Dokumentasi (Foto Kunci yang Dikembalikan)</label>
-                    <div class="mb-2" style="max-width: 200px;">
-                        <select id="camera-source" class="form-select form-select-sm">
-                            <option value="environment">Kamera Belakang</option>
-                            <option value="user">Kamera Depan (Selfie)</option>
-                        </select>
-                    </div>
-                    <video id="camera-preview" autoplay playsinline></video>
-                    <img id="taken-photo" alt="Foto Pengembalian">
-                    <div class="camera-controls">
-                        <button type="button" id="start-camera" class="btn btn-outline-danger btn-sm">Buka Kamera</button>
-                        <button type="button" id="take-photo" class="btn btn-danger btn-sm" style="display: none;">Ambil Foto</button>
-                        <button type="button" id="retake-photo" class="btn btn-outline-secondary btn-sm" style="display: none;">Foto Ulang</button>
-                    </div>
-                    <input type="hidden" id="foto-data" required>
-                </div>
-                
-                <button type="submit" id="btnSubmit" class="btn btn-danger w-100" disabled>Kembalikan Kunci</button>
-                <div class="text-center mt-3">
-                    <a href="index.html" class="text-decoration-none">← Kembali ke Form Peminjaman</a>
-                </div>
-            </form>
-        </div>
-        
-        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-success" style="display: none;">
-            <h1 class="display-4 text-success mb-3">✅</h1>
-            <h3 class="text-success fw-bold">Terima Kasih!</h3>
-            <p class="fs-5 text-muted">Kunci telah berhasil dikembalikan ke dalam sistem dan statusnya kini tersedia kembali.</p>
-            <button class="btn btn-outline-success mt-3" onclick="window.location.reload();">Selesai</button>
-        </div>
-    </div>
-
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
-        
-        const formContainer = document.getElementById('formContainer');
-        const successMessage = document.getElementById('successMessage');
-        const form = document.getElementById('formKembali');
-        const btnSubmit = document.getElementById('btnSubmit');
-        const selectKunci = document.getElementById('kunci');
-        const inputNama = document.getElementById('nama');
-        const inputNoHP = document.getElementById('nohp');
-        const datalistPeminjam = document.getElementById('list-peminjam');
-        
-        const video = document.getElementById('camera-preview');
-        const photoPreview = document.getElementById('taken-photo');
-        const startCameraButton = document.getElementById('start-camera');
-        const takePhotoButton = document.getElementById('take-photo');
-        const retakePhotoButton = document.getElementById('retake-photo');
-        const fotoDataInput = document.getElementById('foto-data');
-        const cameraSourceSelect = document.getElementById('camera-source');
-        let stream;
-        let semuaPeminjam = [];
-
-        // Muat semua nama peminjam aktif saat halaman dibuka untuk pencarian cepat
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch(scriptURL + '?aksi=ambil_semua_peminjam')
-                .then(response => response.json())
-                .then(data => {
-                    semuaPeminjam = data;
-                })
-                .catch(err => console.error("Gagal memuat rekomendasi nama"));
-        });
-
-        // Pantau input nama (Membuat rekomendasi list & mengambil data kunci)
-        inputNama.addEventListener('input', () => {
-            var namaValue = inputNama.value.trim();
-            datalistPeminjam.innerHTML = ''; // Bersihkan list rekomendasi lama
-            
-            // 1. BUAT REKOMENDASI JIKA MINIMAL 3 HURUF TERCAPAI
-            if (namaValue.length >= 3) {
-                var filterNama = semuaPeminjam.filter(nama => nama.toLowerCase().includes(namaValue.toLowerCase()));
-                filterNama.forEach(nama => {
-                    const option = document.createElement('option');
-                    option.value = nama;
-                    datalistPeminjam.appendChild(option);
-                });
-            }
-
-            // 2. JIKA NAMA YANG DIKETIK COCOK DENGAN DAFTAR, CARI KUNCINYA
-            if (semuaPeminjam.includes(namaValue)) {
-                selectKunci.innerHTML = '<option value="">Mencari kunci milik ' + namaValue + '...</option>';
-                fetch(scriptURL + '?aksi=cari_kunci_peminjam&nama=' + encodeURIComponent(namaValue))
-                    .then(response => response.json())
-                    .then(res => {
-                        if (res.kunci && res.kunci.length > 0) {
-                            selectKunci.innerHTML = '<option value="">-- Pilih Kunci yang Dikembalikan --</option>';
-                            res.kunci.forEach(kunci => {
-                                const option = document.createElement('option');
-                                option.value = kunci.id;
-                                option.textContent = kunci.nama;
-                                selectKunci.appendChild(option);
-                            });
-                            selectKunci.disabled = false;
-                            inputNoHP.value = res.nohp; // Salin nomor HP peminjam secara otomatis ke input tersembunyi
-                            btnSubmit.disabled = false;
-                        } else {
-                            selectKunci.innerHTML = '<option value="">Tidak ada kunci aktif untuk nama ini</option>';
-                        }
-                    });
-            } else {
-                selectKunci.innerHTML = '<option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>';
-                selectKunci.disabled = true;
-                btnSubmit.disabled = true;
-            }
-        });
-
-        async function openCamera() {
-            if (stream) { stream.getTracks().forEach(track => track.stop()); }
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cameraSourceSelect.value } } });
-                video.srcObject = stream;
-                startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = '';
-            } catch (error) { alert('Gagal membuka kamera.'); }
-        }
-
-        startCameraButton.addEventListener('click', openCamera);
-        cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
-
-        takePhotoButton.addEventListener('click', () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 600; canvas.height = (video.videoHeight / video.videoWidth) * 600;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
             photoPreview.src = compressedBase64; photoPreview.style.display = 'block'; video.style.display = 'none';
             fotoDataInput.value = compressedBase64; takePhotoButton.style.display = 'none'; retakePhotoButton.style.display = 'inline-block';
             if (stream) stream.getTracks().forEach(track => track.stop());
@@ -354,33 +148,26 @@
 
         form.addEventListener('submit', e => {
             e.preventDefault();
-            if (!fotoDataInput.value) { alert('Silakan ambil foto bukti pengembalian.'); return; }
+            if (!fotoDataInput.value) { alert('Silakan ambil foto dokumentasi terlebih dahulu.'); return; }
+            btnSubmit.disabled = true; btnSubmit.innerText = 'Menyimpan ke Server...';
             
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Memproses Pengembalian...';
-
             const formData = new FormData();
-            formData.append('aksi', 'kembali'); 
-            formData.append('nama', inputNama.value);
-            formData.append('nohp', inputNoHP.value); // Mengirim nomor HP peminjaman lama
+            formData.append('aksi', 'pinjam'); // SINKRONISASI PARAMETER AKSES UTAMA
+            formData.append('nama', document.getElementById('nama').value);
+            formData.append('nohp', document.getElementById('nohp').value);
+            formData.append('estimasi_tgl', tglInput.value);
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
 
             fetch(scriptURL, { method: 'POST', body: formData })
             .then(response => response.json())
             .then(res => {
-                if(res.status === 'success') {
+                if(res.status === 'success') { 
                     formContainer.style.display = 'none';
                     successMessage.style.display = 'block';
-                } else {
-                    alert('Gagal: ' + res.message);
-                    btnSubmit.disabled = false;
-                }
+                } else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; btnSubmit.innerText = 'Pinjam Kunci'; }
             })
-            .catch(error => {
-                alert('Error: ' + error.message);
-                btnSubmit.disabled = false;
-            });
+            .catch(error => { alert('Koneksi sibuk. Silakan ulangi tekan tombol kirim.'); btnSubmit.disabled = false; btnSubmit.innerText = 'Pinjam Kunci'; });
         });
     </script>
 </body>
