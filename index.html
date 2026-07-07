@@ -22,6 +22,12 @@
     .form-section { display: none; }
     .form-section.active { display: block; }
     
+    /* Style Halaman Sukses / Terima Kasih */
+    .success-screen { display: none; text-align: center; padding: 40px 20px; }
+    .success-screen h3 { color: #28a745; font-size: 26px; margin-bottom: 10px; }
+    .success-screen p { color: #555; font-size: 16px; margin-bottom: 20px; }
+    .btn-kembali-form { background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; display: inline-block; }
+    
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 5px; font-weight: bold; }
     input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
@@ -47,7 +53,6 @@
     th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
     th { background-color: #232f3e; color: white; }
     .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; color: white; display: inline-block; }
-    .bg-tersedia { background-color: #28a745; }
     .bg-dipinjam { background-color: #dc3545; }
     .btn-refresh { background-color: #4a5568; color: white; padding: 8px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; float: right; width: auto; }
     
@@ -60,7 +65,7 @@
 <body>
 
   <div class="container">
-    <div class="nav-tabs">
+    <div id="navTabsContainer" class="nav-tabs">
       <button type="button" id="tabPinjam" class="tab-btn active-pinjam" onclick="gantiTab('pinjam')">🔑 Pinjam Kunci</button>
       <button type="button" id="tabKembali" class="tab-btn" onclick="gantiTab('kembali')">🔄 Kembalikan Kunci</button>
     </div>
@@ -119,7 +124,7 @@
           <button type="button" id="btnCariKunci" style="background-color: #17a2b8; color:white; margin-top: 5px; font-size: 14px; padding: 6px; cursor:pointer; border:none; border-radius:4px;">🔍 Cari Kunci Saya</button>
         </div>
         <div class="form-group">
-          <label for="kunci_kembali">Kunci yang Dikembalikan (Hanya yang sedang dipinjam):</label>
+          <label for="kunci_kembali">Kunci yang Dikembalikan:</label>
           <select id="kunci_kembali" name="kunci" required>
             <option value="">-- Klik tombol 'Cari Kunci Saya' di atas --</option>
           </select>
@@ -137,11 +142,17 @@
         <button type="submit" id="btnSubmitKembali" class="btn-submit-kembali" style="margin-top: 15px;">Proses Pengembalian Kunci</button>
       </form>
     </div>
+
+    <div id="screenSukses" class="success-screen">
+      <h3>✨ Terima Kasih!</h3>
+      <p id="pesanSukses">Aktivitas penyerahan kunci Anda telah berhasil direkam oleh sistem.</p>
+      <button type="button" class="btn-kembali-form" onclick="resetKeHalamanForm()">Kembali ke Formulir</button>
+    </div>
   </div>
 
   <div class="monitor-container">
     <button class="btn-refresh" onclick="muatMonitorData()">🔄 Segarkan Data</button>
-    <h2 class="monitor-title" style="text-align: left;">📊 Live Monitor Status Kunci</h2>
+    <h2 class="monitor-title" style="text-align: left;">🚨 Daftar Kunci yangsedang Dipinjam</h2>
     <table>
       <thead>
         <tr>
@@ -156,7 +167,7 @@
       </thead>
       <tbody id="bodyTabel">
         <tr>
-          <td colspan="7" style="text-align: center; padding: 20px;">Memuat status kunci terbaru...</td>
+          <td colspan="7" style="text-align: center; padding: 20px;">Memuat status transaksi aktif...</td>
         </tr>
       </tbody>
     </table>
@@ -171,14 +182,15 @@
 <script>
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
   let semuaDataKunci = [];
-  let dataMonitorLengkap = [];
+  let dataMonitorTerpinjam = [];
   let streamKameraAktif = null;
+  let tabAktifSekarang = 'pinjam';
 
-  // Variabel Paginasi Monitor (Per 10 ID)
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
   function gantiTab(tipe) {
+    tabAktifSekarang = tipe;
     matikanKamera();
     document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-pinjam', 'active-kembali'); });
@@ -192,7 +204,6 @@
     }
   }
 
-  // Muat Kunci Form Pinjam
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_tersedia`)
       .then(res => res.json())
@@ -228,13 +239,15 @@
     });
   }
 
-  // Muat Live Monitor Data Parsial per 10 Baris
+  // MODIFIKASI LENGKAP: Hanya saring data berstatus "Dipinjam"
   function muatMonitorData() {
     const body = document.getElementById("bodyTabel");
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        dataMonitorLengkap = data;
+        // Filter ketat agar data status "Tersedia" tidak dimasukkan ke dalam list
+        dataMonitorTerpinjam = data.filter(item => item.status === "Dipinjam");
+        halamanSekarang = 1;
         tampilkanHalamanMonitor();
       });
   }
@@ -243,27 +256,30 @@
     const body = document.getElementById("bodyTabel");
     body.innerHTML = "";
 
-    const totalHalaman = Math.ceil(dataMonitorLengkap.length / barisPerHalaman) || 1;
+    const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
     if (halamanSekarang > totalHalaman) halamanSekarang = totalHalaman;
 
     const indeksAwal = (halamanSekarang - 1) * barisPerHalaman;
     const indeksAkhir = indeksAwal + barisPerHalaman;
-    const dataHalamanIni = dataMonitorLengkap.slice(indeksAwal, indeksAkhir);
+    const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
     if (dataHalamanIni.length === 0) {
-      body.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data kunci.</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: #28a745; font-weight: bold; padding: 25px;">✅ Amandemen Aman! Seluruh kunci saat ini berada di rak (Tidak ada yang dipinjam).</td></tr>';
+      document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
+      document.getElementById("btnPrev").disabled = true;
+      document.getElementById("btnNext").disabled = true;
       return;
     }
 
     dataHalamanIni.forEach(item => {
       const tr = document.createElement("tr");
-      tr.style.backgroundColor = (item.status === "Dipinjam") ? "#fff0f0" : "#f0fff0";
+      tr.style.backgroundColor = "#fff0f0"; // Warna background soft red tanda dipinjam
       tr.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
         <td>${item.lantai || '-'}</td>
         <td>${item.zona || '-'}</td>
-        <td><span class="badge ${item.status === 'Dipinjam' ? 'bg-dipinjam' : 'bg-tersedia'}">${item.status}</span></td>
+        <td><span class="badge bg-dipinjam">${item.status}</span></td>
         <td>${item.peminjam}</td>
         <td>${item.estimasi}</td>
       `;
@@ -276,9 +292,9 @@
   }
 
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
-  function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorLengkap.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
+  function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
-  // Cari Kunci Aktif (Hanya Menampilkan Kunci Terpinjam Saja)
+  // Cari Kunci Aktif Pengembali
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const nama = document.getElementById('nama_kembali').value.trim();
     if (!nama) { alert("Masukkan nama Anda!"); return; }
@@ -292,14 +308,12 @@
         select.innerHTML = "";
         
         if (!data.kunci || data.kunci.length === 0) {
-          select.innerHTML = '<option value="">-- Tidak ada kunci terpinjam atas nama ini --</option>';
+          select.innerHTML = '<option value="">-- Tidak ada kunci terpinjam --</option>';
           alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam.");
           return;
         }
         
         document.getElementById('nohp_kembali').value = data.nohp || "";
-        
-        // Memasukkan list kunci terpinjam secara aman
         data.kunci.forEach(k => { 
           select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; 
         });
@@ -349,8 +363,8 @@
     document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
   }
 
-  // Submit Penanganan Form & Muncul Pesan Terima Kasih
-  function pasangSubmitForm(idForm, idBtn, textReset) {
+  // Penanganan Submit Form Menampilkan Halaman Terima Kasih Langsung
+  function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
     document.getElementById(idForm).addEventListener('submit', function(e) {
       e.preventDefault();
       const inputFoto = this.querySelector('input[name="foto"]').value;
@@ -362,14 +376,23 @@
       fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
         .then(res => res.json()).then(res => {
           if(res.status === 'success') { 
-            // Mengganti alert biasa dengan Pesan Terima Kasih Sesuai Permintaan
-            alert("✨ Terima Kasih! Data Anda telah berhasil disimpan ke sistem."); 
-            
-            // Mereset form secara bersih tanpa hard-reload agar monitor langsung sinkron
             document.getElementById(idForm).reset();
             matikanKamera();
+            
+            // Perbarui Live monitor & data penunjang
             muatKunciTersedia();
             muatMonitorData();
+            
+            // Sembunyikan form dan navigasi tab, tampilkan layar Terima kasih
+            document.getElementById('navTabsContainer').style.display = 'none';
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            
+            const teksPesan = (konteksAksi === 'pinjam') 
+              ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
+              : "Terima Kasih! Kunci telah dikembalikan dan status ruangan telah diperbarui.";
+            
+            document.getElementById('pesanSukses').textContent = teksPesan;
+            document.getElementById('screenSukses').style.display = 'block';
             
             btn.disabled = false; btn.textContent = textReset;
           }
@@ -378,13 +401,20 @@
     });
   }
 
+  // Kembali ke halaman formulir setelah menekan tombol di layar Terima Kasih
+  function resetKeHalamanForm() {
+    document.getElementById('screenSukses').style.display = 'none';
+    document.getElementById('navTabsContainer').style.display = 'flex';
+    gantiTab(tabAktifSekarang);
+  }
+
   window.onload = () => {
     muatKunciTersedia();
     muatMonitorData();
     aturKamera('P');
     aturKamera('K');
-    pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman');
-    pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci');
+    pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman', 'pinjam');
+    pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
 </script>
 </body>
