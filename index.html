@@ -35,6 +35,144 @@
                 <div class="mb-3">
                     <label class="form-label">Estimasi Tanggal Pengembalian</label>
                     <input type="date" id="estimasi_tgl" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pilih Kunci</label>
+                    <select id="kunci" class="form-select" required>
+                        <option value="">Memuat daftar kunci...</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Dokumentasi (Ambil Foto Kunci/Peminjam Langsung)</label>
+                    <div class="mb-2" style="max-width: 200px;">
+                        <select id="camera-source" class="form-select form-select-sm">
+                            <option value="environment">Kamera Belakang</option>
+                            <option value="user">Kamera Depan (Selfie)</option>
+                        </select>
+                    </div>
+                    <video id="camera-preview" autoplay playsinline></video>
+                    <img id="taken-photo" alt="Foto yang Diambil">
+                    <div class="camera-controls">
+                        <button type="button" id="start-camera" class="btn btn-outline-primary btn-sm">Buka Kamera</button>
+                        <button type="button" id="take-photo" class="btn btn-primary btn-sm" style="display: none;">Ambil Foto</button>
+                        <button type="button" id="retake-photo" class="btn btn-outline-secondary btn-sm" style="display: none;">Foto Ulang</button>
+                    </div>
+                    <input type="hidden" id="foto-data" required>
+                </div>
+                
+                <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
+            </form>
+        </div>
+
+        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-primary" style="display: none;">
+            <h1 class="display-4 text-primary mb-3">✅</h1>
+            <h3 class="text-primary fw-bold">Peminjaman Berhasil!</h3>
+            <p class="fs-5 text-muted">Data peminjam dan dokumentasi telah berhasil dicatat ke dalam sistem.</p>
+            <button class="btn btn-outline-primary mt-3" onclick="window.location.reload();">Selesai / Formulir Baru</button>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
+        
+        const formContainer = document.getElementById('formContainer');
+        const successMessage = document.getElementById('successMessage');
+        const form = document.getElementById('formPinjam');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const selectKunci = document.getElementById('kunci');
+        const video = document.getElementById('camera-preview');
+        const photoPreview = document.getElementById('taken-photo');
+        const startCameraButton = document.getElementById('start-camera');
+        const takePhotoButton = document.getElementById('take-photo');
+        const retakePhotoButton = document.getElementById('retake-photo');
+        const fotoDataInput = document.getElementById('foto-data');
+        const cameraSourceSelect = document.getElementById('camera-source');
+        let stream;
+
+        const tglInput = document.getElementById('estimasi_tgl');
+        tglInput.min = new Date().toISOString().split('T')[0];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(scriptURL + '?aksi=ambil_tersedia')
+                .then(response => response.json())
+                .then(data => {
+                    selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
+                    if (data.length === 0) {
+                        selectKunci.innerHTML = '<option value="">Semua kunci sedang dipinjam</option>';
+                        return;
+                    }
+                    data.forEach(kunci => {
+                        const option = document.createElement('option');
+                        option.value = kunci.id;
+                        option.textContent = kunci.nama;
+                        selectKunci.appendChild(option);
+                    });
+                    btnSubmit.disabled = false;
+                })
+                .catch(error => { selectKunci.innerHTML = '<option value="">Gagal memuat data kunci</option>'; });
+        });
+
+        async function openCamera() {
+            if (stream) { stream.getTracks().forEach(track => track.stop()); }
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cameraSourceSelect.value } } });
+                video.srcObject = stream;
+                startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = '';
+            } catch (error) { alert('Gagal mengakses kamera.'); }
+        }
+
+        startCameraButton.addEventListener('click', openCamera);
+        cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
+
+        takePhotoButton.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const max_size = 400;
+            let width = video.videoWidth;
+            let height = video.videoHeight;
+            if (width > height) {
+                if (width > max_size) { height *= max_size / width; width = max_size; }
+            } else {
+                if (height > max_size) { width *= max_size / height; height = max_size; }
+            }
+            canvas.width = width; canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
+            photoPreview.src = compressedBase64; photoPreview.style.display = 'block'; video.style.display = 'none';
+            fotoDataInput.value = compressedBase64; takePhotoButton.style.display = 'none'; retakePhotoButton.style.display = 'inline-block';
+            if (stream) stream.getTracks().forEach(track => track.stop());
+        });
+
+        retakePhotoButton.addEventListener('click', openCamera);
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            if (!fotoDataInput.value) { alert('Silakan ambil foto dokumentasi terlebih dahulu.'); return; }
+            btnSubmit.disabled = true; btnSubmit.innerText = 'Menyimpan ke Server...';
+            
+            const formData = new FormData();
+            formData.append('aksi', 'pinjam'); // SINKRONISASI PARAMETER AKSES UTAMA
+            formData.append('nama', document.getElementById('nama').value);
+            formData.append('nohp', document.getElementById('nohp').value);
+            formData.append('estimasi_tgl', tglInput.value);
+            formData.append('kunci', selectKunci.value);
+            formData.append('foto', fotoDataInput.value);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(res => {
+                if(res.status === 'success') { 
+                    formContainer.style.display = 'none';
+                    successMessage.style.display = 'block';
+                } else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; btnSubmit.innerText = 'Pinjam Kunci'; }
+            })
+            .catch(error => { alert('Koneksi sibuk. Silakan ulangi tekan tombol kirim.'); btnSubmit.disabled = false; btnSubmit.innerText = 'Pinjam Kunci'; });
+        });
+    </script>
+</body>
+</html>
+                    <input type="date" id="estimasi_tgl" class="form-control" required>
                     <small class="text-muted">Jika melewati tanggal ini dan kunci belum dikembalikan, sistem akan mengirimkan teguran WA otomatis.</small>
                 </div>
                 <div class="mb-3">
