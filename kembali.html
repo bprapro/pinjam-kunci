@@ -16,12 +16,13 @@
     <div class="container my-5" style="max-width: 600px;">
         <h2 class="text-center mb-4">🔄 Sistem Pengembalian Kunci</h2>
         
-        <div class="card p-4 shadow-sm mb-4">
+        <div class="card p-4 shadow-sm mb-4" id="formContainer">
             <h4 class="card-title mb-3 text-danger">Formulir Pengembalian</h4>
             <form id="formKembali">
                 <div class="mb-3">
-                    <label class="form-label">Nama Pengembali</label>
-                    <input type="text" id="nama" class="form-control" required placeholder="Masukkan nama lengkap Anda">
+                    <label class="form-label">Nama Pengembali (Sesuai Saat Meminjam)</label>
+                    <input type="text" id="nama" class="form-control" required placeholder="Ketik nama Anda untuk mencari kunci">
+                    <small class="text-muted">Kunci yang Anda pinjam akan muncul otomatis setelah Anda mengetik nama.</small>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Nomor HP (WhatsApp)</label>
@@ -29,8 +30,8 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Pilih Kunci yang Dikembalikan</label>
-                    <select id="kunci" class="form-select" required>
-                        <option value="">Memuat kunci yang sedang dipinjam...</option>
+                    <select id="kunci" class="form-select" required disabled>
+                        <option value="">Silakan ketik nama terlebih dahulu...</option>
                     </select>
                 </div>
                 
@@ -58,15 +59,25 @@
                 </div>
             </form>
         </div>
+        
+        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-success" style="display: none;">
+            <h1 class="display-4 text-success mb-3">✅</h1>
+            <h3 class="text-success fw-bold">Terima Kasih!</h3>
+            <p class="fs-5 text-muted">Kunci telah berhasil dikembalikan ke dalam sistem dan statusnya kini tersedia kembali.</p>
+            <button class="btn btn-outline-success mt-3" onclick="window.location.reload();">Selesai</button>
+        </div>
     </div>
 
     <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
         
+        const formContainer = document.getElementById('formContainer');
+        const successMessage = document.getElementById('successMessage');
         const form = document.getElementById('formKembali');
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
+        const inputNama = document.getElementById('nama');
+        
         const video = document.getElementById('camera-preview');
         const photoPreview = document.getElementById('taken-photo');
         const startCameraButton = document.getElementById('start-camera');
@@ -76,27 +87,40 @@
         const cameraSourceSelect = document.getElementById('camera-source');
         let stream;
 
-        // Memuat kunci yang berstatus "Dipinjam" saja
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch(scriptURL + '?status=Dipinjam')
-                .then(response => response.json())
-                .then(data => {
-                    selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
-                    if (data.length === 0) {
-                        selectKunci.innerHTML = '<option value="">Tidak ada kunci yang sedang dipinjam</option>';
-                        return;
-                    }
-                    data.forEach(kunci => {
-                        const option = document.createElement('option');
-                        option.value = kunci.id;
-                        option.textContent = kunci.nama;
-                        selectKunci.appendChild(option);
-                    });
-                    btnSubmit.disabled = false;
-                })
-                .catch(error => {
-                    selectKunci.innerHTML = '<option value="">Gagal memuat data kunci</option>';
-                });
+        // Mendeteksi ketikan pada input Nama (Debounce pencarian kunci)
+        let timerCari;
+        inputNama.addEventListener('input', () => {
+            clearTimeout(timerCari);
+            selectKunci.innerHTML = '<option value="">Mencari kunci yang Anda pinjam...</option>';
+            selectKunci.disabled = true;
+            btnSubmit.disabled = true;
+
+            timerCari = setTimeout(() => {
+                var namaValue = inputNama.value.trim();
+                if(namaValue.length < 2) {
+                    selectKunci.innerHTML = '<option value="">Silakan ketik nama terlebih dahulu...</option>';
+                    return;
+                }
+                
+                fetch(scriptURL + '?aksi=cari_kunci_peminjam&nama=' + encodeURIComponent(namaValue))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length === 0) {
+                            selectKunci.innerHTML = '<option value="">Nama tidak ditemukan atau tidak ada kunci aktif</option>';
+                        } else {
+                            selectKunci.innerHTML = '<option value="">-- Pilih Kunci yang Dikembalikan --</option>';
+                            data.forEach(kunci => {
+                                const option = document.createElement('option');
+                                option.value = kunci.id;
+                                option.textContent = kunci.nama;
+                                selectKunci.appendChild(option);
+                            });
+                            selectKunci.disabled = false;
+                            btnSubmit.disabled = false;
+                        }
+                    })
+                    .catch(error => { selectKunci.innerHTML = '<option value="">Gagal mencari data kunci</option>'; });
+            }, 800); // Mencari otomatis 0.8 detik setelah user berhenti mengetik
         });
 
         async function openCamera() {
@@ -132,8 +156,8 @@
             btnSubmit.innerText = 'Memproses Pengembalian...';
 
             const formData = new FormData();
-            formData.append('aksi', 'kembali'); // Mengirimkan instruksi kalau ini aksi pengembalian
-            formData.append('nama', document.getElementById('nama').value);
+            formData.append('aksi', 'kembali'); 
+            formData.append('nama', inputNama.value);
             formData.append('nohp', document.getElementById('nohp').value);
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
@@ -142,8 +166,9 @@
             .then(response => response.json())
             .then(res => {
                 if(res.status === 'success') {
-                    alert('Kunci Berhasil Dikembalikan! Status kunci di spreadsheet kembali Tersedia.');
-                    window.location.reload();
+                    // SELESAI INPUT: Sembunyikan form dan tampilkan Ucapan Terima Kasih secara interaktif
+                    formContainer.style.display = 'none';
+                    successMessage.style.display = 'block';
                 } else {
                     alert('Gagal: ' + res.message);
                     btnSubmit.disabled = false;
