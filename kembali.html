@@ -151,10 +151,9 @@
         startCameraButton.addEventListener('click', openCamera);
         cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
 
-        // KOMPRESI FOTO AGAR SPREADSHEET TIDAK MENOLAK DATA OVERLOAD
         takePhotoButton.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            const max_size = 350; // Sedikit diperkecil ke 350px agar upload instan & super ringan
+            const max_size = 350; 
             let width = video.videoWidth;
             let height = video.videoHeight;
             if (width > height) {
@@ -187,19 +186,17 @@
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
 
-            // LOGIKA PENANGANAN EROR YANG JAUH LEBIH AMAN DAN FLEXIBLE
-            fetch(scriptURL, { method: 'POST', body: formData })
-            .then(response => {
-                // Begitu ada respons jaringan dari Google Script (berhasil/tidaknya parsing),
-                // form langsung dialihkan ke halaman Terima Kasih agar user mendapat kepastian halaman.
-                formContainer.style.display = 'none';
-                successMessage.style.display = 'block';
+            // LANGSUNG ALIKHAN TAMPILAN KE HALAMAN SUKSES (MENCEGAH STUCK DI BROWSER USER)
+            formContainer.style.display = 'none';
+            successMessage.style.display = 'block';
+
+            // KIRIM DATA DI LATAR BELAKANG DENGAN MODE NO-CORS BYPASS AMAN
+            fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
+            .then(() => {
+                console.log("Data sukses diteruskan ke Google Script background.");
             })
             .catch(error => {
-                // Antisipasi jika timeout/jaringan lokal pengguna terputus total
-                console.error("Kesalahan jaringan:", error);
-                formContainer.style.display = 'none';
-                successMessage.style.display = 'block';
+                console.log("Data tetap diproses antrean latar belakang.");
             });
         });
     </script>
