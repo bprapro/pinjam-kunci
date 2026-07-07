@@ -16,7 +16,7 @@
     <div class="container my-5" style="max-width: 600px;">
         <h2 class="text-center mb-4">🔑 Sistem Peminjaman Kunci</h2>
         
-        <div class="card p-4 shadow-sm mb-4">
+        <div class="card p-4 shadow-sm mb-4" id="formContainer">
             <h4 class="card-title mb-3">Formulir Peminjaman</h4>
             <form id="formPinjam">
                 <div class="mb-3">
@@ -64,11 +64,21 @@
                 </div>
             </form>
         </div>
+
+        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-primary" style="display: none;">
+            <h1 class="display-4 text-primary mb-3">✅</h1>
+            <h3 class="text-primary fw-bold">Peminjaman Berhasil!</h3>
+            <p class="fs-5 text-muted">Data peminjam dan dokumentasi telah berhasil dicatat ke dalam sistem.</p>
+            <p class="text-muted small">Sistem pengingat otomatis telah diaktifkan untuk estimasi tanggal pengembalian yang Anda pilih.</p>
+            <button class="btn btn-outline-primary mt-3" onclick="window.location.reload();">Selesai / Formulir Baru</button>
+        </div>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
         
+        const formContainer = document.getElementById('formContainer');
+        const successMessage = document.getElementById('successMessage');
         const form = document.getElementById('formPinjam');
         const btnSubmit = document.getElementById('btnSubmit');
         const selectKunci = document.getElementById('kunci');
@@ -148,8 +158,9 @@
             .then(response => response.json())
             .then(res => {
                 if(res.status === 'success') { 
-                    alert('Peminjaman Berhasil Dicatat! Sistem pengingat otomatis telah diaktifkan untuk tenggat tanggal tersebut.'); 
-                    window.location.reload(); 
+                    // SELESAI INPUT: Sembunyikan form dan tampilkan kotak Ucapan Terima Kasih secara interaktif
+                    formContainer.style.display = 'none';
+                    successMessage.style.display = 'block';
                 } else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; }
             })
             .catch(error => { alert('Error: ' + error.message); btnSubmit.disabled = false; });
