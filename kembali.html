@@ -1,204 +1,158 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pengembalian Kunci</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        #camera-preview, #taken-photo { width: 100%; max-width: 400px; height: auto; border-radius: 8px; display: none; margin-bottom: 15px; }
-        #camera-preview { border: 2px solid #ddd; }
-        #taken-photo { border: 2px solid #dc3545; }
-        .camera-controls { display: flex; gap: 10px; margin-bottom: 15px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir Pengembalian Kunci</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
+    .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: auto; }
+    h2 { color: #dc3545; text-align: center; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { background-color: #dc3545; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
+    button:hover { background-color: #bd2130; }
+    #canvas { display: none; width: 100%; max-width: 400px; border-radius: 4px; margin-top: 10px; }
+    #video { width: 100%; max-width: 400px; border-radius: 4px; background: #222; }
+    .foto-container { text-align: center; margin-top: 10px; }
+  </style>
 </head>
-<body class="bg-light">
-    <div class="container my-5" style="max-width: 600px;">
-        <h2 class="text-center mb-4">🔄 Sistem Pengembalian Kunci</h2>
-        
-        <div class="card p-4 shadow-sm mb-4" id="formContainer">
-            <h4 class="card-title mb-3 text-danger">Formulir Pengembalian</h4>
-            <form id="formKembali">
-                <div class="mb-3">
-                    <label class="form-label">Nama Pengembali (Ketik min. 3 huruf awal)</label>
-                    <input type="text" id="nama" class="form-control" autocomplete="off" list="list-peminjam" required placeholder="Masukkan nama Anda...">
-                    <datalist id="list-peminjam"></datalist>
-                    <small class="text-muted">Rekomendasi nama otomatis muncul berdasarkan peminjam aktif.</small>
-                </div>
+<body>
 
-                <input type="hidden" id="nohp">
-
-                <div class="mb-3">
-                    <label class="form-label">Pilih Kunci yang Dikembalikan</label>
-                    <select id="kunci" class="form-select" required disabled>
-                        <option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>
-                    </select>
-                </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Dokumentasi (Foto Kunci yang Dikembalikan)</label>
-                    <div class="mb-2" style="max-width: 200px;">
-                        <select id="camera-source" class="form-select form-select-sm">
-                            <option value="environment">Kamera Belakang</option>
-                            <option value="user">Kamera Depan (Selfie)</option>
-                        </select>
-                    </div>
-                    <video id="camera-preview" autoplay playsinline></video>
-                    <img id="taken-photo" alt="Foto Pengembalian">
-                    <div class="camera-controls">
-                        <button type="button" id="start-camera" class="btn btn-outline-danger btn-sm">Buka Kamera</button>
-                        <button type="button" id="take-photo" class="btn btn-danger btn-sm" style="display: none;">Ambil Foto</button>
-                        <button type="button" id="retake-photo" class="btn btn-outline-secondary btn-sm" style="display: none;">Foto Ulang</button>
-                    </div>
-                    <input type="hidden" id="foto-data" required>
-                </div>
-                
-                <button type="submit" id="btnSubmit" class="btn btn-danger w-100" disabled>Kembalikan Kunci</button>
-                <div class="text-center mt-3">
-                    <a href="index.html" class="text-decoration-none">← Kembali ke Form Peminjaman</a>
-                </div>
-            </form>
-        </div>
-        
-        <div id="successMessage" class="card p-5 shadow-sm text-center bg-white border-success" style="display: none;">
-            <h1 class="display-4 text-success mb-3">✅</h1>
-            <h3 class="text-success fw-bold">Terima Kasih!</h3>
-            <p class="fs-5 text-muted">Proses pengembalian selesai dikirim. Status ketersediaan kunci akan diperbarui di sistem dalam beberapa saat.</p>
-            <button class="btn btn-outline-success mt-3" onclick="window.location.reload();">Selesai / Formulir Baru</button>
-        </div>
+<div class="container">
+  <h2>🔄 Formulir Pengembalian Kunci</h2>
+  <form id="formKembali">
+    <input type="hidden" name="aksi" value="kembali">
+    
+    <div class="form-group">
+      <label for="nama">Nama Pengembali (Ketik Nama Anda):</label>
+      <input type="text" id="nama" name="nama" required placeholder="Contoh: bagus" autocomplete="off">
+      <button type="button" id="btnCariKunci" style="background-color: #17a2b8; margin-top: 5px; font-size: 14px; padding: 6px;">🔍 Cari Kunci Saya</button>
     </div>
 
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
+    <div class="form-group">
+      <label for="kunci">Kunci yang Anda Bawa:</label>
+      <select id="kunci" name="kunci" required>
+        <option value="">-- Klik tombol 'Cari Kunci Saya' di atas --</option>
+      </select>
+    </div>
+
+    <div class="form-group" style="display:none;">
+      <label for="nohp">No HP:</label>
+      <input type="text" id="nohp" name="nohp">
+    </div>
+
+    <div class="form-group foto-container">
+      <label>Dokumentasi Foto Pengembalian:</label>
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+      <button type="button" id="btnAmbilFoto" style="background-color: #28a745; margin-top: 5px;">📸 Ambil Foto</button>
+      <button type="button" id="btnFotoUlang" style="background-color: #6c757d; margin-top: 5px; display: none;">🔄 Foto Ulang</button>
+      <input type="hidden" id="foto" name="foto" required>
+    </div>
+
+    <button type="submit" id="btnSubmit" style="margin-top: 15px;">Proses Pengembalian Kunci</button>
+  </form>
+</div>
+
+<script>
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const fotoInput = document.getElementById('foto');
+  const btnAmbilFoto = document.getElementById('btnAmbilFoto');
+  const btnFotoUlang = document.getElementById('btnFotoUlang');
+  const btnCariKunci = document.getElementById('btnCariKunci');
+  const selectKunci = document.getElementById('kunci');
+  const nohpInput = document.getElementById('nohp');
+
+  // 1. Jalankan Kamera Otomatis
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(stream => { video.srcObject = stream; })
+    .catch(() => alert("Izin kamera ditolak/gagal diakses."));
+
+  // 2. Fungsi Cari Kunci Berdasarkan Input Nama
+  btnCariKunci.addEventListener('click', () => {
+    const namaUser = document.getElementById('nama').value.trim();
+    if (!namaUser) { alert("Silakan ketik nama Anda terlebih dahulu!"); return; }
+    
+    btnCariKunci.textContent = "Mencari...";
+    
+    fetch(`${scriptUrl}?aksi=cari_kunci_peminjam&nama=${encodeURIComponent(namaUser)}`)
+      .then(res => res.json())
+      .then(data => {
+        btnCariKunci.textContent = "🔍 Cari Kunci Saya";
+        selectKunci.innerHTML = "";
         
-        const formContainer = document.getElementById('formContainer');
-        const successMessage = document.getElementById('successMessage');
-        const form = document.getElementById('formKembali');
-        const btnSubmit = document.getElementById('btnSubmit');
-        const selectKunci = document.getElementById('kunci');
-        const inputNama = document.getElementById('nama');
-        const inputNoHP = document.getElementById('nohp');
-        const datalistPeminjam = document.getElementById('list-peminjam');
-        const video = document.getElementById('camera-preview');
-        const photoPreview = document.getElementById('taken-photo');
-        const startCameraButton = document.getElementById('start-camera');
-        const takePhotoButton = document.getElementById('take-photo');
-        const retakePhotoButton = document.getElementById('retake-photo');
-        const fotoDataInput = document.getElementById('foto-data');
-        const cameraSourceSelect = document.getElementById('camera-source');
-        let stream;
-        let semuaPeminjam = [];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch(scriptURL + '?aksi=ambil_semua_peminjam')
-                .then(response => response.json())
-                .then(data => { semuaPeminjam = data; })
-                .catch(err => console.error("Gagal memuat data"));
-        });
-
-        inputNama.addEventListener('input', () => {
-            var namaValue = inputNama.value.trim();
-            datalistPeminjam.innerHTML = '';
-            
-            if (namaValue.length >= 3) {
-                var filterNama = semuaPeminjam.filter(nama => nama.toLowerCase().includes(namaValue.toLowerCase()));
-                filterNama.forEach(nama => {
-                    const option = document.createElement('option');
-                    option.value = nama;
-                    datalistPeminjam.appendChild(option);
-                });
-            }
-
-            if (semuaPeminjam.includes(namaValue)) {
-                selectKunci.innerHTML = '<option value="">Mencari kunci milik ' + namaValue + '...</option>';
-                fetch(scriptURL + '?aksi=cari_kunci_peminjam&nama=' + encodeURIComponent(namaValue))
-                    .then(response => response.json())
-                    .then(res => {
-                        let kunciList = res.kunci ? res.kunci : (Array.isArray(res) ? res : []);
-                        let nohpVal = res.nohp ? res.nohp : "";
-
-                        if (kunciList.length > 0) {
-                            selectKunci.innerHTML = '<option value="">-- Pilih Kunci --</option>';
-                            kunciList.forEach(kunci => {
-                                const option = document.createElement('option');
-                                option.value = kunci.id;
-                                option.textContent = kunci.nama;
-                                selectKunci.appendChild(option);
-                            });
-                            selectKunci.disabled = false;
-                            inputNoHP.value = nohpVal;
-                            btnSubmit.disabled = false;
-                        } else {
-                            selectKunci.innerHTML = '<option value="">Tidak ada kunci aktif untuk nama ini</option>';
-                        }
-                    });
-            } else {
-                selectKunci.innerHTML = '<option value="">Silakan masukkan nama yang valid terlebih dahulu...</option>';
-                selectKunci.disabled = true;
-                btnSubmit.disabled = true;
-            }
-        });
-
-        async function openCamera() {
-            if (stream) { stream.getTracks().forEach(track => track.stop()); }
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: cameraSourceSelect.value } } });
-                video.srcObject = stream;
-                startCameraButton.style.display = 'none'; video.style.display = 'block'; takePhotoButton.style.display = 'inline-block'; photoPreview.style.display = 'none'; retakePhotoButton.style.display = 'none'; fotoDataInput.value = '';
-            } catch (error) { alert('Gagal membuka kamera.'); }
+        if (!data.kunci || data.kunci.length === 0) {
+          selectKunci.innerHTML = '<option value="">-- Tidak ada kunci aktif atas nama ini --</option>';
+          alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam.");
+          return;
         }
-
-        startCameraButton.addEventListener('click', openCamera);
-        cameraSourceSelect.addEventListener('change', () => { if (video.style.display === 'block') openCamera(); });
-
-        takePhotoButton.addEventListener('click', () => {
-            const canvas = document.createElement('canvas');
-            const max_size = 350; 
-            let width = video.videoWidth;
-            let height = video.videoHeight;
-            if (width > height) {
-                if (width > max_size) { height *= max_size / width; width = max_size; }
-            } else {
-                if (height > max_size) { width *= max_size / height; height = max_size; }
-            }
-            canvas.width = width; canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, width, height);
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
-            photoPreview.src = compressedBase64; photoPreview.style.display = 'block'; video.style.display = 'none';
-            fotoDataInput.value = compressedBase64; takePhotoButton.style.display = 'none'; retakePhotoButton.style.display = 'inline-block';
-            if (stream) stream.getTracks().forEach(track => track.stop());
+        
+        nohpInput.value = data.nohp || "";
+        data.kunci.forEach(k => {
+          const opt = document.createElement("option");
+          opt.value = k.id;
+          opt.textContent = `${k.id} - ${k.nama}`;
+          selectKunci.appendChild(opt);
         });
+      })
+      .catch(() => {
+        btnCariKunci.textContent = "🔍 Cari Kunci Saya";
+        alert("Gagal terhubung ke database.");
+      });
+  });
 
-        retakePhotoButton.addEventListener('click', openCamera);
+  // 3. Logika Jepret Kamera Canvas
+  btnAmbilFoto.addEventListener('click', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    fotoInput.value = canvas.toDataURL('image/jpeg');
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+    btnAmbilFoto.style.display = 'none';
+    btnFotoUlang.style.display = 'block';
+  });
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            if (!fotoDataInput.value) { alert('Silakan ambil foto bukti pengembalian.'); return; }
-            
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Memproses Pengembalian...';
+  btnFotoUlang.addEventListener('click', () => {
+    fotoInput.value = "";
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    btnAmbilFoto.style.display = 'block';
+    btnFotoUlang.style.display = 'none';
+  });
 
-            const formData = new FormData();
-            formData.append('aksi', 'kembali'); 
-            formData.append('nama', inputNama.value);
-            formData.append('nohp', inputNoHP.value); 
-            formData.append('kunci', selectKunci.value);
-            formData.append('foto', fotoDataInput.value);
-
-            // LANGSUNG ALIKHAN TAMPILAN KE HALAMAN SUKSES (MENCEGAH STUCK DI BROWSER USER)
-            formContainer.style.display = 'none';
-            successMessage.style.display = 'block';
-
-            // KIRIM DATA DI LATAR BELAKANG DENGAN MODE NO-CORS BYPASS AMAN
-            fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
-            .then(() => {
-                console.log("Data sukses diteruskan ke Google Script background.");
-            })
-            .catch(error => {
-                console.log("Data tetap diproses antrean latar belakang.");
-            });
-        });
-    </script>
+  // 4. Kirim Data Selesai Pengembalian Kunci
+  document.getElementById('formKembali').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if(!selectKunci.value) { alert("Pilih kunci ruangan yang valid!"); return; }
+    if(!fotoInput.value) { alert("Anda wajib melampirkan foto dokumentasi kunci!"); return; }
+    
+    const btnSubmit = document.getElementById('btnSubmit');
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Memproses Pengembalian...";
+    
+    fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
+      .then(res => res.json())
+      .then(res => {
+        if(res.status === 'success') {
+          alert("Kunci berhasil dikembalikan! Terima kasih.");
+          window.location.reload();
+        } else {
+          alert("Eror: " + res.message);
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = "Proses Pengembalian Kunci";
+        }
+      })
+      .catch(() => {
+        alert("Eror: Gagal mengirim data pengembalian.");
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Proses Pengembalian Kunci";
+      });
+  });
+</script>
 </body>
 </html>
