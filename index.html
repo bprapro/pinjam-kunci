@@ -24,19 +24,13 @@
                     <input type="text" id="nama" class="form-control" required placeholder="Masukkan nama lengkap Anda">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Nomor HP (WhatsApp)</label>
+                    <label class="form-label">Nomor HP / WhatsApp (Awali dengan 08/62)</label>
                     <input type="tel" id="nohp" class="form-control" required placeholder="Contoh: 08123456789">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Estimasi Durasi Peminjaman</label>
-                    <select id="durasi" class="form-select" required>
-                        <option value="">-- Pilih Durasi --</option>
-                        <option value="1 Jam">1 Jam</option>
-                        <option value="2 Jam">2 Jam</option>
-                        <option value="半 Hari (Aktivitas Kerja)">Setengah Hari</option>
-                        <option value="1 Hari penuh">1 Hari penuh</option>
-                        <option value="Lainnya / Hingga Selesai">Hingga Selesai Aktivitas</option>
-                    </select>
+                    <label class="form-label">Estimasi Tanggal Pengembalian</label>
+                    <input type="date" id="estimasi_tgl" class="form-control" required>
+                    <small class="text-muted">Jika melewati tanggal ini dan kunci belum dikembalikan, sistem akan mengirimkan teguran WA otomatis.</small>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Pilih Kunci</label>
@@ -86,6 +80,11 @@
         const fotoDataInput = document.getElementById('foto-data');
         const cameraSourceSelect = document.getElementById('camera-source');
         let stream;
+
+        // Batasi agar tanggal minimal adalah hari ini
+        const tglInput = document.getElementById('estimasi_tgl');
+        const hariIni = new Date().toISOString().split('T')[0];
+        tglInput.min = hariIni;
 
         window.addEventListener('DOMContentLoaded', () => {
             fetch(scriptURL + '?aksi=ambil_tersedia')
@@ -141,7 +140,7 @@
             formData.append('aksi', 'pinjam');
             formData.append('nama', document.getElementById('nama').value);
             formData.append('nohp', document.getElementById('nohp').value);
-            formData.append('durasi', document.getElementById('durasi').value);
+            formData.append('estimasi_tgl', tglInput.value);
             formData.append('kunci', selectKunci.value);
             formData.append('foto', fotoDataInput.value);
 
@@ -149,7 +148,7 @@
             .then(response => response.json())
             .then(res => {
                 if(res.status === 'success') { 
-                    alert('Peminjaman Berhasil Dicatat! Terima kasih.'); 
+                    alert('Peminjaman Berhasil Dicatat! Sistem pengingat otomatis telah diaktifkan untuk tenggat tanggal tersebut.'); 
                     window.location.reload(); 
                 } else { alert('Gagal: ' + res.message); btnSubmit.disabled = false; }
             })
