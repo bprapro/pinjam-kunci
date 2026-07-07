@@ -46,7 +46,7 @@
     h2.kembali-title { color: var(--danger); }
     h2.monitor-title { color: var(--dark); margin-bottom: 20px; }
     
-    /* Segmented Control Tab (ala iOS/Modern SaaS) */
+    /* Segmented Control Tab */
     .nav-tabs { 
       display: flex; 
       background-color: #f1f5f9; 
@@ -115,10 +115,12 @@
     .foto-container { text-align: center; margin-top: 10px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
     .btn-buka-cam { background-color: #475569; color: white; border: none; }
     .btn-buka-cam:hover { background-color: #334155; }
-    .btn-ambil-foto { background-color: var(--success); color: white; border: none; }
-    .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; }
+    
+    /* Tombol Ambil dan Ulang disembunyikan di awal lewat CSS */
+    .btn-ambil-foto { background-color: var(--success); color: white; border: none; display: none; margin-top: 10px; }
+    .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; display: none; margin-top: 10px; }
 
-    /* Desain Minimalis Tabel Monitor */
+    /* Tabel Monitor */
     table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
     th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
     th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -322,7 +324,6 @@
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        // HANYA menampilkan status kunci yang sedang "Dipinjam"
         dataMonitorTerpinjam = data.filter(item => item.status === "Dipinjam");
         halamanSekarang = 1;
         tampilkanHalamanMonitor();
@@ -370,7 +371,6 @@
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
-  // Logika Rekomendasi Auto-complete Nama Minimal 3 Huruf Peminjam Aktif
   function cekMinimalKarakterNama(nilaiInput) {
     const datalist = document.getElementById("listPeminjamAktif");
     datalist.innerHTML = ""; 
@@ -389,7 +389,6 @@
     });
   }
 
-  // Pencarian Kunci Terpinjam Saja Berdasarkan Nama
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const nama = document.getElementById('nama_kembali').value.trim();
     if (!nama) { alert("Masukkan nama Anda!"); return; }
@@ -415,7 +414,7 @@
       });
   });
 
-  // Kamera Engine Universal
+  // Manajemen Tombol Kamera Bertahap
   function aturKamera(suffix) {
     const video = document.getElementById('video' + suffix);
     const canvas = document.getElementById('canvas' + suffix);
@@ -428,8 +427,12 @@
       matikanKamera();
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
         streamKameraAktif = stream; video.srcObject = stream;
-        video.style.display = 'block'; btnAmbil.style.display = 'block'; btnBuka.style.display = 'none';
-        canvas.style.display = 'none'; btnUlang.style.display = 'none'; input.value = "";
+        video.style.display = 'block'; 
+        btnAmbil.style.display = 'block'; // Ambil Foto muncul setelah kamera aktif
+        btnBuka.style.display = 'none';
+        canvas.style.display = 'none'; 
+        btnUlang.style.display = 'none'; 
+        input.value = "";
       }).catch(() => alert("Izin kamera ditolak."));
     });
 
@@ -437,14 +440,18 @@
       canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       input.value = canvas.toDataURL('image/jpeg');
-      canvas.style.display = 'block'; video.style.display = 'none';
-      btnUlang.style.display = 'block'; btnAmbil.style.display = 'none';
+      canvas.style.display = 'block'; 
+      video.style.display = 'none';
+      btnUlang.style.display = 'block'; // Foto Ulang baru muncul setelah foto diambil
+      btnAmbil.style.display = 'none';
     });
 
     btnUlang.addEventListener('click', () => {
       input.value = "";
-      video.style.display = 'block'; canvas.style.display = 'none';
-      btnAmbil.style.display = 'block'; btnUlang.style.display = 'none';
+      video.style.display = 'block'; 
+      canvas.style.display = 'none';
+      btnAmbil.style.display = 'block'; 
+      btnUlang.style.display = 'none';
     });
   }
 
@@ -476,7 +483,6 @@
             muatKunciTersedia();
             muatMonitorData();
             
-            // Sembunyikan form dan tab navigasi
             document.getElementById('navTabsContainer').style.display = 'none';
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             
@@ -494,7 +500,6 @@
     });
   }
 
-  // Kembali ke halaman formulir, selalu dialihkan khusus ke form PINJAM KUNCI
   function resetKeHalamanForm() {
     document.getElementById('screenSukses').style.display = 'none';
     document.getElementById('navTabsContainer').style.display = 'flex';
