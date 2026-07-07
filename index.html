@@ -30,7 +30,7 @@
                 <div class="mb-3">
                     <label class="form-label">Dokumentasi (Ambil Foto Kunci/Peminjam)</label>
                     <input type="file" id="foto" class="form-control" accept="image/*" required>
-                    <small class="text-muted">Foto otomatis dikompres oleh sistem agar hemat penyimpanan.</small>
+                    <small class="text-muted">Foto akan otomatis disimpan aman ke Google Drive & tautannya dicatat ke Spreadsheet.</small>
                 </div>
                 <button type="submit" id="btnSubmit" class="btn btn-primary w-100" disabled>Pinjam Kunci</button>
             </form>
@@ -38,7 +38,6 @@
     </div>
 
     <script>
-        // TAUTAN GOOGLE APPS SCRIPT ANDA
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec';
         
         const form = document.getElementById('formPinjam');
@@ -72,7 +71,7 @@
             e.preventDefault();
             
             btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Mengompres Gambar & Menyimpan...';
+            btnSubmit.innerText = 'Mengunggah Data & Foto ke Sistem...';
 
             const fileInput = document.getElementById('foto');
             const file = fileInput.files[0];
@@ -83,20 +82,17 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function () {
-                    // FITUR KOMPRESI: Mengecilkan gambar menggunakan elemen Canvas HTML5
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Batasi lebar maksimum gambar ke 800 pixel saja (Cukup jernih untuk dokumentasi sel)
-                    const max_width = 800;
+                    // Optimasi Resolusi ke 600px agar unggahan super ringan dan stabil
+                    const max_width = 600;
                     const scaleSize = max_width / img.width;
                     canvas.width = max_width;
                     canvas.height = img.height * scaleSize;
 
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Ubah jadi base64 dengan kualitas 70% (Sangat menghemat ruang cell Google Sheet)
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
                     const formData = new FormData();
                     formData.append('nama', document.getElementById('nama').value);
@@ -111,7 +107,7 @@
                     .then(response => response.json())
                     .then(res => {
                         if(res.status === 'success') {
-                            alert('Peminjaman dan Dokumentasi Foto Berhasil Dicatat!');
+                            alert('Peminjaman Berhasil! Foto dokumentasi telah tersimpan aman di Google Drive.');
                             window.location.reload();
                         } else {
                             alert('Gagal menyimpan: ' + res.message);
