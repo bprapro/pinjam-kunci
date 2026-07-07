@@ -22,7 +22,6 @@
     .form-section { display: none; }
     .form-section.active { display: block; }
     
-    /* Style Halaman Sukses / Terima Kasih */
     .success-screen { display: none; text-align: center; padding: 40px 20px; }
     .success-screen h3 { color: #28a745; font-size: 26px; margin-bottom: 10px; }
     .success-screen p { color: #555; font-size: 16px; margin-bottom: 20px; }
@@ -48,7 +47,6 @@
     .btn-ambil-foto { background-color: #007bff; color: white; margin-top: 5px; display: none; }
     .btn-foto-ulang { background-color: #6c757d; color: white; margin-top: 5px; display: none; }
 
-    /* Tabel Monitor & Paginasi */
     table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
     th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
     th { background-color: #232f3e; color: white; }
@@ -60,6 +58,7 @@
     .btn-page { background-color: #f8f9fa; border: 1px solid #ccc; padding: 6px 12px; font-weight: bold; cursor: pointer; width: auto; border-radius: 4px; }
     .btn-page:disabled { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
     #infoHalaman { font-weight: bold; }
+    .hint-text { font-size: 12px; color: #6c757d; margin-top: 4px; display: block; }
   </style>
 </head>
 <body>
@@ -120,8 +119,10 @@
         <input type="hidden" name="aksi" value="kembali">
         <div class="form-group">
           <label for="nama_kembali">Nama Pengembali:</label>
-          <input type="text" id="nama_kembali" name="nama" required placeholder="Ketik nama saat meminjam" autocomplete="off">
-          <button type="button" id="btnCariKunci" style="background-color: #17a2b8; color:white; margin-top: 5px; font-size: 14px; padding: 6px; cursor:pointer; border:none; border-radius:4px;">🔍 Cari Kunci Saya</button>
+          <input type="text" id="nama_kembali" name="nama" list="listPeminjamAktif" required placeholder="Ketik min. 3 huruf nama Anda..." autocomplete="off" oninput="cekMinimalKarakterNama(this.value)">
+          <datalist id="listPeminjamAktif"></datalist>
+          <span class="hint-text">Rekomendasi nama otomatis muncul berdasarkan peminjam aktif.</span>
+          <button type="button" id="btnCariKunci" style="background-color: #17a2b8; color:white; margin-top: 8px; font-size: 14px; padding: 8px; cursor:pointer; border:none; border-radius:4px;">🔍 Cari Kunci Saya</button>
         </div>
         <div class="form-group">
           <label for="kunci_kembali">Kunci yang Dikembalikan:</label>
@@ -152,7 +153,7 @@
 
   <div class="monitor-container">
     <button class="btn-refresh" onclick="muatMonitorData()">🔄 Segarkan Data</button>
-    <h2 class="monitor-title" style="text-align: left;">🚨 Daftar Kunci yangsedang Dipinjam</h2>
+    <h2 class="monitor-title" style="text-align: left;">🚨 Daftar Kunci yang sedang Dipinjam</h2>
     <table>
       <thead>
         <tr>
@@ -239,13 +240,10 @@
     });
   }
 
-  // MODIFIKASI LENGKAP: Hanya saring data berstatus "Dipinjam"
   function muatMonitorData() {
-    const body = document.getElementById("bodyTabel");
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        // Filter ketat agar data status "Tersedia" tidak dimasukkan ke dalam list
         dataMonitorTerpinjam = data.filter(item => item.status === "Dipinjam");
         halamanSekarang = 1;
         tampilkanHalamanMonitor();
@@ -264,7 +262,7 @@
     const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
     if (dataHalamanIni.length === 0) {
-      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: #28a745; font-weight: bold; padding: 25px;">✅ Amandemen Aman! Seluruh kunci saat ini berada di rak (Tidak ada yang dipinjam).</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: #28a745; font-weight: bold; padding: 25px;">✅ Seluruh kunci saat ini berada di rak (Tidak ada yang dipinjam).</td></tr>';
       document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
       document.getElementById("btnPrev").disabled = true;
       document.getElementById("btnNext").disabled = true;
@@ -273,7 +271,7 @@
 
     dataHalamanIni.forEach(item => {
       const tr = document.createElement("tr");
-      tr.style.backgroundColor = "#fff0f0"; // Warna background soft red tanda dipinjam
+      tr.style.backgroundColor = "#fff0f0";
       tr.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
@@ -293,6 +291,27 @@
 
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
+
+  // LOGIKA BARU: Rekomendasi nama otomatis saat mengetik minimal 3 huruf
+  function cekMinimalKarakterNama(nilaiInput) {
+    const datalist = document.getElementById("listPeminjamAktif");
+    datalist.innerHTML = ""; // Bersihkan list setiap mengetik
+    
+    const teksCari = nilaiInput.trim().toLowerCase();
+    if (teksCari.length < 3) return; // Jalankan filter hanya jika sudah mengetik minimal 3 huruf
+
+    // Ambil daftar nama unik dari dataMonitorTerpinjam (yang statusnya sedang meminjam kunci)
+    const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+    
+    // Saring nama yang cocok dengan ketikan user
+    listNamaUnik.forEach(nama => {
+      if (nama.toLowerCase().includes(teksCari)) {
+        const option = document.createElement("option");
+        option.value = nama;
+        datalist.appendChild(option);
+      }
+    });
+  }
 
   // Cari Kunci Aktif Pengembali
   document.getElementById('btnCariKunci').addEventListener('click', () => {
@@ -363,7 +382,6 @@
     document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
   }
 
-  // Penanganan Submit Form Menampilkan Halaman Terima Kasih Langsung
   function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
     document.getElementById(idForm).addEventListener('submit', function(e) {
       e.preventDefault();
@@ -379,11 +397,9 @@
             document.getElementById(idForm).reset();
             matikanKamera();
             
-            // Perbarui Live monitor & data penunjang
             muatKunciTersedia();
             muatMonitorData();
             
-            // Sembunyikan form dan navigasi tab, tampilkan layar Terima kasih
             document.getElementById('navTabsContainer').style.display = 'none';
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             
@@ -401,7 +417,6 @@
     });
   }
 
-  // Kembali ke halaman formulir setelah menekan tombol di layar Terima Kasih
   function resetKeHalamanForm() {
     document.getElementById('screenSukses').style.display = 'none';
     document.getElementById('navTabsContainer').style.display = 'flex';
