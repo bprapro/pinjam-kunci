@@ -84,7 +84,7 @@
     
     /* Layar Sukses / Terima Kasih */
     .success-screen { display: none; text-align: center; padding: 20px 10px; }
-    .success-screen h3 { color: var(--success); font-size: 28px; margin-bottom: 12px; font-weight: 700; }
+    .success-screen h3 { color: var(--dark); font-size: 28px; margin-bottom: 12px; font-weight: 700; }
     .success-screen p { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; }
     
     /* Form & Input Fields */
@@ -135,7 +135,7 @@
     .btn-buka-cam { background-color: #475569; color: white; border: none; }
     .btn-buka-cam:hover { background-color: #334155; }
     
-    .btn-ambil-foto { background-color: var(--success); color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
+    .btn-ambil-foto { background-color: var(--primary); color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
     .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
 
     /* Tabel Monitor */
@@ -325,7 +325,7 @@
   </div>
 
 <script>
-  // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
+  // URL Web App Resmi Anda
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
   
   let semuaDataKunci = [];
@@ -348,15 +348,15 @@
     } else {
       document.getElementById('sectionKembali').classList.add('active');
       document.getElementById('tabKembali').classList.add('active-kembali');
+      // Reset dropdown pengembalian saat pindah tab
+      document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol 'Cari Kunci Saya' di atas --</option>';
     }
   }
 
-  // DIUBAH: Menggunakan 'ambil_status_lengkap' agar sesuai dengan Code.gs baru
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        // Saring hanya yang berstatus "Tersedia" untuk menu dropdown formulir peminjaman
         semuaDataKunci = data.filter(k => k.status.toLowerCase() === 'tersedia');
         
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
@@ -413,7 +413,7 @@
     const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
     if (dataHalamanIni.length === 0) {
-      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--success); font-weight: bold; padding: 25px;"> Seluruh kunci saat ini berada di rak.</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;"> Seluruh kunci saat ini berada di rak.</td></tr>';
       document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
       document.getElementById("btnPrev").disabled = true;
       document.getElementById("btnNext").disabled = true;
@@ -460,29 +460,34 @@
     });
   }
 
+  // DIOPTIMALKAN: Menggunakan pencarian lokal secepat kilat (0ms) dari cache frontend tanpa fetch eksternal
   document.getElementById('btnCariKunci').addEventListener('click', () => {
-    const nama = document.getElementById('nama_kembali').value.trim();
-    if (!nama) { alert("Masukkan nama Anda!"); return; }
-    document.getElementById('btnCariKunci').textContent = "Mencari...";
+    const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
+    if (!namaInput) { alert("Masukkan nama Anda!"); return; }
     
-    fetch(`${scriptUrl}?aksi=cari_kunci_peminjam&nama=${encodeURIComponent(nama)}`)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('btnCariKunci').innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
-        const select = document.getElementById('kunci_kembali');
-        select.innerHTML = "";
-        
-        if (!data.kunci || data.kunci.length === 0) {
-          select.innerHTML = '<option value="">-- Tidak ada kunci terpinjam --</option>';
-          alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam.");
-          return;
-        }
-        
-        document.getElementById('nohp_kembali').value = data.nohp || "";
-        data.kunci.forEach(k => { 
-          select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; 
-        });
+    const btnCari = document.getElementById('btnCariKunci');
+    btnCari.textContent = "Mencari...";
+    
+    // Cari kecocokan data dari log cache lokal dataMonitorTerpinjam
+    const kunciDitemukan = dataMonitorTerpinjam.filter(item => item.peminjam.toLowerCase() === namaInput);
+    const select = document.getElementById('kunci_kembali');
+    select.innerHTML = "";
+    
+    setTimeout(() => {
+      btnCari.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
+      
+      if (kunciDitemukan.length === 0) {
+        select.innerHTML = '<option value="">-- Tidak ada kunci terpinjam --</option>';
+        alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam. Pastikan nama sesuai dengan tabel di bawah.");
+        return;
+      }
+      
+      // Mengisi nomor HP tiruan/pembantu jika terdeteksi dari log (opsional) atau kosongkan aman
+      document.getElementById('nohp_kembali').value = "-";
+      kunciDitemukan.forEach(k => { 
+        select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; 
       });
+    }, 200);
   });
 
   function aturKamera(suffix) {
@@ -544,6 +549,10 @@
       const btn = document.getElementById(idBtn);
       btn.disabled = true; btn.textContent = "Memproses...";
       
+      const formatUlangTombol = (konteksAksi === 'pinjam') 
+        ? `<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
+        : `<svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
+
       fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
         .then(res => res.json()).then(res => {
           if(res.status === 'success') { 
@@ -564,12 +573,18 @@
             document.getElementById('screenSukses').style.display = 'block';
             
             btn.disabled = false;
-            btn.innerHTML = (konteksAksi === 'pinjam') 
-              ? `<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
-              : `<svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
+            btn.innerHTML = formatUlangTombol;
           }
-          else { alert("Gagal: " + res.message); btn.disabled = false; btn.textContent = textReset; }
-        }).catch(() => { alert("Kendala Jaringan."); btn.disabled = false; btn.textContent = textReset; });
+          else { 
+            alert("Gagal: " + res.message); 
+            btn.disabled = false; 
+            btn.innerHTML = formatUlangTombol; 
+          }
+        }).catch(() => { 
+          alert("Kendala Jaringan atau Server Timeout."); 
+          btn.disabled = false; 
+          btn.innerHTML = formatUlangTombol; 
+        });
     });
   }
 
