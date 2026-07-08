@@ -1,350 +1,127 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajemen Kunci Ruangan</title>
-  <style>
-    /* --- Gaya Desain Modern & Responsif --- */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f7f6;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto 30px auto;
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-    h2, h3 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    .form-group {
-      margin-bottom: 18px;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #34495e;
-    }
-    input[type="text"], select, input[type="date"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-pinjam { background-color: #27ae60; color: white; }
-    .btn-pinjam:hover { background-color: #219653; }
-    .btn-kembali { background-color: #c0392b; color: white; margin-top: 10px; }
-    .btn-kembali:hover { background-color: #962d22; }
-    .btn-cari { background-color: #2980b9; color: white; margin-top: 5px; }
-    .btn-cari:hover { background-color: #2471a3; }
-    
-    /* Tabel Data */
-    .table-container {
-      max-width: 950px;
-      margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-      font-size: 14px;
-    }
-    th { background-color: #f8f9fa; color: #2c3e50; }
-    .badge-dipinjam {
-      color: #c0392b;
-      background: #fde8e7;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 12px;
-    }
-    .spinner {
-      text-align: center;
-      padding: 10px;
-      font-weight: bold;
-      color: #7f8c8d;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Peminjaman Kunci 23 Semarang</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .form-container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], select, input[type="date"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 10px; background-color: #2e7d32; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .btn-submit:hover { background-color: #1b5e20; }
+        .camera-section { border: 1px dashed #ccc; padding: 15px; text-align: center; border-radius: 4px; background: #fafafa; }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>🔑 Formulir Peminjaman Kunci</h2>
-    <form id="formPinjam">
-      <div class="form-group">
-        <label>Nama Peminjam:</label>
-        <input type="text" id="nama_peminjam" placeholder="Masukkan nama lengkap" required>
-      </div>
-      <div class="form-group">
-        <label>Nomor HP (WhatsApp):</label>
-        <input type="text" id="nohp_peminjam" placeholder="Contoh: 08123456789" required>
-      </div>
-      <div class="form-group">
-        <label>Pilih Kunci / Ruangan yang Tersedia:</label>
-        <select id="pilihan_kunci" required>
-          <option value="">-- Memuat data kunci... --</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Estimasi Tanggal Pengembalian:</label>
-        <input type="date" id="estimasi_kembali" required>
-      </div>
-      <button type="button" class="btn btn-pinjam" onclick="prosesTransaksi('pinjam')">🚀 Kirim Data Peminjaman</button>
-    </form>
-
-    <hr style="margin: 30px 0; border: 0; border-top: 1px dashed #ccc;">
-
-    <h2>🔄 Formulir Pengembalian Kunci</h2>
-    <form id="formKembali">
-      <div class="form-group">
-        <label>Nama Pengembali:</label>
-        <input type="text" id="nama_pengembali" placeholder="Masukkan nama Anda saat mempinjam" required>
-        <button type="button" class="btn btn-cari" onclick="cariKunciPeminjamAktif()">🔍 Cari Kunci Saya</button>
-      </div>
-      <div class="form-group">
-        <label>Kunci yang Dikembalikan:</label>
-        <select id="kunci_dikembalikan" required>
-          <option value="">-- Klik tombol 'Cari Kunci Saya' di atas --</option>
-        </select>
-      </div>
-      <button type="button" class="btn btn-kembali" onclick="prosesTransaksi('kembali')">🔄 Proses Pengembalian Kunci</button>
-    </form>
-  </div>
-
-  <div class="table-container">
-    <h3>🚨 Daftar Kunci yang sedang Dipinjam</h3>
-    <div id="loading-spinner" class="spinner">Memuat status transaksi aktif...</div>
-    <table>
-      <thead>
-        <tr>
-          <th>ID Kunci</th>
-          <th>Nama Kunci / Ruangan</th>
-          <th>Lantai</th>
-          <th>Zona</th>
-          <th>Status</th>
-          <th>Peminjam Saat Ini</th>
-          <th>Estimasi Kembali</th>
-        </tr>
-      </thead>
-      <tbody id="tabel_kunci_dipinjam">
-        </tbody>
-    </table>
-  </div>
-
-  <script>
-    // URL WEB APP MILIK ANDA SUDAH TERPASANG DI BAWAH INI
-    const URL_WEB_APP = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec"; 
+<div class="form-container">
+    <h2 style="text-align: center; color: #2e7d32;">🔑 Formulir Peminjaman Kunci</h2>
     
-    // Variabel global memori untuk menampung data master hasil fetch
-    let globalDataKunci = [];
+    <form id="formPinjam">
+        <div class="form-group">
+            <label for="namaPeminjam">Nama Peminjam:</label>
+            <input type="text" id="namaPeminjam" placeholder="Masukkan nama lengkap" required>
+        </div>
 
-    // 1. FUNGSI UTAMA: AMBIL DATA DARI SERVER DAN RENDER INSTAN
-    function muatSemuaDataKunci() {
-      document.getElementById("loading-spinner").style.display = "block";
-      
-      fetch(`${URL_WEB_APP}?aksi=ambil_status_lengkap`)
-        .then(response => response.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            globalDataKunci = data; // Simpan ke memori global
+        <div class="form-group">
+            <label for="nomorHP">Nomor HP (WhatsApp):</label>
+            <input type="text" id="nomorHP" placeholder="Contoh: 08123456789" required>
+        </div>
 
-            // --- RENDER 1: ISI DROP-DOWN PINJAM KUNCI ---
-            const selectPinjam = document.getElementById("pilihan_kunci");
-            if (selectPinjam) {
-              const fragmentPinjam = document.createDocumentFragment();
-              selectPinjam.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
-              
-              data.forEach(item => {
-                const statusMurni = item.status ? item.status.toString().trim().toLowerCase() : "";
-                if (statusMurni === "tersedia") {
-                  const opt = document.createElement("option");
-                  opt.value = item.id;
-                  opt.textContent = `${item.id} - ${item.nama} (Lantai ${item.lantai})`;
-                  fragmentPinjam.appendChild(opt);
-                }
-              });
-              selectPinjam.appendChild(fragmentPinjam);
-            }
+        <div class="form-group">
+            <label for="filterLantai">Pilih Lantai:</label>
+            <select id="filterLantai" onchange="filterKunci()">
+                <option value="">-- Semua Lantai --</option>
+                <option value="LG">LG</option>
+                <option value="L1">L1</option>
+                <option value="L2">L2</option>
+                <option value="L3">L3</option>
+                <option value="L4">L4</option>
+            </select>
+        </div>
 
-            // --- RENDER 2: ISI TABEL KUNCI DIPINJAM ---
-            const bodiTabel = document.getElementById("tabel_kunci_dipinjam");
-            if (bodiTabel) {
-              const fragmentTabel = document.createDocumentFragment();
-              bodiTabel.innerHTML = "";
-              let adaTerpinjam = false;
+        <div class="form-group">
+            <label for="filterZona">Pilih Zona:</label>
+            <select id="filterZona" onchange="filterKunci()">
+                <option value="">-- Semua Zona --</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+            </select>
+        </div>
 
-              data.forEach(item => {
-                const statusMurni = item.status ? item.status.toString().trim().toLowerCase() : "";
-                if (statusMurni === "dipinjam" || statusMurni === "pinjam") {
-                  adaTerpinjam = true;
-                  const baris = document.createElement("tr");
-                  
-                  // Format tampilan tanggal estimasi agar rapi pendek jika panjang
-                  let tglEstimasi = item.estimasi || "-";
-                  if (tglEstimasi.includes("GMT")) {
-                    const opsiWaktu = { year: 'numeric', month: 'short', day: 'numeric' };
-                    tglEstimasi = new Date(tglEstimasi).toLocaleDateString('id-ID', opsiWaktu);
-                  }
+        <div class="form-group">
+            <label for="pilihKunci">Pilih Kunci / Ruangan yang Tersedia:</label>
+            <select id="pilihKunci" required>
+                <option value="">-- Pilih Kunci / Ruangan --</option>
+            </select>
+        </div>
 
-                  baris.innerHTML = `
-                    <td><b>${item.id}</b></td>
-                    <td>${item.nama}</td>
-                    <td>${item.lantai}</td>
-                    <td>${item.zona}</td>
-                    <td><span class="badge-dipinjam">Dipinjam</span></td>
-                    <td><b>${item.peminjam}</b></td>
-                    <td>${tglEstimasi}</td>
-                  `;
-                  fragmentTabel.appendChild(baris);
-                }
-              });
+        <div class="form-group">
+            <label for="estimasiKembali">Estimasi Tanggal Pengembalian:</label>
+            <input type="date" id="estimasiKembali" required>
+        </div>
 
-              if (!adaTerpinjam) {
-                bodiTabel.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999;">Tidak ada kunci yang sedang dipinjam.</td></tr>`;
-              } else {
-                bodiTabel.appendChild(fragmentTabel);
-              }
-            }
-          }
-        })
-        .catch(error => {
-          console.error("Gagal memuat data:", error);
-        })
-        .finally(() => {
-          document.getElementById("loading-spinner").style.display = "none";
+        <div class="form-group">
+            <label>Dokumentasi Foto Ambil Kunci (Wajib Kamera Belakang):</label>
+            <div class="camera-section">
+                <input type="file" id="fotoKunci" accept="image/*" capture="environment" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">🚀 Kirim Data Peminjaman</button>
+    </form>
+</div>
+
+<script>
+    // Data master kunci (Simulasi data yang biasanya diambil dari Google Sheets)
+    // Anda bisa menyesuaikan atau menghubungkannya dengan fungsi fetch dari Web App URL Anda
+    const masterKunci = [
+        { id: "10", nama: "Ruang Panel TR/LVMDP", lantai: "LG", zona: "A" },
+        { id: "108", nama: "Smoke Lobby 1", lantai: "LG", zona: "C" },
+        { id: "128", nama: "R. SWP", lantai: "LG", zona: "D" },
+        { id: "141", nama: "Nursery Room", lantai: "L1", zona: "A" },
+        { id: "131", nama: "Ruang Server", lantai: "L1", zona: "B" }
+    ];
+
+    // Fungsi untuk memfilter kunci berdasarkan Lantai dan Zona yang dipilih
+    function filterKunci() {
+        const lantaiSelected = document.getElementById("filterLantai").value;
+        const zonaSelected = document.getElementById("filterZona").value;
+        const selectKunci = document.getElementById("pilihKunci");
+
+        // Kosongkan opsi kunci sebelumnya
+        selectKunci.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
+
+        // Filter data berdasarkan kecocokan lantai & zona
+        const hasilFilter = masterKunci.filter(kunci => {
+            const cocokLantai = lantaiSelected === "" || kunci.lantai === lantaiSelected;
+            const cocokZona = zonaSelected === "" || kunci.zona === zonaSelected;
+            return cocokLantai && cocokZona;
+        });
+
+        // Masukkan hasil filter ke dalam dropdown kunci
+        hasilFilter.forEach(kunci => {
+            const option = document.createElement("option");
+            option.value = kunci.id;
+            option.textContent = `${kunci.id} - ${kunci.nama} (Lantai ${kunci.lantai} / Zona ${kunci.zona})`;
+            selectKunci.appendChild(option);
         });
     }
 
-    // 2. FUNGSI PENCARIAN KUNCI AKTIF BERDASARKAN NAMA (ANTI HURUF BESAR/KECIL)
-    function cariKunciPeminjamAktif() {
-      const namaInput = document.getElementById("nama_pengembali").value.trim().toLowerCase();
-      
-      if (!namaInput) {
-        alert("Silakan isi nama pengembali terlebih dahulu.");
-        return;
-      }
+    // Jalankan fungsi filter pertama kali saat halaman dimuat agar semua kunci muncul jika belum difilter
+    window.onload = filterKunci;
 
-      if (globalDataKunci.length === 0) {
-        alert("Data server belum siap, mohon tunggu beberapa detik lalu coba lagi.");
-        return;
-      }
+    // Logika pengiriman form (silakan hubungkan kembali ke fungsi script fetch Web App URL Anda)
+    document.getElementById("formPinjam").addEventListener("submit", function(e) {
+        e.preventDefault();
+        alert("Formulir berhasil disubmit! Silakan lanjutkan integrasi data ke Google Sheets Anda.");
+    });
+</script>
 
-      // Filter data di browser dengan menyamakan semua teks menjadi huruf kecil (.toLowerCase())
-      const hasilFilter = globalDataKunci.filter(item => {
-        const namaDb = item.peminjam ? item.peminjam.toString().trim().toLowerCase() : "";
-        const statusDb = item.status ? item.status.toString().trim().toLowerCase() : "";
-        return namaDb === namaInput && (statusDb === "dipinjam" || statusDb === "pinjam");
-      });
-
-      const selectKembali = document.getElementById("kunci_dikembalikan");
-      
-      if (hasilFilter.length > 0) {
-        selectKembali.innerHTML = "";
-        const fragmentFilter = document.createDocumentFragment();
-        
-        hasilFilter.forEach(item => {
-          const opt = document.createElement("option");
-          opt.value = item.id;
-          opt.textContent = `${item.id} - ${item.nama} (Lantai ${item.lantai})`;
-          fragmentFilter.appendChild(opt);
-        });
-        selectKembali.appendChild(fragmentFilter);
-      } else {
-        selectKembali.innerHTML = '<option value="">-- Tidak ada kunci terpinjam --</option>';
-        alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam.");
-      }
-    }
-
-    // 3. FUNGSI SUBMIT POST FORMULIR KE GOOGLE APPS SCRIPT
-    function prosesTransaksi(jenisAksi) {
-      let dataPayload = {};
-
-      if (jenisAksi === 'pinjam') {
-        const nama = document.getElementById("nama_peminjam").value.trim();
-        const nohp = document.getElementById("nohp_peminjam").value.trim();
-        const kunci = document.getElementById("pilihan_kunci").value;
-        const estimasi = document.getElementById("estimasi_kembali").value;
-
-        if (!nama || !nohp || !kunci || !estimasi) {
-          alert("Mohon lengkapi seluruh kolom formulir peminjaman!");
-          return;
-        }
-
-        dataPayload = { aksi: "pinjam", nama: nama, nohp: nohp, kunci: kunci, estimasi_tgl: estimasi };
-      } else {
-        const nama = document.getElementById("nama_pengembali").value.trim();
-        const kunci = document.getElementById("kunci_dikembalikan").value;
-
-        if (!nama || !kunci) {
-          alert("Silakan cari nama pengembali dan pilih kunci yang ingin dikembalikan!");
-          return;
-        }
-
-        dataPayload = { aksi: "kembali", nama: nama, kunci: kunci };
-      }
-
-      // Ubah data payload menjadi parameter URL (URL-encoded) agar aman dibaca doPost
-      const formBody = Object.keys(dataPayload)
-        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(dataPayload[key]))
-        .join('&');
-
-      fetch(URL_WEB_APP, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formBody
-      })
-      .then(res => res.json())
-      .then(hasil => {
-        if (hasil.status === "success") {
-          alert(hasil.message);
-          // Reset form setelah berhasil
-          if (jenisAksi === 'pinjam') document.getElementById("formPinjam").reset();
-          else document.getElementById("formKembali").reset();
-          // Muat ulang data terbaru otomatis
-          muatSemuaDataKunci();
-        } else {
-          alert("Gagal memproses: " + hasil.message);
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Terjadi kendala jaringan saat mengirim data.");
-      });
-    }
-
-    // Jalankan pemuatan data otomatis saat website pertama kali dibuka
-    window.onload = muatSemuaDataKunci;
-  </script>
 </body>
 </html>
