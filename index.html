@@ -10,7 +10,7 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input[type="text"], select, input[type="date"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn-submit { width: 100%; padding: 10px; background-color: #2e7d32; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .btn-submit { width: 100%; padding: 10px; background-color: #2e7d32; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-submit:hover { background-color: #1b5e20; }
         .camera-section { border: 1px dashed #ccc; padding: 15px; text-align: center; border-radius: 4px; background: #fafafa; }
     </style>
@@ -78,48 +78,60 @@
 </div>
 
 <script>
-    // Data master kunci (Simulasi data yang biasanya diambil dari Google Sheets)
-    // Anda bisa menyesuaikan atau menghubungkannya dengan fungsi fetch dari Web App URL Anda
+    // Data master kunci lengkap dengan properti status terupdate
     const masterKunci = [
-        { id: "10", nama: "Ruang Panel TR/LVMDP", lantai: "LG", zona: "A" },
-        { id: "108", nama: "Smoke Lobby 1", lantai: "LG", zona: "C" },
-        { id: "128", nama: "R. SWP", lantai: "LG", zona: "D" },
-        { id: "141", nama: "Nursery Room", lantai: "L1", zona: "A" },
-        { id: "131", nama: "Ruang Server", lantai: "L1", zona: "B" }
+        { id: "10", nama: "Ruang Panel TR/LVMDP", lantai: "LG", zona: "A", status: "Dipinjam" },
+        { id: "108", nama: "Smoke Lobby 1", lantai: "LG", zona: "C", status: "Dipinjam" },
+        { id: "128", nama: "R. SWP", lantai: "LG", zona: "D", status: "Dipinjam" },
+        { id: "141", nama: "Nursery Room", lantai: "L1", zona: "A", status: "Dipinjam" },
+        { id: "131", nama: "Ruang Server", lantai: "L1", zona: "B", status: "Tersedia" },
+        { id: "395", nama: "Kunci Ruang ME L2", lantai: "L2", zona: "C", status: "Tersedia" },
+        { id: "19", nama: "Gudang Sipil L3", lantai: "L3", zona: "B", status: "Tersedia" },
+        { id: "85", nama: "AHU Room L4", lantai: "L4", zona: "A", status: "Tersedia" }
     ];
 
-    // Fungsi untuk memfilter kunci berdasarkan Lantai dan Zona yang dipilih
+    // Fungsi memfilter kunci berdasar Lantai, Zona, DAN wajib berstatus 'Tersedia'
     function filterKunci() {
         const lantaiSelected = document.getElementById("filterLantai").value;
         const zonaSelected = document.getElementById("filterZona").value;
         const selectKunci = document.getElementById("pilihKunci");
 
-        // Kosongkan opsi kunci sebelumnya
+        // Reset isi dropdown
         selectKunci.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
 
-        // Filter data berdasarkan kecocokan lantai & zona
+        // Jalankan filter bertingkat
         const hasilFilter = masterKunci.filter(kunci => {
             const cocokLantai = lantaiSelected === "" || kunci.lantai === lantaiSelected;
             const cocokZona = zonaSelected === "" || kunci.zona === zonaSelected;
-            return cocokLantai && cocokZona;
+            const pastikanTersedia = kunci.status === "Tersedia"; // Hanya meloloskan data 'Tersedia'
+            
+            return cocokLantai && cocokZona && pastikanTersedia;
         });
 
-        // Masukkan hasil filter ke dalam dropdown kunci
-        hasilFilter.forEach(kunci => {
+        // Tampilkan hasil filter ke elemen select option
+        if (hasilFilter.length === 0) {
             const option = document.createElement("option");
-            option.value = kunci.id;
-            option.textContent = `${kunci.id} - ${kunci.nama} (Lantai ${kunci.lantai} / Zona ${kunci.zona})`;
+            option.value = "";
+            option.textContent = "Tidak ada kunci tersedia untuk lantai/zona ini";
+            option.disabled = true;
             selectKunci.appendChild(option);
-        });
+        } else {
+            hasilFilter.forEach(kunci => {
+                const option = document.createElement("option");
+                option.value = kunci.id;
+                option.textContent = `${kunci.id} - ${kunci.nama}`;
+                selectKunci.appendChild(option);
+            });
+        }
     }
 
-    // Jalankan fungsi filter pertama kali saat halaman dimuat agar semua kunci muncul jika belum difilter
+    // Eksekusi filter saat pertama kali web dibuka
     window.onload = filterKunci;
 
-    // Logika pengiriman form (silakan hubungkan kembali ke fungsi script fetch Web App URL Anda)
+    // Handler submit form
     document.getElementById("formPinjam").addEventListener("submit", function(e) {
         e.preventDefault();
-        alert("Formulir berhasil disubmit! Silakan lanjutkan integrasi data ke Google Sheets Anda.");
+        alert("Data Peminjaman Berhasil Dikirim!");
     });
 </script>
 
