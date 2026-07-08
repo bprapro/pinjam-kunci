@@ -324,8 +324,8 @@
     </div>
   </div>
 
-<script>
-  // URL Web App Resmi Anda
+<<script>
+  // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
   
   let semuaDataKunci = [];
@@ -348,8 +348,8 @@
     } else {
       document.getElementById('sectionKembali').classList.add('active');
       document.getElementById('tabKembali').classList.add('active-kembali');
-      // Reset dropdown pengembalian saat pindah tab
-      document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol 'Cari Kunci Saya' di atas --</option>';
+      // PERBAIKAN: Tanda petik disesuaikan agar tidak merusak sintaksis JavaScript
+      document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
     }
   }
 
@@ -460,7 +460,6 @@
     });
   }
 
-  // DIOPTIMALKAN: Menggunakan pencarian lokal secepat kilat (0ms) dari cache frontend tanpa fetch eksternal
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
     if (!namaInput) { alert("Masukkan nama Anda!"); return; }
@@ -468,7 +467,6 @@
     const btnCari = document.getElementById('btnCariKunci');
     btnCari.textContent = "Mencari...";
     
-    // Cari kecocokan data dari log cache lokal dataMonitorTerpinjam
     const kunciDitemukan = dataMonitorTerpinjam.filter(item => item.peminjam.toLowerCase() === namaInput);
     const select = document.getElementById('kunci_kembali');
     select.innerHTML = "";
@@ -482,7 +480,6 @@
         return;
       }
       
-      // Mengisi nomor HP tiruan/pembantu jika terdeteksi dari log (opsional) atau kosongkan aman
       document.getElementById('nohp_kembali').value = "-";
       kunciDitemukan.forEach(k => { 
         select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; 
@@ -508,7 +505,7 @@
         canvas.style.display = 'none'; 
         btnUlang.style.display = 'none'; 
         input.value = "";
-      }).catch(() => alert("Izin kamera ditolak."));
+      }).catch(() => alert("Izin kamera ditolak atau perangkat kamera tidak ditemukan."));
     });
 
     btnAmbil.addEventListener('click', () => {
@@ -558,7 +555,6 @@
           if(res.status === 'success') { 
             document.getElementById(idForm).reset();
             matikanKamera();
-            
             muatKunciTersedia();
             muatMonitorData();
             
@@ -583,7 +579,7 @@
         }).catch(() => { 
           alert("Kendala Jaringan atau Server Timeout."); 
           btn.disabled = false; 
-          btn.innerHTML = formatUlangTombol; 
+          btn.innerHTML = formatUflowTombol; 
         });
     });
   }
