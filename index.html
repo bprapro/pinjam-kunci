@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajemen Kunci 23 Semarang</title>
+  <title>Sistem Manajemen Kunci Terpadu</title>
   <style>
     :root {
       --primary: #619A7E;
@@ -12,102 +12,154 @@
       --dark: #053B3D;
       --bg-body: #003830;
       --card-bg: #ffffff;
-      --border-color: #e2e8f0;
+      --border-color: #003830;
+      --text-muted: #619A7E;
     }
 
     body { 
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif; 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
       margin: 0; 
       padding: 30px 15px;
       background-color: var(--bg-body); 
       color: var(--dark); 
+      line-height: 1.5;
     }
 
+    /* Container Card */
     .container, .monitor-container { 
       max-width: 600px; 
       background: var(--card-bg); 
       padding: 30px; 
       border-radius: 16px; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.03); 
       margin: 0 auto 30px auto; 
+      border: 1px solid var(--border-color);
     }
 
     .monitor-container { 
-      max-width: 1100px; 
+      max-width: 1000px; 
       overflow-x: auto;
     }
     
-    h2 { text-align: center; margin-top: 0; font-weight: 700; }
+    h2 { text-align: center; margin-top: 0; font-weight: 700; font-size: 24px; letter-spacing: -0.5px; }
     h2.pinjam-title { color: var(--primary); }
     h2.kembali-title { color: var(--danger); }
     h2.monitor-title { color: var(--dark); margin-bottom: 20px; }
     
+    /* Segmented Control Tab */
     .nav-tabs { 
       display: flex; 
       background-color: #f1f5f9; 
       padding: 6px; 
       border-radius: 12px; 
       margin-bottom: 30px; 
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border-color);
     }
     .tab-btn { 
-      flex: 1; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; background-color: transparent; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex: 1; 
+      padding: 10px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: all 0.25s ease; 
+      background-color: transparent; 
+      color: var(--text-muted); 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .tab-btn svg { width: 18px; height: 18px; fill: #64748b; }
+    .tab-btn svg { width: 18px; height: 18px; fill: var(--text-muted); transition: fill 0.25s; }
     
-    .tab-btn.active-pinjam { background-color: var(--primary); color: white; }
+    .tab-btn.active-pinjam { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(0,102,204,0.25); }
     .tab-btn.active-pinjam svg { fill: white; }
     
-    .tab-btn.active-kembali { background-color: var(--danger); color: white; }
+    .tab-btn.active-kembali { background-color: var(--danger); color: white; box-shadow: 0 4px 12px rgba(223,44,62,0.25); }
     .tab-btn.active-kembali svg { fill: white; }
     
     .form-section { display: none; }
     .form-section.active { display: block; }
     
+    /* Layar Sukses / Terima Kasih */
     .success-screen { display: none; text-align: center; padding: 20px 10px; }
-    .success-screen h3 { color: var(--dark); font-size: 26px; }
+    .success-screen h3 { color: var(--dark); font-size: 28px; margin-bottom: 12px; font-weight: 700; }
+    .success-screen p { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; }
     
+    /* Form & Input Fields */
     .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #334155; }
     input, select, button { 
-      width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 15px; background-color: #f8fafc;
+      width: 100%; 
+      padding: 12px 16px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 8px; 
+      box-sizing: border-box; 
+      font-size: 15px;
+      transition: all 0.2s;
+      background-color: #f8fafc;
     }
-    input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #fff; }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgba(0,102,204,0.1);
+    }
     
+    /* Tombol Aksi Universal */
     .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form, .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang, #btnCariKunci, .btn-refresh, .btn-page { 
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn-submit-pinjam svg, .btn-submit-kembali svg, .btn-kembali-form svg, .btn-buka-cam svg, .btn-ambil-foto svg, .btn-foto-ulang svg, #btnCariKunci svg { width: 18px; height: 18px; fill: white; }
+    .btn-submit-pinjam svg, .btn-submit-kembali svg, .btn-kembali-form svg, .btn-buka-cam svg, .btn-ambil-foto svg, .btn-foto-ulang svg, #btnCariKunci svg {
+      width: 18px; height: 18px; fill: white;
+    }
     
-    .btn-submit-pinjam { background-color: var(--primary); color: white; border: none; cursor: pointer; font-weight: 600; }
-    .btn-submit-kembali { background-color: var(--danger); color: white; border: none; cursor: pointer; font-weight: 600; }
-    .btn-kembali-form { background-color: #64748b; color: white; width: auto; padding: 12px 24px; border: none; cursor: pointer;}
+    .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form { 
+      border: none; font-size: 15px; cursor: pointer; font-weight: 600; padding: 14px; border-radius: 8px; transition: opacity 0.2s;
+    }
+    .btn-submit-pinjam { background-color: var(--primary); color: white; }
+    .btn-submit-kembali { background-color: var(--danger); color: white; }
+    .btn-kembali-form { background-color: #64748b; color: white; width: auto; padding: 12px 24px; }
+    .btn-submit-pinjam:hover, .btn-submit-kembali:hover, .btn-kembali-form:hover { opacity: 0.9; }
     
     .filter-row { display: flex; gap: 10px; margin-bottom: 10px; }
     .search-box { margin-bottom: 10px; background-color: #fff; }
     
-    video, canvas { display: none; width: 100%; border-radius: 12px; background: #0f172a; margin-top: 12px; }
-    .foto-container { text-align: center; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
-    .btn-buka-cam { background-color: #475569; color: white; border: none; cursor: pointer; }
-    .btn-ambil-foto { background-color: var(--primary); color: white; border: none; display: none; margin-top: 10px; cursor: pointer; }
-    .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; display: none; margin-top: 10px; cursor: pointer; }
+    /* Kamera Dokumentasi */
+    video, canvas { display: none; width: 100%; max-width: 100%; border-radius: 12px; background: #0f172a; margin: 12px auto 0 auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .foto-container { text-align: center; margin-top: 10px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+    .btn-buka-cam { background-color: #475569; color: white; border: none; }
+    .btn-buka-cam:hover { background-color: #334155; }
+    
+    .btn-ambil-foto { background-color: var(--primary); color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
+    .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
 
-    table { width: 100%; border-collapse: collapse; min-width: 800px; margin-top: 15px; }
-    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; }
+    /* Tabel Monitor */
+    table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { font-size: 14px; color: #334155; }
     
     .badge { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: white; display: inline-block; }
     .bg-dipinjam { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
     
-    .btn-refresh { background-color: white; color: #475569; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; float: right; width: auto; }
-    .btn-refresh svg { width: 14px; height: 14px; fill: #475569; }
+    .btn-refresh { background-color: white; color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; float: right; width: auto; }
+    .btn-refresh svg { width: 14px; height: 14px; fill: var(--text-muted); }
+    .btn-refresh:hover { background-color: #f1f5f9; color: var(--dark); }
+    .btn-refresh:hover svg { fill: var(--dark); }
     
-    .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
-    .btn-page { background-color: white; border: 1px solid #cbd5e1; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; width: auto; border-radius: 8px; }
+    /* Navigasi Paginasi */
+    .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); }
+    .btn-page { background-color: white; border: 1px solid var(--border-color); padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; width: auto; border-radius: 8px; color: #475569; }
     .btn-page svg { width: 14px; height: 14px; fill: #475569; }
+    .btn-page:hover:not(:disabled) { background-color: #f8fafc; border-color: #cbd5e1; }
     .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
-    #infoHalaman { font-size: 13px; font-weight: 600; color: #64748b; }
-    .hint-text { font-size: 12px; color: #64748b; margin-top: 6px; display: block; }
+    #infoHalaman { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .hint-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: block; }
   </style>
 </head>
 <body>
@@ -124,7 +176,6 @@
       </button>
     </div>
 
-    <!-- TAB PINJAM -->
     <div id="sectionPinjam" class="form-section active">
       <h2 class="pinjam-title">Formulir Peminjaman Kunci 23 Semarang</h2>
       <form id="formPinjam">
@@ -181,17 +232,16 @@
       </form>
     </div>
 
-    <!-- TAB KEMBALI -->
     <div id="sectionKembali" class="form-section">
       <h2 class="kembali-title">Formulir Pengembalian Kunci</h2>
       <form id="formKembali">
         <input type="hidden" name="aksi" value="kembali">
         <div class="form-group">
           <label for="nama_kembali">Nama Pengembali:</label>
-          <input type="text" id="nama_kembali" name="nama" list="listPeminjamAktif" required placeholder="Ketik nama Anda..." autocomplete="off" oninput="cekMinimalKarakterNama(this.value)">
+          <input type="text" id="nama_kembali" name="nama" list="listPeminjamAktif" required placeholder="Ketik min. 3 huruf nama Anda..." autocomplete="off" oninput="cekMinimalKarakterNama(this.value)">
           <datalist id="listPeminjamAktif"></datalist>
           <span class="hint-text">Rekomendasi nama otomatis muncul berdasarkan daftar peminjam aktif.</span>
-          <button type="button" id="btnCariKunci" style="background-color: var(--danger); color:white; margin-top: 10px; font-size: 14px; padding: 10px; cursor:pointer; border:none; border-radius:6px; font-weight:600;">
+          <button type="button" id="btnCariKunci" style="background-color: #619A7E; color:white; margin-top: 10px; font-size: 14px; padding: 10px; cursor:pointer; border:none; border-radius:6px; font-weight:600;">
             <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             Cari Kunci Saya
           </button>
@@ -203,8 +253,23 @@
           </select>
         </div>
         <input type="hidden" id="nohp_kembali" name="nohp">
-        <div class="form-group foto-container" style="display:none;">
-          <input type="hidden" id="fotoK" name="foto" value="-">
+        <div class="form-group foto-container">
+          <label>Dokumentasi Foto Kembalikan Kunci:</label>
+          <button type="button" id="btnBukaKameraK" class="btn-buka-cam">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+            Buka Kamera
+          </button>
+          <video id="videoK" autoplay playsinline></video>
+          <canvas id="canvasK"></canvas>
+          <button type="button" id="btnAmbilFotoK" class="btn-ambil-foto">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+            Ambil Foto
+          </button>
+          <button type="button" id="btnFotoUlangK" class="btn-foto-ulang">
+            <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+            Foto Ulang
+          </button>
+          <input type="hidden" id="fotoK" name="foto" required>
         </div>
         <button type="submit" id="btnSubmitKembali" class="btn-submit-kembali" style="margin-top: 15px;">
           <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
@@ -213,10 +278,9 @@
       </form>
     </div>
 
-    <!-- LAYAR BERHASIL -->
     <div id="screenSukses" class="success-screen">
-      <h3>✨ Transaksi Berhasil!</h3>
-      <p id="pesanSukses">Aktivitas Anda telah berhasil direkam ke dalam database.</p>
+      <h3>✨ Terima Kasih!</h3>
+      <p id="pesanSukses">Aktivitas Anda telah berhasil direkam ke dalam sistem database.</p>
       <button type="button" class="btn-kembali-form" onclick="resetKeHalamanForm()">
         <svg viewBox="0 0 24 24" style="fill:white; width:16px; height:16px;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         Kembali ke Formulir
@@ -224,13 +288,12 @@
     </div>
   </div>
 
-  <!-- TABEL MONITOR -->
   <div class="monitor-container">
     <button class="btn-refresh" onclick="muatMonitorData()">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
       Segarkan Data
     </button>
-    <h2 class="monitor-title" style="text-align: left;">🚨 Daftar Kunci Dipinjam (Aktif)</h2>
+    <h2 class="monitor-title" style="text-align: left;">🚨 Daftar Kunci Dipinjam</h2>
     <table>
       <thead>
         <tr>
@@ -240,13 +303,12 @@
           <th>Zona</th>
           <th>Status</th>
           <th>Peminjam Saat Ini</th>
-          <th>Estimasi Pengembalian</th>
-          <th style="text-align: center;">Dokumentasi</th>
+          <th>Estimasi Kembali</th>
         </tr>
       </thead>
       <tbody id="bodyTabel">
         <tr>
-          <td colspan="8" style="text-align: center; padding: 25px;">Memuat status transaksi aktif...</td>
+          <td colspan="7" style="text-align: center; padding: 25px;">Memuat status transaksi aktif...</td>
         </tr>
       </tbody>
     </table>
@@ -262,13 +324,15 @@
     </div>
   </div>
 
-<script>
+<<script>
+  // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
   
   let semuaDataKunci = [];
   let dataMonitorTerpinjam = [];
   let streamKameraAktif = null;
   let tabAktifSekarang = 'pinjam';
+
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
@@ -284,17 +348,16 @@
     } else {
       document.getElementById('sectionKembali').classList.add('active');
       document.getElementById('tabKembali').classList.add('active-kembali');
+      // PERBAIKAN: Tanda petik disesuaikan agar tidak merusak sintaksis JavaScript
       document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
     }
   }
 
   function muatKunciTersedia() {
-    document.getElementById("kunci_pinjam").innerHTML = '<option value="">-- Memuat data kunci... --</option>';
-    
-    google.script.run
-      .withSuccessHandler(function(data) {
-        // PERBAIKAN: Menghapus filter ganda 'Tersedia'
-        semuaDataKunci = data.filter(k => k.status === 'Tersedia');
+    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
+      .then(res => res.json())
+      .then(data => {
+        semuaDataKunci = data.filter(k => k.status.toLowerCase() === 'tersedia');
         
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
@@ -306,14 +369,10 @@
         const selectZona = document.getElementById("filterZona");
         selectZona.innerHTML = '<option value="">-- Semua Zona --</option>';
         listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
-        
         saringKunci();
-      })
-      .withFailureHandler(function(err) {
-        document.getElementById("kunci_pinjam").innerHTML = '<option value="">❌ Gagal memuat data kunci.</option>';
-        console.error(err);
-      })
-      .ambilDataKunciFrontend();
+      }).catch(err => {
+        document.getElementById("kunci_pinjam").innerHTML = '<option value="">❌ Gagal memuat data. Periksa kembali Web App URL.</option>';
+      });
   }
 
   function saringKunci() {
@@ -328,25 +387,18 @@
              (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
              (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
     }).forEach(k => {
-      select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`;
+      select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [${k.lantai} - ${k.zona}]</option>`;
     });
   }
 
   function muatMonitorData() {
-    const body = document.getElementById("bodyTabel");
-    body.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 25px;">Memuat status transaksi aktif...</td></tr>';
-    
-    google.script.run
-      .withSuccessHandler(function(data) {
-        dataMonitorTerpinjam = data.filter(item => item.status === "Pinjam");
+    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
+      .then(res => res.json())
+      .then(data => {
+        dataMonitorTerpinjam = data.filter(item => item.status === "Dipinjam");
         halamanSekarang = 1;
         tampilkanHalamanMonitor();
-      })
-      .withFailureHandler(function(err) {
-        body.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red; padding: 25px;">❌ Gagal memuat tabel monitor.</td></tr>';
-        console.error(err);
-      })
-      .ambilDataKunciFrontend();
+      });
   }
 
   function tampilkanHalamanMonitor() {
@@ -361,7 +413,7 @@
     const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
     if (dataHalamanIni.length === 0) {
-      body.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;"> Seluruh kunci berada di rak (Tersedia).</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;"> Seluruh kunci saat ini berada di rak.</td></tr>';
       document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
       document.getElementById("btnPrev").disabled = true;
       document.getElementById("btnNext").disabled = true;
@@ -370,21 +422,14 @@
 
     dataHalamanIni.forEach(item => {
       const tr = document.createElement("tr");
-      
-      let elemenFoto = '<span style="color:#94a3b8; font-size:12px;">Tidak ada foto</span>';
-      if (item.foto && (item.foto.startsWith("http") || item.foto.startsWith("data:image"))) {
-        elemenFoto = `<img src="${item.foto}" alt="Foto Kunci" style="width: 45px; height: 45px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 1px solid #cbd5e1;" onclick="lihatFotoPenuh('${item.foto}')" title="Klik untuk memperbesar">`;
-      }
-
       tr.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
         <td>${item.lantai || '-'}</td>
         <td>${item.zona || '-'}</td>
-        <td><span class="badge bg-dipinjam">Dipinjam</span></td>
+        <td><span class="badge bg-dipinjam">${item.status}</span></td>
         <td>${item.peminjam}</td>
         <td>${item.estimasi}</td>
-        <td style="text-align: center;">${elemenFoto}</td>
       `;
       body.appendChild(tr);
     });
@@ -394,34 +439,18 @@
     document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
   }
 
-  function lihatFotoPenuh(sumberFoto) {
-    let modal = document.getElementById("modalFotoPenuh");
-    if (!modal) {
-      modal = document.createElement("div");
-      modal.id = "modalFotoPenuh";
-      modal.style = "display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.85); align-items:center; justify-content:center; cursor:pointer;";
-      modal.innerHTML = `<img id="kontenFotoPenuh" src="" style="max-width:90%; max-height:85%; border-radius:12px; box-shadow: 0 4px 25px rgba(0,0,0,0.6);">`;
-      modal.onclick = function() { modal.style.display = "none"; };
-      document.body.appendChild(modal);
-    }
-    document.getElementById("kontenFotoPenuh").src = sumberFoto;
-    modal.style.display = "flex";
-  }
-
-  // PERBAIKAN: Logika paginasi dinamis yang aman
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
-  function halamanBerikutnya() { 
-    const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
-    if (halamanSekarang < totalHalaman) { halamanSekarang++; tampilkanHalamanMonitor(); } 
-  }
+  function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
   function cekMinimalKarakterNama(nilaiInput) {
     const datalist = document.getElementById("listPeminjamAktif");
     datalist.innerHTML = ""; 
+    
     const teksCari = nilaiInput.trim().toLowerCase();
     if (teksCari.length < 3) return; 
 
     const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+    
     listNamaUnik.forEach(nama => {
       if (nama.toLowerCase().includes(teksCari)) {
         const option = document.createElement("option");
@@ -444,11 +473,13 @@
     
     setTimeout(() => {
       btnCari.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
+      
       if (kunciDitemukan.length === 0) {
         select.innerHTML = '<option value="">-- Tidak ada kunci terpinjam --</option>';
-        alert("Sistem tidak menemukan kunci aktif atas nama Anda.");
+        alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam. Pastikan nama sesuai dengan tabel di bawah.");
         return;
       }
+      
       document.getElementById('nohp_kembali').value = "-";
       kunciDitemukan.forEach(k => { 
         select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; 
@@ -464,28 +495,35 @@
     const btnAmbil = document.getElementById('btnAmbilFoto' + suffix);
     const btnUlang = document.getElementById('btnFotoUlang' + suffix);
 
-    if(!btnBuka) return;
-
     btnBuka.addEventListener('click', () => {
       matikanKamera();
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
         streamKameraAktif = stream; video.srcObject = stream;
-        video.style.display = 'block'; btnAmbil.style.display = 'inline-flex'; btnBuka.style.display = 'none';
-        canvas.style.display = 'none'; btnUlang.style.display = 'none'; input.value = "";
-      }).catch(() => alert("Izin kamera ditolak atau perangkat tidak ditemukan."));
+        video.style.display = 'block'; 
+        btnAmbil.style.display = 'inline-flex'; 
+        btnBuka.style.display = 'none';
+        canvas.style.display = 'none'; 
+        btnUlang.style.display = 'none'; 
+        input.value = "";
+      }).catch(() => alert("Izin kamera ditolak atau perangkat kamera tidak ditemukan."));
     });
 
     btnAmbil.addEventListener('click', () => {
       canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       input.value = canvas.toDataURL('image/jpeg');
-      canvas.style.display = 'block'; video.style.display = 'none';
-      btnUlang.style.display = 'inline-flex'; btnAmbil.style.display = 'none';
+      canvas.style.display = 'block'; 
+      video.style.display = 'none';
+      btnUlang.style.display = 'inline-flex'; 
+      btnAmbil.style.display = 'none';
     });
 
     btnUlang.addEventListener('click', () => {
-      input.value = ""; video.style.display = 'block'; canvas.style.display = 'none';
-      btnAmbil.style.display = 'inline-flex'; btnUlang.style.display = 'none';
+      input.value = "";
+      video.style.display = 'block'; 
+      canvas.style.display = 'none';
+      btnAmbil.style.display = 'inline-flex'; 
+      btnUlang.style.display = 'none';
     });
   }
 
@@ -499,18 +537,19 @@
     document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
   }
 
-  function pasangSubmitForm(idForm, idBtn, konteksAksi) {
+  function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
     document.getElementById(idForm).addEventListener('submit', function(e) {
       e.preventDefault();
-      
-      if (konteksAksi === 'pinjam') {
-        const inputFoto = this.querySelector('input[name="foto"]').value;
-        if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
-      }
+      const inputFoto = this.querySelector('input[name="foto"]').value;
+      if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
       
       const btn = document.getElementById(idBtn);
       btn.disabled = true; btn.textContent = "Memproses...";
       
+      const formatUlangTombol = (konteksAksi === 'pinjam') 
+        ? `<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
+        : `<svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
+
       fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
         .then(res => res.json()).then(res => {
           if(res.status === 'success') { 
@@ -522,19 +561,25 @@
             document.getElementById('navTabsContainer').style.display = 'none';
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             
-            document.getElementById('pesanSukses').textContent = (konteksAksi === 'pinjam') 
-              ? "Data Peminjaman Kunci Anda telah berhasil disimpan ke database."
-              : "Kunci sukses dikembalikan! Rak monitor telah diperbarui.";
+            const teksPesan = (konteksAksi === 'pinjam') 
+              ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
+              : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
             
+            document.getElementById('pesanSukses').textContent = teksPesan;
             document.getElementById('screenSukses').style.display = 'block';
-          } else { 
-            alert("Gagal: " + res.message); 
+            
+            btn.disabled = false;
+            btn.innerHTML = formatUlangTombol;
           }
-          // PERBAIKAN: Cukup kembalikan tombol disabled, teks otomatis reset lewat form reset
-          btn.disabled = false; 
+          else { 
+            alert("Gagal: " + res.message); 
+            btn.disabled = false; 
+            btn.innerHTML = formatUlangTombol; 
+          }
         }).catch(() => { 
-          alert("Gagal memproses transaksi (Server Timeout/Network Error)."); 
+          alert("Kendala Jaringan atau Server Timeout."); 
           btn.disabled = false; 
+          btn.innerHTML = formatUflowTombol; 
         });
     });
   }
@@ -549,8 +594,9 @@
     muatKunciTersedia();
     muatMonitorData();
     aturKamera('P');
-    pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'pinjam');
-    pasangSubmitForm('formKembali', 'btnSubmitKembali', 'kembali');
+    aturKamera('K');
+    pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman', 'pinjam');
+    pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
 </script>
 </body>
