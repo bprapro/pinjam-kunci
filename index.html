@@ -289,10 +289,11 @@
   }
 
   function muatKunciTersedia() {
-    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-      .then(res => res.json())
-      .then(data => {
-        semuaDataKunci = data.filter(k => k.status === 'Tersedia');
+    document.getElementById("kunci_pinjam").innerHTML = '<option value="">-- Memuat data kunci... --</option>';
+    
+    google.script.run
+      .withSuccessHandler(function(data) {
+        semuaDataKunci = data.filter(k => k.status === 'Tersedia' || k.status === 'Tersedia');
         
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
@@ -304,12 +305,15 @@
         const selectZona = document.getElementById("filterZona");
         selectZona.innerHTML = '<option value="">-- Semua Zona --</option>';
         listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
+        
         saringKunci();
-      }).catch(err => {
-        document.getElementById("kunci_pinjam").innerHTML = '<option value="">❌ Gagal memuat data.</option>';
-      });
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById("kunci_pinjam").innerHTML = '<option value="">❌ Gagal memuat data kunci.</option>';
+        console.error(err);
+      })
+      .ambilDataKunciFrontend();
   }
-
   function saringKunci() {
     const lantai = document.getElementById("filterLantai").value.toLowerCase();
     const zona = document.getElementById("filterZona").value.toLowerCase();
@@ -327,13 +331,20 @@
   }
 
   function muatMonitorData() {
-    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-      .then(res => res.json())
-      .then(data => {
+    const body = document.getElementById("bodyTabel");
+    body.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 25px;">Memuat status transaksi aktif...</td></tr>';
+    
+    google.script.run
+      .withSuccessHandler(function(data) {
         dataMonitorTerpinjam = data.filter(item => item.status === "Pinjam");
         halamanSekarang = 1;
         tampilkanHalamanMonitor();
-      });
+      })
+      .withFailureHandler(function(err) {
+        body.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red; padding: 25px;">❌ Gagal memuat tabel monitor.</td></tr>';
+        console.error(err);
+      })
+      .ambilDataKunciFrontend();
   }
 
   function tampilkanHalamanMonitor() {
