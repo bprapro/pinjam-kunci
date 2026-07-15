@@ -309,20 +309,20 @@ select:focus {
         <input type="hidden" name="aksi" value="pinjam">
         <div class="form-group">
           <label for="nama_pinjam">Nama Peminjam:</label>
-          <input type="text" id="nama_pinjam" name="nama" required placeholder="Masukkan nama lengkap">
+          <input type="text" id="nama_pinjam" name="nama" required placeholder="Nama...">
         </div>
         <div class="form-group">
           <label for="nohp">Nomor HP (WhatsApp):</label>
-          <input type="tel" id="nohp" name="nohp" required placeholder="Con: 08123456789">
+          <input type="tel" id="nohp" name="nohp" required placeholder="082...">
         </div>
         <div class="form-group">
           <label>Pilih Kunci / Ruangan:</label>
           <div class="filter-row">
             <select id="filterLantai" onchange="saringKunci()">
-              <option value="">-- Semua Lantai --</option>
+              <option value="">All Floor</option>
             </select>
             <select id="filterZona" onchange="saringKunci()">
-              <option value="">-- Semua Zona --</option>
+              <option value="">All Zone</option>
             </select>
           </div>
           <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
