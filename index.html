@@ -667,15 +667,25 @@ function gantiTab(tipe) {
   void select.offsetWidth; 
   select.classList.add("drop-animasi");
 }
-  function muatMonitorData() {
-    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-      .then(res => res.json())
-      .then(data => {
-        dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
-        halamanSekarang = 1;
-        tampilkanHalamanMonitor();
-      });
+ function muatMonitorData() {
+  // 1. Cek apakah ada data tersimpan di memori browser untuk mempercepat tampilan awal
+  const dataLokal = localStorage.getItem('cacheDataMonitor');
+  if (dataLokal) {
+    dataMonitorTerpinjam = JSON.parse(dataLokal);
+    tampilkanHalamanMonitor(); // Langsung muncul tanpa loading lama
   }
+
+  // 2. Tetap ambil data terbaru di latar belakang agar data tetap sinkron
+  fetch(scriptUrl + "?aksi=monitor")
+    .then(res => res.json())
+    .then(data => {
+      dataMonitorTerpinjam = data;
+      // Simpan data terbaru ke dalam memori lokal untuk sesi berikutnya
+      localStorage.setItem('cacheDataMonitor', JSON.stringify(data));
+      tampilkanHalamanMonitor();
+    })
+    .catch(err => console.error("Gagal memperbarui data dari server:", err));
+}
 
   function tampilkanHalamanMonitor() {
     const body = document.getElementById("tabelMonitorBody");
