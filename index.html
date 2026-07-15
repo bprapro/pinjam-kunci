@@ -563,7 +563,7 @@ function gantiTab(tipe) {
   // Beri kelas animasi sebelum mengubah data
   select.classList.remove("drop-animasi");
   
-  select.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
+  select.innerHTML = '<option value="">Pilih Kunci / Ruangan</option>';
   
   const hasilSaring = semuaDataKunci.filter(k => {
     return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
