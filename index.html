@@ -386,7 +386,7 @@
              (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
              (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
     }).forEach(k => {
-      select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [${k.lantai} - ${k.zona}]</option>`;
+      select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [Lantai ${k.lantai} - ${k.zona}]</option>`;
     });
   }
 
@@ -394,88 +394,66 @@
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        dataMonitorTerpinjam = data.filter(item => item.status === "Dipinjam");
+        dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
         halamanSekarang = 1;
         tampilkanHalamanMonitor();
       });
   }
 
   function tampilkanHalamanMonitor() {
-  const body = document.getElementById("bodyTabel");
-  body.innerHTML = "";
+    const body = document.getElementById("bodyTabel");
+    body.innerHTML = "";
 
-  const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
-  if (halamanSekarang > totalHalaman) halamanSekarang = totalHalaman;
+    const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
+    if (halamanSekarang > totalHalaman) halamanSekarang = totalHalaman;
 
-  const indeksAwal = (halamanSekarang - 1) * barisPerHalaman;
-  const indeksAkhir = indeksAwal + barisPerHalaman;
-  const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
+    const indeksAwal = (halamanSekarang - 1) * barisPerHalaman;
+    const indeksAkhir = indeksAwal + barisPerHalaman;
+    const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
-  if (dataHalamanIni.length === 0) {
-    body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;"> Seluruh kunci saat ini berada di rak.</td></tr>';
-    document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
-    document.getElementById("btnPrev").disabled = true;
-    document.getElementById("btnNext").disabled = true;
-    return;
-  }
+    if (dataHalamanIni.length === 0) {
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;"> Seluruh kunci saat ini berada di rak.</td></tr>';
+      document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
+      document.getElementById("btnPrev").disabled = true;
+      document.getElementById("btnNext").disabled = true;
+      return;
+    }
 
-  dataHalamanIni.forEach((item, indeks) => {
-    const idBarisFoto = `foto-row-${indeks}`;
-    
-    // Baris Utama Data Kunci
-    const trUtama = document.createElement("tr");
-    trUtama.style.cursor = "pointer";
-    trUtama.setAttribute("onclick", `toggleShowFoto('${idBarisFoto}')`);
-    trUtama.title = "Klik untuk melihat foto dokumentasi";
-    trUtama.innerHTML = `
-      <td><b>${item.id}</b></td>
-      <td>${item.nama}</td>
-      <td>${item.lantai || '-'}</td>
-      <td>${item.zona || '-'}</td>
-      <td><span class="badge bg-dipinjam">${item.status}</span></td>
-      <td>${item.peminjam}</td>
-      <td>${item.estimasi} <small style="color:var(--text-muted); block; font-size:10px;">(Klik untuk foto)</small></td>
-    `;
-    body.appendChild(trUtama);
-
-    // Baris Tersembunyi untuk Menampilkan Foto Peminjaman
-    const trFoto = document.createElement("tr");
-    trFoto.id = idBarisFoto;
-    trFoto.style.display = "none";
-    trFoto.style.backgroundColor = "#f8fafc";
-    
-    // Pastikan properti 'item.foto' sesuai dengan nama kolom/key URL foto dari Apps Script Anda
-    const urlFoto = item.foto || ""; 
-    
-    trFoto.innerHTML = `
-      <td colspan="7" style="padding: 15px; text-align: center;">
-        <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">📸 Foto Dokumentasi Peminjaman:</div>
-        ${urlFoto ? 
-          `<img src="${urlFoto}" alt="Dokumentasi Kunci ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid var(--primary);">` : 
-          `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Link foto tidak ditemukan atau format kolom Apps Script berbeda.</p>`
-        }
-      </td>
-    `;
-    body.appendChild(trFoto);
-  });
-
-  document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
-  document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
-  document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
-}
-
-    dataHalamanIni.forEach(item => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+    dataHalamanIni.forEach((item, indeks) => {
+      const idBarisFoto = `foto-row-${indeks}`;
+      
+      const trUtama = document.createElement("tr");
+      trUtama.style.cursor = "pointer";
+      trUtama.setAttribute("onclick", `toggleShowFoto('${idBarisFoto}')`);
+      trUtama.title = "Klik untuk melihat foto dokumentasi";
+      trUtama.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
         <td>${item.lantai || '-'}</td>
         <td>${item.zona || '-'}</td>
         <td><span class="badge bg-dipinjam">${item.status}</span></td>
         <td>${item.peminjam}</td>
-        <td>${item.estimasi}</td>
+        <td>${item.estimasi} <br><small style="color:var(--text-muted); font-size:10px;">(Klik untuk lihat foto)</small></td>
       `;
-      body.appendChild(tr);
+      body.appendChild(trUtama);
+
+      const trFoto = document.createElement("tr");
+      trFoto.id = idBarisFoto;
+      trFoto.style.display = "none";
+      trFoto.style.backgroundColor = "#f8fafc";
+      
+      const urlFoto = item.foto || ""; 
+      
+      trFoto.innerHTML = `
+        <td colspan="7" style="padding: 15px; text-align: center;">
+          <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">📸 Foto Dokumentasi Peminjaman:</div>
+          ${urlFoto && urlFoto !== "Tidak ada foto" && !urlFoto.startsWith("Gagal") ? 
+            `<img src="${urlFoto}" alt="Dokumentasi Kunci ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid var(--primary);">` : 
+            `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia untuk transaksi ini.</p>`
+          }
+        </td>
+      `;
+      body.appendChild(trFoto);
     });
 
     document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
@@ -634,6 +612,16 @@
     gantiTab('pinjam'); 
   }
 
+  function toggleShowFoto(idBaris) {
+    const barisFoto = document.getElementById(idBaris);
+    if (barisFoto.style.display === "none") {
+      document.querySelectorAll('[id^="foto-row-"]').forEach(el => el.style.display = "none");
+      barisFoto.style.display = "table-row";
+    } else {
+      barisFoto.style.display = "none";
+    }
+  }
+
   window.onload = () => {
     muatKunciTersedia();
     muatMonitorData();
@@ -642,20 +630,6 @@
     pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman', 'pinjam');
     pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
-
-  function toggleShowFoto(idBaris) {
-  const barisFoto = document.getElementById(idBaris);
-  if (barisFoto.style.display === "none") {
-    // Sembunyikan semua baris foto lain yang sedang terbuka terlebih dahulu (opsional, biar rapi)
-    document.querySelectorAll('[id^="foto-row-"]').forEach(el => el.style.display = "none");
-    // Tampilkan baris foto yang dipilih
-    barisFoto.style.display = "table-row";
-  } else {
-    // Tutup jika baris yang sama diklik kembali
-    barisFoto.style.display = "none";
-  }
-}
-    
 </script>
 </body>
 </html>
