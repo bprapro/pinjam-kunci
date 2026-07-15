@@ -364,21 +364,53 @@ button:hover:not(:disabled) {
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
-  function gantiTab(tipe) {
-    tabAktifSekarang = tipe;
-    matikanKamera();
-    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-pinjam', 'active-kembali'); });
+function gantiTab(tipe) {
+  // Jika tab yang diklik adalah tab yang sedang aktif, abaikan untuk menghindari stuttering animasi
+  if (tabAktifSekarang === tipe && document.querySelector('.form-section.active')) return;
+
+  tabAktifSekarang = tipe;
+  matikanKamera();
+
+  // 1. Hilangkan kelas active pada tab button secara instan untuk respon visual cepat
+  document.querySelectorAll('.tab-btn').forEach(b => { 
+    b.classList.remove('active-pinjam', 'active-kembali'); 
+  });
+
+  // Pasang kelas aktif pada button tab yang dipilih
+  if (tipe === 'pinjam') {
+    document.getElementById('tabPinjam').classList.add('active-pinjam');
+  } else {
+    document.getElementById('tabKembali').classList.add('active-kembali');
+  }
+
+  // 2. Proses transisi konten form secara elegan (Fade Out -> Fade In)
+  const formPinjam = document.getElementById('sectionPinjam');
+  const formKembali = document.getElementById('sectionKembali');
+  const formAktifLama = tipe === 'pinjam' ? formKembali : formPinjam;
+  const formAktifBaru = tipe === 'pinjam' ? formPinjam : formKembali;
+
+  // Mulai memudarkan form lama keluar
+  formAktifLama.classList.remove('active');
+
+  // Tunggu transisi fade-out selesai (300ms-400ms), lalu switch display dan fade-in form baru
+  setTimeout(() => {
+    formAktifLama.style.display = 'none';
     
-    if (tipe === 'pinjam') {
-      document.getElementById('sectionPinjam').classList.add('active');
-      document.getElementById('tabPinjam').classList.add('active-pinjam');
-    } else {
-      document.getElementById('sectionKembali').classList.add('active');
-      document.getElementById('tabKembali').classList.add('active-kembali');
+    // Reset konten select khusus untuk tab pengembalian saat dibuka
+    if (tipe === 'kembali') {
       document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
     }
-  }
+
+    // Tampilkan form baru
+    formAktifBaru.style.display = 'block';
+    
+    // Beri jeda micro-task agar browser sempat me-render display: block sebelum opacity naik
+    setTimeout(() => {
+      formAktifBaru.classList.add('active');
+    }, 20);
+
+  }, 350); // Durasi ini harus selaras dengan transition-duration di CSS kamu (misal: 0.35s)
+}
 
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
