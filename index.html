@@ -384,16 +384,28 @@ select:focus {
       <h2 class="kembali-title">Formulir Pengembalian Kunci</h2>
       <form id="formKembali">
         <input type="hidden" name="aksi" value="kembali">
-        <div class="form-group">
-          <label for="nama_kembali">Nama Pengembali:</label>
-          <input type="text" id="nama_kembali" name="nama" list="listPeminjamAktif" required placeholder="Ketik min. 3 huruf nama Anda..." autocomplete="off" oninput="cekMinimalKarakterNama(this.value)">
-          <datalist id="listPeminjamAktif"></datalist>
-          <span class="hint-text">Rekomendasi nama otomatis muncul berdasarkan daftar peminjam aktif.</span>
-          <button type="button" id="btnCariKunci" style="background-color: #619A7E; color:white; margin-top: 10px; font-size: 14px; padding: 10px; cursor:pointer; border:none; border-radius:6px; font-weight:600;">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            Cari Kunci Saya
-          </button>
-        </div>
+       <div class="form-group">
+  <label for="nama_kembali">Nama Pengembali:</label>
+  <!-- Wadah pembungkus untuk efek inline autocomplete -->
+  <div class="autocomplete-wrapper">
+    <div id="nama_hint" class="autocomplete-hint"></div>
+    <input 
+      type="text" 
+      id="nama_kembali" 
+      name="nama" 
+      required 
+      placeholder="Ketik nama Anda..." 
+      autocomplete="off" 
+      oninput="prosesInlineAutocomplete(this.value)"
+      onkeydown="tanganiKeydownAutocomplete(event)"
+    >
+  </div>
+  <span class="hint-text">Tekan tombol <b>Tab</b> atau <b>Panah Kanan</b> untuk melengkapi nama secara otomatis.</span>
+  <button type="button" id="btnCariKunci" style="background-color: #619A7E; color:white; margin-top: 10px; font-size: 14px; padding: 10px; cursor:pointer; border:none; border-radius:6px; font-weight:600; width: 100%;">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    Cari Kunci Saya
+  </button>
+</div>
         <div class="form-group">
           <label for="kunci_kembali">Kunci yang Dikembalikan:</label>
           <select id="kunci_kembali" name="kunci" required>
