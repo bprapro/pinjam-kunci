@@ -169,12 +169,20 @@ input:focus, select:focus {
     /* Kamera Dokumentasi */
     video, canvas { display: none; width: 100%; max-width: 100%; border-radius: 12px; background: #0f172a; margin: 12px auto 0 auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
     .foto-container { text-align: center; margin-top: 10px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
-    .btn-buka-cam { background-color: #475569; color: white; border: none; }
-    .btn-buka-cam:hover { background-color: #334155; }
-    
-    .btn-ambil-foto { background-color: var(--primary); color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
-    .btn-foto-ulang { background-color: #94a3b8; color: white; border: none; display: none; margin-top: 10px; padding: 12px; font-weight: 600; }
+   .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang {
+  border: none;
+  border-radius: 8px; /* Membuat sudut tombol bulat */
+  padding: 12px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
+.btn-buka-cam { background-color: #475569; color: white; }
+.btn-buka-cam:hover { background-color: #334155; }
+
+.btn-ambil-foto { background-color: var(--primary); color: white; display: none; margin-top: 10px; }
+.btn-foto-ulang { background-color: #94a3b8; color: white; display: none; margin-top: 10px; }
     /* Tabel Monitor */
     table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
 th, td { 
