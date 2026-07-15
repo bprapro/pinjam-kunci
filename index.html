@@ -716,24 +716,49 @@ function gantiTab(tipe) {
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
-  function cekMinimalKarakterNama(nilaiInput) {
-  const datalist = document.getElementById("listPeminjamAktif");
-  datalist.innerHTML = ""; 
-  
-  const teksCari = nilaiInput.trim().toLowerCase();
-  // Jika kotak input kosong, langsung hentikan proses
-  if (teksCari.length === 0) return; 
+let rekomendasiNamaTerpilih = "";
 
-  // Mengambil daftar nama peminjam aktif dari data monitor
-  const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+function prosesInlineAutocomplete(nilaiInput) {
+  const hintEl = document.getElementById("nama_hint");
+  const inputEl = document.getElementById("nama_kembali");
   
-  listNamaUnik.forEach(nama => {
-    if (nama.toLowerCase().includes(teksCari)) {
-      const option = document.createElement("option");
-      option.value = nama;
-      datalist.appendChild(option);
-    }
-  });
+  const teksCari = nilaiInput;
+  rekomendasiNamaTerpilih = "";
+  hintEl.textContent = "";
+
+  if (!teksCari.trim()) return;
+
+  // Ambil daftar nama unik dari database monitor yang aktif
+  const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+
+  // Cari nama yang berawalan dengan ketikan user (case-insensitive)
+  const kecocokan = listNamaUnik.find(nama => 
+    nama.toLowerCase().startsWith(teksCari.toLowerCase())
+  );
+
+  if (kecocokan) {
+    rekomendasiNamaTerpilih = kecocokan;
+    // Buat visual teks bayangan agar sejajar dengan huruf yang diketik
+    // Bagian yang sudah diketik dibuat transparan, sisanya (rekomendasi kanan) berwarna abu-abu
+    const bagianSama = kecocokan.substring(0, teksCari.length);
+    const sisaRekomendasi = kecocokan.substring(teksCari.length);
+    
+    // Gunakan elemen pembantu agar posisi teks bayangan presisi di belakang teks asli
+    hintEl.innerHTML = `<span style="color: transparent;">${bagianSama}</span>${sisaRekomendasi}`;
+  }
+}
+
+function tanganiKeydownAutocomplete(e) {
+  const inputEl = document.getElementById("nama_kembali");
+  const hintEl = document.getElementById("nama_hint");
+
+  // Jika user menekan tombol Tab atau Panah Kanan, dan ada rekomendasi yang tersedia
+  if ((e.key === "Tab" || e.key === "ArrowRight") && rekomendasiNamaTerpilih) {
+    e.preventDefault(); // Mencegah kursor pindah fokus (khusus tombol Tab)
+    inputEl.value = rekomendasiNamaTerpilih;
+    hintEl.textContent = ""; // Kosongkan hint setelah dipilih
+    rekomendasiNamaTerpilih = "";
+  }
 }
 
   document.getElementById('btnCariKunci').addEventListener('click', () => {
