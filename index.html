@@ -240,10 +240,58 @@ select:focus {
     transform: scale(1) translateY(0);
   }
 }
+
+    /* Container Background Video */
+.video-background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -100; /* Berada jauh di belakang konten utama */
+  overflow: hidden;
+  pointer-events: none; /* Agar tidak mengganggu klik/interaksi user pada formulir */
+  background-color: var(--bg-body); /* Warna cadangan jika video gagal dimuat */
+}
+
+/* Membuat video menutup penuh layar (aspect ratio cover) */
+.video-background-container iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 56.25vw; /* Rasio 16:9 */
+  min-height: 100vh;
+  min-width: 177.77vh; /* Rasio 16:9 */
+  transform: translate(-50%, -50%);
+  opacity: 0.12; /* Sesuaikan tingkat keburaman di sini (0.05 sampai 0.15 direkomendasikan) */
+  filter: grayscale(40%) contrast(110%); /* Opsional: memberikan kesan estetik dan menyatu dengan warna gelap website */
+}
+
+/* Modifikasi sedikit kontainer formulir agar lebih kontras di atas video */
+.container, .monitor-container {
+  position: relative;
+  z-index: 1;
+  /* Tambahkan efek kaca (Glassmorphism) tipis agar latar belakang video terlihat estetik di sela-sela card */
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
   </style>
 </head>
 <body>
 
+  <!-- Background Video YouTube -->
+<div class="video-background-container">
+  <!-- Ganti 1fa7GGNL9CQ dengan ID video YouTube pilihanmu (misal: dWq9g7N02hY atau video lo-fi/aesthetic) -->
+  <iframe 
+    src="https://www.youtube.com/embed/1fa7GGNL9CQ?autoplay=1&mute=1&loop=1&playlist=1fa7GGNL9CQ&controls=0&showinfo=0&rel=0&iv_load_policy=3&playsinline=1" 
+    frameborder="0" 
+    allow="autoplay; encrypted-media" 
+    allowfullscreen>
+  </iframe>
+</div>
+  
   <div class="container">
     <div id="navTabsContainer" class="nav-tabs">
       <button type="button" id="tabPinjam" class="tab-btn active-pinjam" onclick="gantiTab('pinjam')">
