@@ -127,7 +127,7 @@ button:hover:not(:disabled) {
       box-sizing: border-box; 
       font-size: 15px;
       transition: all 0.2s;
-      background-color: #f8fafc;
+      background-color: #EFF1F0;
     }
     input:focus, select:focus {
       outline: none;
@@ -170,7 +170,7 @@ button:hover:not(:disabled) {
     /* Tabel Monitor */
     table { width: 100%; border-collapse: collapse; min-width: 700px; margin-top: 15px; }
     th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
-    th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    th { background-color: #EFF1F0; color: #475569; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
     td { font-size: 14px; color: #334155; }
     
     .badge { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: white; display: inline-block; }
@@ -185,7 +185,7 @@ button:hover:not(:disabled) {
     .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); }
     .btn-page { background-color: white; border: 1px solid var(--border-color); padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; width: auto; border-radius: 8px; color: #475569; }
     .btn-page svg { width: 14px; height: 14px; fill: #475569; }
-    .btn-page:hover:not(:disabled) { background-color: #f8fafc; border-color: #cbd5e1; }
+    .btn-page:hover:not(:disabled) { background-color: #EFF1F0; border-color: #cbd5e1; }
     .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
     #infoHalaman { font-size: 13px; font-weight: 600; color: var(--text-muted); }
     .hint-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: block; }
@@ -608,7 +608,7 @@ function gantiTab(tipe) {
       const trFoto = document.createElement("tr");
       trFoto.id = idBarisFoto;
       trFoto.style.display = "none";
-      trFoto.style.backgroundColor = "#f8fafc";
+      trFoto.style.backgroundColor = "#EFF1F0";
       
       // LOGIK PERBAIKAN URL FOTO
       let urlFoto = (item.foto || "").trim(); 
