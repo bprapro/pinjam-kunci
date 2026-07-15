@@ -759,42 +759,7 @@ function gantiTab(tipe) {
         </td>
       `;
       body.appendChild(trFoto);
-    }); // Batas akhir forEach
-
-      const trFoto = document.createElement("tr");
-      trFoto.id = idBarisFoto;
-      trFoto.style.display = "none";
-      trFoto.style.backgroundColor = "#EFF1F0";
-      
-      // LOGIK PERBAIKAN URL FOTO
-      let urlFoto = (item.foto || "").trim(); 
-      
-      // Jika link berupa share Google Drive biasa, konversi ke direct link view
-      if (urlFoto.includes("drive.google.com/file/d/")) {
-        const match = urlFoto.match(/file\/d\/(.*?)\//);
-        if (match && match[1]) {
-          urlFoto = `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-      } else if (urlFoto.includes("id=")) {
-        const match = urlFoto.match(/id=(.*?)(&|$)/);
-        if (match && match[1]) {
-          urlFoto = `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-      }
-      
-      const fotoValid = urlFoto && urlFoto !== "Tidak ada foto" && !urlFoto.startsWith("Gagal") && urlFoto.length > 20;
-      
-      trFoto.innerHTML = `
-        <td colspan="7" style="padding: 15px; text-align: center;">
-          <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">📸 Foto Dokumentasi Peminjaman:</div>
-          ${fotoValid ? 
-            `<img src="${urlFoto}" alt="Dokumentasi Kunci ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid var(--primary);" onerror="this.onerror=null; this.parentNode.innerHTML='<p style=\'color: var(--danger); font-size: 13px; margin: 0;\'>⚠️ Gagal memuat gambar. Pastikan akses file di Google Drive telah diatur ke \\'Siapa saja yang memiliki link\\'.</p>';">` : 
-            `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia atau format tidak didukung.</p>`
-          }
-        </td>
-      `;
-      body.appendChild(trFoto);
-    });
+    }); // Menutup dataMonitorTerpinjam.forEach di fungsi tampilkanHalamanMonitor
 
     document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
     document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
@@ -804,50 +769,40 @@ function gantiTab(tipe) {
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
-let rekomendasiNamaTerpilih = "";
+  let rekomendasiNamaTerpilih = "";
 
-function prosesInlineAutocomplete(nilaiInput) {
-  const hintEl = document.getElementById("nama_hint");
-  const inputEl = document.getElementById("nama_kembali");
-  
-  const teksCari = nilaiInput;
-  rekomendasiNamaTerpilih = "";
-  hintEl.textContent = "";
-
-  if (!teksCari.trim()) return;
-
-  // Ambil daftar nama unik dari database monitor yang aktif
-  const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
-
-  // Cari nama yang berawalan dengan ketikan user (case-insensitive)
-  const kecocokan = listNamaUnik.find(nama => 
-    nama.toLowerCase().startsWith(teksCari.toLowerCase())
-  );
-
-  if (kecocokan) {
-    rekomendasiNamaTerpilih = kecocokan;
-    // Buat visual teks bayangan agar sejajar dengan huruf yang diketik
-    // Bagian yang sudah diketik dibuat transparan, sisanya (rekomendasi kanan) berwarna abu-abu
-    const bagianSama = kecocokan.substring(0, teksCari.length);
-    const sisaRekomendasi = kecocokan.substring(teksCari.length);
-    
-    // Gunakan elemen pembantu agar posisi teks bayangan presisi di belakang teks asli
-    hintEl.innerHTML = `<span style="color: transparent;">${bagianSama}</span>${sisaRekomendasi}`;
-  }
-}
-
-function tanganiKeydownAutocomplete(e) {
-  const inputEl = document.getElementById("nama_kembali");
-  const hintEl = document.getElementById("nama_hint");
-
-  // Jika user menekan tombol Tab atau Panah Kanan, dan ada rekomendasi yang tersedia
-  if ((e.key === "Tab" || e.key === "ArrowRight") && rekomendasiNamaTerpilih) {
-    e.preventDefault(); // Mencegah kursor pindah fokus (khusus tombol Tab)
-    inputEl.value = rekomendasiNamaTerpilih;
-    hintEl.textContent = ""; // Kosongkan hint setelah dipilih
+  function prosesInlineAutocomplete(nilaiInput) {
+    const hintEl = document.getElementById("nama_hint");
+    const teksCari = nilaiInput;
     rekomendasiNamaTerpilih = "";
+    hintEl.textContent = "";
+
+    if (!teksCari.trim()) return;
+
+    const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+    const kecocokan = listNamaUnik.find(nama => 
+      nama.toLowerCase().startsWith(teksCari.toLowerCase())
+    );
+
+    if (kecocokan) {
+      rekomendasiNamaTerpilih = kecocokan;
+      const bagianSama = kecocokan.substring(0, teksCari.length);
+      const sisaRekomendasi = kecocokan.substring(teksCari.length);
+      hintEl.innerHTML = `<span style="color: transparent;">${bagianSama}</span>${sisaRekomendasi}`;
+    }
   }
-}
+
+  function tanganiKeydownAutocomplete(e) {
+    const inputEl = document.getElementById("nama_kembali");
+    const hintEl = document.getElementById("nama_hint");
+
+    if ((e.key === "Tab" || e.key === "ArrowRight") && rekomendasiNamaTerpilih) {
+      e.preventDefault(); 
+      inputEl.value = rekomendasiNamaTerpilih;
+      hintEl.textContent = ""; 
+      rekomendasiNamaTerpilih = "";
+    }
+  }
 
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
@@ -979,28 +934,27 @@ function tanganiKeydownAutocomplete(e) {
     gantiTab('pinjam'); 
   }
 
-function toggleShowFoto(idBaris) {
-  const barisFoto = document.getElementById(idBaris);
-  
-  // Tutup semua yang terbuka dulu
-  document.querySelectorAll('[id^="foto-row-"]').forEach(el => {
-    if (el.id !== idBaris) {
-      el.style.display = "none";
-    }
-  });
+  function toggleShowFoto(idBaris) {
+    const barisFoto = document.getElementById(idBaris);
+    
+    document.querySelectorAll('[id^="foto-row-"]').forEach(el => {
+      if (el.id !== idBaris) {
+        el.style.display = "none";
+      }
+    });
 
-  // Toggle dengan animasi sederhana
-  if (barisFoto.style.display === "none" || barisFoto.style.display === "") {
-    barisFoto.style.display = "table-row";
-    barisFoto.style.opacity = "0";
-    setTimeout(() => {
-      barisFoto.style.transition = "opacity 0.4s ease";
-      barisFoto.style.opacity = "1";
-    }, 10);
-  } else {
-    barisFoto.style.display = "none";
+    if (barisFoto.style.display === "none" || barisFoto.style.display === "") {
+      barisFoto.style.display = "table-row";
+      barisFoto.style.opacity = "0";
+      setTimeout(() => {
+        barisFoto.style.transition = "opacity 0.4s ease";
+        barisFoto.style.opacity = "1";
+      }, 10);
+    } else {
+      barisFoto.style.display = "none";
+    }
   }
-}
+
   window.onload = () => {
     muatKunciTersedia();
     muatMonitorData();
