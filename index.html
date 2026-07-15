@@ -324,7 +324,7 @@
     </div>
   </div>
 
-<<script>
+<script>
   // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
   
@@ -348,7 +348,6 @@
     } else {
       document.getElementById('sectionKembali').classList.add('active');
       document.getElementById('tabKembali').classList.add('active-kembali');
-      // PERBAIKAN: Tanda petik disesuaikan agar tidak merusak sintaksis JavaScript
       document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
     }
   }
@@ -579,7 +578,7 @@
         }).catch(() => { 
           alert("Kendala Jaringan atau Server Timeout."); 
           btn.disabled = false; 
-          btn.innerHTML = formatUflowTombol; 
+          btn.innerHTML = formatUlangTombol; 
         });
     });
   }
