@@ -486,22 +486,31 @@ function gantiTab(tipe) {
       });
   }
 
-  function saringKunci() {
-    const lantai = document.getElementById("filterLantai").value.toLowerCase();
-    const zona = document.getElementById("filterZona").value.toLowerCase();
-    const cari = document.getElementById("kotakCari").value.toLowerCase();
-    const select = document.getElementById("kunci_pinjam");
-    select.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
-    
-    semuaDataKunci.filter(k => {
-      return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
-             (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
-             (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
-    }).forEach(k => {
-      select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [Lantai ${k.lantai} - ${k.zona}]</option>`;
-    });
-  }
+ function saringKunci() {
+  const lantai = document.getElementById("filterLantai").value.toLowerCase();
+  const zona = document.getElementById("filterZona").value.toLowerCase();
+  const cari = document.getElementById("kotakCari").value.toLowerCase();
+  const select = document.getElementById("kunci_pinjam");
+  
+  // Beri kelas animasi sebelum mengubah data
+  select.classList.remove("drop-animasi");
+  
+  select.innerHTML = '<option value="">-- Pilih Kunci / Ruangan --</option>';
+  
+  const hasilSaring = semuaDataKunci.filter(k => {
+    return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
+           (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
+           (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
+  });
 
+  hasilSaring.forEach(k => {
+    select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [Lantai ${k.lantai} - ${k.zona}]</option>`;
+  });
+
+  // Memicu ulang render animasi CSS
+  void select.offsetWidth; 
+  select.classList.add("drop-animasi");
+}
   function muatMonitorData() {
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
