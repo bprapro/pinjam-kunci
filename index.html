@@ -25,6 +25,34 @@
       line-height: 1.5;
     }
 
+    /* Efek Fade untuk Perpindahan Form */
+.form-section {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.form-section.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Transisi Accordion (Geser halus untuk Foto) */
+[id^="foto-row-"] {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* Efek Hover Modern pada Tombol */
+button {
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+    
     /* Container Card */
     .container, .monitor-container { 
       max-width: 600px; 
@@ -628,16 +656,28 @@
     gantiTab('pinjam'); 
   }
 
-  function toggleShowFoto(idBaris) {
-    const barisFoto = document.getElementById(idBaris);
-    if (barisFoto.style.display === "none") {
-      document.querySelectorAll('[id^="foto-row-"]').forEach(el => el.style.display = "none");
-      barisFoto.style.display = "table-row";
-    } else {
-      barisFoto.style.display = "none";
+function toggleShowFoto(idBaris) {
+  const barisFoto = document.getElementById(idBaris);
+  
+  // Tutup semua yang terbuka dulu
+  document.querySelectorAll('[id^="foto-row-"]').forEach(el => {
+    if (el.id !== idBaris) {
+      el.style.display = "none";
     }
-  }
+  });
 
+  // Toggle dengan animasi sederhana
+  if (barisFoto.style.display === "none" || barisFoto.style.display === "") {
+    barisFoto.style.display = "table-row";
+    barisFoto.style.opacity = "0";
+    setTimeout(() => {
+      barisFoto.style.transition = "opacity 0.4s ease";
+      barisFoto.style.opacity = "1";
+    }, 10);
+  } else {
+    barisFoto.style.display = "none";
+  }
+}
   window.onload = () => {
     muatKunciTersedia();
     muatMonitorData();
