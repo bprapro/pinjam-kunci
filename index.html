@@ -8,6 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Efek Kedip Kuning Lembut untuk Baris yang Terlambat */
+@keyframes kedipPeringatan {
+  0% { background-color: rgba(255, 193, 7, 0.05); }
+  50% { background-color: rgba(255, 193, 7, 0.35); }
+  100% { background-color: rgba(255, 193, 7, 0.05); }
+}
+
+.baris-terlambat {
+  animation: kedipPeringatan 2s infinite ease-in-out;
+}
     :root {
       --primary: #619A7E;
       --danger: #df2c3e;
