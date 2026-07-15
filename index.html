@@ -299,39 +299,57 @@ select:focus {
   -webkit-backdrop-filter: blur(8px);
 }
 
-    /* Container pembungkus autocomplete */
+/* Container pembungkus autocomplete */
 .autocomplete-wrapper {
   position: relative;
   width: 100%;
 }
 
-/* Input utama harus transparan agar teks bayangan di belakangnya kelihatan */
-.autocomplete-wrapper input {
+/* PAKSA INPUT DAN HINT MEMILIKI UKURAN, HURUF, DAN PADDING YANG SAMA PERSIS */
+#nama_kembali, 
+#nama_hint {
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif !important; /* Samakan jenis font */
+  font-size: 15px !important;      /* Samakan ukuran font */
+  font-weight: 400 !important;     /* Samakan ketebalan font */
+  letter-spacing: normal !important;
+  line-height: 1.5 !important;     /* Samakan tinggi baris */
+  padding: 12px 16px !important;   /* Samakan padding */
+  box-sizing: border-box !important;
+}
+
+/* Aturan khusus untuk input utama */
+#nama_kembali {
   position: relative;
-  background: transparent !important;
+  width: 100%;
+  background: transparent !important; /* Buat transparan agar bayangan di bawahnya kelihatan */
+  border: 1px solid #cbd5e1; /* Gunakan border asli di sini */
+  border-radius: 8px;
+  color: var(--dark);
   z-index: 2;
 }
 
-/* Teks bayangan pembawa rekomendasi di sebelah kanan */
-.autocomplete-hint {
+/* Hilangkan border asli input saat fokus agar tidak double dengan hint */
+#nama_kembali:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+}
+
+/* Aturan khusus untuk teks bayangan (Hint) */
+#nama_hint {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 12px 16px; /* Harus sama persis dengan padding input */
-  font-size: 15px; /* Harus sama persis dengan ukuran font input */
-  font-family: inherit;
-  box-sizing: border-box;
-  color: #cbd5e1; /* Warna abu-abu samar untuk teks rekomendasi */
+  color: #cbd5e1; /* Warna abu-abu samar untuk rekomendasi */
+  background-color: #f8fafc; /* Background diletakkan di elemen paling belakang */
+  border: 1px solid transparent; /* Border transparan hanya untuk menyamakan ruang pixel */
+  border-radius: 8px;
   pointer-events: none;
   z-index: 1;
   white-space: pre;
   display: flex;
   align-items: center;
-  background-color: #f8fafc; /* Latar belakang asli dipindah ke sini */
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
 }
   </style>
 </head>
