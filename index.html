@@ -160,6 +160,42 @@
     .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
     #infoHalaman { font-size: 13px; font-weight: 600; color: var(--text-muted); }
     .hint-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: block; }
+
+    /* ========================================== */
+    /* STEP A: CSS UNTUK POPUP FOTO HOVER MOUSE  */
+    /* ========================================== */
+    .preview-foto-container {
+      position: fixed;
+      display: none;
+      z-index: 9999;
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      padding: 6px;
+      max-width: 250px;
+      pointer-events: none;
+    }
+    .preview-foto-container img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+    }
+    .preview-foto-loading {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 12px;
+      font-weight: 600;
+    }
+    .baris-terpinjam {
+      cursor: help;
+      transition: background-color 0.15s ease;
+    }
+    .baris-terpinjam:hover {
+      background-color: #f1f5f9 !important;
+    }
   </style>
 </head>
 <body>
@@ -324,8 +360,12 @@
     </div>
   </div>
 
-<<script>
-  // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
+  <!-- ========================================== */
+  /* STEP B: ELEMEN WADAH POPUP FOTO MELAYANG    */
+  /* ========================================== -->
+  <div id="popupPratinjauFoto" class="preview-foto-container"></div>
+
+<script>
   const scriptUrl = "https://script.google.com/macros/s/AKfycbzRNNX80qWU1dFSYhrvN1GwcW76FbIwfv6Ut4pWYZVRADZAGZflcv2kkO786Ez5BFIqwg/exec";
   
   let semuaDataKunci = [];
@@ -348,7 +388,6 @@
     } else {
       document.getElementById('sectionKembali').classList.add('active');
       document.getElementById('tabKembali').classList.add('active-kembali');
-      // PERBAIKAN: Tanda petik disesuaikan agar tidak merusak sintaksis JavaScript
       document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
     }
   }
@@ -401,8 +440,12 @@
       });
   }
 
+  // ========================================== */
+  /* STEP C: RENDER MONITOR & DETEKSI HOVER      */
+  /* ========================================== -->
   function tampilkanHalamanMonitor() {
     const body = document.getElementById("bodyTabel");
+    const popup = document.getElementById("popupPratinjauFoto");
     body.innerHTML = "";
 
     const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
@@ -422,6 +465,16 @@
 
     dataHalamanIni.forEach(item => {
       const tr = document.createElement("tr");
+      tr.className = "baris-terpinjam";
+      
+      // Mengubah URL Google Drive biasa menjadi Direct Image Source Link
+      let cleanFotoUrl = item.foto;
+      if (cleanFotoUrl && cleanFotoUrl.includes('id=')) {
+        const idFile = cleanFotoUrl.split('id=')[1].split('&')[0];
+        cleanFotoUrl = `https://docs.google.com/uc?export=view&id=${idFile}`;
+      }
+      tr.setAttribute("data-foto", cleanFotoUrl || "Tidak ada foto");
+
       tr.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
@@ -437,6 +490,29 @@
     document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
     document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
     document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
+
+    // KONEKSI EVENT MOUSE UNTUK MEMUNCULKAN FOTO
+    document.querySelectorAll('.baris-terpinjam').forEach(baris => {
+      baris.addEventListener('mouseenter', function(e) {
+        const urlGambar = this.getAttribute('data-foto');
+        if (!urlGambar || urlGambar.includes('Tidak ada foto') || urlGambar.startsWith('Gagal')) {
+          popup.innerHTML = '<div class="preview-foto-loading">Foto tidak ditemukan</div>';
+        } else {
+          popup.innerHTML = `<img src="${urlGambar}" alt="Dokumentasi"/>`;
+        }
+        popup.style.display = 'block';
+      });
+
+      baris.addEventListener('mousemove', function(e) {
+        popup.style.left = (e.clientX + 15) + 'px';
+        popup.style.top = (e.clientY + 15) + 'px';
+      });
+
+      baris.addEventListener('mouseleave', function() {
+        popup.style.display = 'none';
+        popup.innerHTML = '';
+      });
+    });
   }
 
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
@@ -569,17 +645,17 @@
             document.getElementById('screenSukses').style.display = 'block';
             
             btn.disabled = false;
-            btn.innerHTML = formatUlangTombol; // <-- PERBAIKAN: Diubah dari formatUflowTombol
+            btn.innerHTML = formatUlangTombol;
           }
           else { 
             alert("Gagal: " + res.message); 
             btn.disabled = false; 
-            btn.innerHTML = formatUlangTombol; // <-- PERBAIKAN: Diubah dari formatUflowTombol
+            btn.innerHTML = formatUlangTombol; 
           }
         }).catch(() => { 
           alert("Kendala Jaringan atau Server Timeout."); 
           btn.disabled = false; 
-          btn.innerHTML = formatUlangTombol; // <-- PERBAIKAN: Diubah dari formatUflowTombol
+          btn.innerHTML = formatUlangTombol; 
         });
     });
   }
