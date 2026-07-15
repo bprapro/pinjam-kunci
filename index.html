@@ -364,33 +364,21 @@ button:hover:not(:disabled) {
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
-function gantiTab(tipe) {
-  tabAktifSekarang = tipe;
-  matikanKamera();
-  
-  // Sembunyikan semua dulu dengan transisi
-  document.querySelectorAll('.form-section').forEach(s => {
-    s.classList.remove('active');
-    setTimeout(() => { s.style.display = 'none'; }, 400); // Sesuai durasi CSS 0.4s
-  });
-
-  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-pinjam', 'active-kembali'); });
-  
-  // Tampilkan tab yang dipilih
-  setTimeout(() => {
+  function gantiTab(tipe) {
+    tabAktifSekarang = tipe;
+    matikanKamera();
+    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-pinjam', 'active-kembali'); });
+    
     if (tipe === 'pinjam') {
-      const target = document.getElementById('sectionPinjam');
-      target.style.display = 'block';
-      setTimeout(() => target.classList.add('active'), 10);
+      document.getElementById('sectionPinjam').classList.add('active');
       document.getElementById('tabPinjam').classList.add('active-pinjam');
     } else {
-      const target = document.getElementById('sectionKembali');
-      target.style.display = 'block';
-      setTimeout(() => target.classList.add('active'), 10);
+      document.getElementById('sectionKembali').classList.add('active');
       document.getElementById('tabKembali').classList.add('active-kembali');
+      document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
     }
-  }, 200);
-}
+  }
 
   function muatKunciTersedia() {
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
