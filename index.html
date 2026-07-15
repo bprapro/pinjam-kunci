@@ -670,22 +670,24 @@ function gantiTab(tipe) {
   function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
 
   function cekMinimalKarakterNama(nilaiInput) {
-    const datalist = document.getElementById("listPeminjamAktif");
-    datalist.innerHTML = ""; 
-    
-    const teksCari = nilaiInput.trim().toLowerCase();
-    if (teksCari.length < 3) return; 
+  const datalist = document.getElementById("listPeminjamAktif");
+  datalist.innerHTML = ""; 
+  
+  const teksCari = nilaiInput.trim().toLowerCase();
+  // Jika kotak input kosong, langsung hentikan proses
+  if (teksCari.length === 0) return; 
 
-    const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
-    
-    listNamaUnik.forEach(nama => {
-      if (nama.toLowerCase().includes(teksCari)) {
-        const option = document.createElement("option");
-        option.value = nama;
-        datalist.appendChild(option);
-      }
-    });
-  }
+  // Mengambil daftar nama peminjam aktif dari data monitor
+  const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+  
+  listNamaUnik.forEach(nama => {
+    if (nama.toLowerCase().includes(teksCari)) {
+      const option = document.createElement("option");
+      option.value = nama;
+      datalist.appendChild(option);
+    }
+  });
+}
 
   document.getElementById('btnCariKunci').addEventListener('click', () => {
     const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
