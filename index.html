@@ -348,7 +348,7 @@ select:focus {
           </div>
           <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
           <select id="kunci_pinjam" name="kunci" required>
-            <option value="">-- Memuat data kunci... --</option>
+            <option value="">Memuat data kunci...</option>
           </select>
         </div>
         <div class="form-group">
@@ -518,7 +518,7 @@ function gantiTab(tipe) {
     
     // Reset konten select khusus untuk tab pengembalian saat dibuka
     if (tipe === 'kembali') {
-      document.getElementById('kunci_kembali').innerHTML = '<option value="">-- Klik tombol \'Cari Kunci Saya\' di atas --</option>';
+      document.getElementById('kunci_kembali').innerHTML = '<option value="">Klik tombol \'Cari Kunci Saya\' di atas</option>';
     }
 
     // Tampilkan form baru
