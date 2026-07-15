@@ -521,11 +521,11 @@ function gantiTab(tipe) {
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
         
         const selectLantai = document.getElementById("filterLantai");
-        selectLantai.innerHTML = '<option value="">-- Semua Lantai --</option>';
+        selectLantai.innerHTML = '<option value="">All Floor</option>';
         listLantai.forEach(l => { selectLantai.innerHTML += `<option value="${l}">${l}</option>`; });
         
         const selectZona = document.getElementById("filterZona");
-        selectZona.innerHTML = '<option value="">-- Semua Zona --</option>';
+        selectZona.innerHTML = '<option value="">All Zone</option>';
         listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
         saringKunci();
       }).catch(err => {
