@@ -569,17 +569,17 @@
             document.getElementById('screenSukses').style.display = 'block';
             
             btn.disabled = false;
-            btn.innerHTML = formatUlangTombol;
+            btn.innerHTML = formatUlangTombol; // <-- PERBAIKAN: Diubah dari formatUflowTombol
           }
           else { 
             alert("Gagal: " + res.message); 
             btn.disabled = false; 
-            btn.innerHTML = formatUlangTombol; 
+            btn.innerHTML = formatUlangTombol; // <-- PERBAIKAN: Diubah dari formatUflowTombol
           }
         }).catch(() => { 
           alert("Kendala Jaringan atau Server Timeout."); 
           btn.disabled = false; 
-          btn.innerHTML = formatUflowTombol; 
+          btn.innerHTML = formatUlangTombol; // <-- PERBAIKAN: Diubah dari formatUflowTombol
         });
     });
   }
