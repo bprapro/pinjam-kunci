@@ -8,16 +8,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+/* Efek kedip warning yang bersih, modern, dan tanpa garis tepi */
 @keyframes pulse-warning {
-  0% { background-color: rgba(254, 240, 138, 0.2); }
-  50% { background-color: rgba(254, 240, 138, 0.6); }
-  100% { background-color: rgba(254, 240, 138, 0.2); }
+  0% { background-color: rgba(254, 240, 138, 0.15); }  /* Kuning sangat tipis */
+  50% { background-color: rgba(254, 240, 138, 0.45); } /* Naik halus tanpa kontras berlebih */
+  100% { background-color: rgba(254, 240, 138, 0.15); }
 }
 
 .row-terlambat {
-  animation: pulse-warning 2.5s infinite ease-in-out !important;
-  border-left: 4px solid #ca8a04 !important;
+  animation: pulse-warning 3s infinite ease-in-out !important;
+  /* Garis kuning tua di sebelah kiri sudah dihapus total di sini */
 }
+
     :root {
       --primary: #619A7E;
       --danger: #df2c3e;
