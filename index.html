@@ -389,14 +389,16 @@ select:focus {
 </div>
   
   <div class="container">
-<div id="navTabsContainer" class="tabs-container">
-  <button type="button" class="tab-btn active" onclick="gantiTab('pinjam')">
-    🔑 Pinjam Kunci
-  </button>
-  <button type="button" class="tab-btn" onclick="gantiTab('kembali')">
-    🔄 Kembalikan Kunci
-  </button>
-</div>
+    <div id="navTabsContainer" class="nav-tabs">
+      <button type="button" id="tabPinjam" class="tab-btn active-pinjam" onclick="gantiTab('pinjam')">
+        <svg viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+        Pinjam Kunci
+      </button>
+      <button type="button" id="tabKembali" class="tab-btn" onclick="gantiTab('kembali')">
+        <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+        Kembalikan Kunci
+      </button>
+    </div>
 
     <div id="sectionPinjam" class="form-section active">
       <h2 class="pinjam-title">Form Kunci 23 Semarang</h2>
@@ -570,30 +572,6 @@ select:focus {
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
-  function gantiTab(tabName) {
-  // 1. Matikan kamera aktif terlebih dahulu agar tidak error saat pindah form
-  matikanKamera();
-
-  // 2. Ambil semua tombol tab dan semua section form
-  const semuaTombol = document.querySelectorAll('.tab-btn');
-  const semuaForm = document.querySelectorAll('.form-section');
-
-  // 3. Hapus kelas 'active' dari semua tombol dan form
-  semuaTombol.forEach(btn => btn.classList.remove('active'));
-  semuaForm.forEach(form => form.classList.remove('active'));
-
-  // 4. Aktifkan tombol dan form yang dipilih
-  if (tabName === 'pinjam') {
-    // Cari tombol pertama (index 0) atau tombol yang memiliki teks/fungsi pinjam
-    semuaTombol[0].classList.add('active');
-    document.getElementById('formPinjam').classList.add('active');
-  } else if (tabName === 'kembali') {
-    // Cari tombol kedua (index 1) atau tombol yang memiliki teks/fungsi kembali
-    semuaTombol[1].classList.add('active');
-    document.getElementById('formKembali').classList.add('active');
-  }
-}
-  
 function gantiTab(tipe) {
   // Jika tab yang diklik adalah tab yang sedang aktif, abaikan untuk menghindari stuttering animasi
   if (tabAktifSekarang === tipe && document.querySelector('.form-section.active')) return;
@@ -689,25 +667,15 @@ function gantiTab(tipe) {
   void select.offsetWidth; 
   select.classList.add("drop-animasi");
 }
- function muatMonitorData() {
-  // 1. Cek apakah ada data tersimpan di memori browser untuk mempercepat tampilan awal
-  const dataLokal = localStorage.getItem('cacheDataMonitor');
-  if (dataLokal) {
-    dataMonitorTerpinjam = JSON.parse(dataLokal);
-    tampilkanHalamanMonitor(); // Langsung muncul tanpa loading lama
+  function muatMonitorData() {
+    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
+      .then(res => res.json())
+      .then(data => {
+        dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
+        halamanSekarang = 1;
+        tampilkanHalamanMonitor();
+      });
   }
-
-  // 2. Tetap ambil data terbaru di latar belakang agar data tetap sinkron
-  fetch(scriptUrl + "?aksi=monitor")
-    .then(res => res.json())
-    .then(data => {
-      dataMonitorTerpinjam = data;
-      // Simpan data terbaru ke dalam memori lokal untuk sesi berikutnya
-      localStorage.setItem('cacheDataMonitor', JSON.stringify(data));
-      tampilkanHalamanMonitor();
-    })
-    .catch(err => console.error("Gagal memperbarui data dari server:", err));
-}
 
   function tampilkanHalamanMonitor() {
     const body = document.getElementById("tabelMonitorBody");
