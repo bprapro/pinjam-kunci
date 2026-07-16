@@ -386,14 +386,9 @@ select:focus {
 <body>
 
 <!-- Background Video YouTube Anti-Iklan -->
-<div class="video-background-container">
-  <iframe 
-    src="https://www.youtube-nocookie.com/embed/RzVvThhjAKw?autoplay=1&mute=1&loop=1&playlist=RzVvThhjAKw&controls=0&disablekb=1&fs=0&modestbranding=1&iv_load_policy=3&rel=0&showinfo=0" 
-    frameborder="0" 
-    allow="autoplay; encrypted-media" 
-    contenteditable="false">
-  </iframe>
-</div>
+<video autoplay loop muted playsinline style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -100; object-fit: cover;">
+  <source src="videoplayback.mp4" type="video/mp4">
+</video>
   
   <div class="container">
     <div id="navTabsContainer" class="nav-tabs">
