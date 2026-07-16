@@ -352,17 +352,22 @@ select:focus {
   align-items: center;
 }
 
-    /* Animasi Kedip Kuning Lembut */
+/* Efek Kedip Kuning Lembut & Modern */
 @keyframes kedipWarning {
   0% { background-color: rgba(255, 255, 255, 0.92); }
-  50% { background-color: rgba(234, 179, 8, 0.25); } /* Kuning warning transparan */
+  50% { background-color: rgba(234, 179, 8, 0.18); } /* Kuning pastel transparan agar tetap elegan */
   100% { background-color: rgba(255, 255, 255, 0.92); }
 }
 
 /* Kelas khusus untuk baris yang terlambat */
 .baris-terlambat {
-  animation: kedipWarning 2s infinite ease-in-out;
-  border-left: 4px solid #eab308 !important; /* Tambahan garis kuning tegas di sebelah kiri */
+  animation: kedipWarning 2.5s infinite ease-in-out;
+  border-left: 4px solid #eab308 !important; /* Garis kuning tegas di sebelah kiri baris */
+}
+
+/* Memastikan efek transisi warna latar belakang mulus saat berkedip */
+.monitor-container table tbody tr {
+  transition: background-color 0.5s ease;
 }
   </style>
 </head>
@@ -690,20 +695,58 @@ function gantiTab(tipe) {
       const idBarisFoto = `foto-row-${indeks}`;
       
       // GANTI DENGAN BLOK KODE BARU INI:
+     dataHalamanIni.forEach((item, indeks) => {
+      const idBarisFoto = `foto-row-${indeks}`;
+      
       let klasTerlambat = "";
       if (item.estimasi) {
         try {
-          const [jamEst, menitEst] = item.estimasi.split(":").map(Number);
+          // Mengubah string estimasi (contoh: "2026-07-15" atau format tanggal dari Sheet) ke objek Date
+          const waktuEstimasi = new Date(item.estimasi);
           const waktuSekarang = new Date();
-          const waktuEstimasi = new Date();
-          waktuEstimasi.setHours(jamEst, menitEst, 0, 0);
 
+          // Set jam, menit, detik ke 0 agar fokus membandingkan tanggalnya saja
+          waktuEstimasi.setHours(0,0,0,0);
+          waktuSekarang.setHours(0,0,0,0);
+
+          // Jika tanggal hari ini sudah melewati tanggal estimasi kembali
           if (waktuSekarang > waktuEstimasi) {
             klasTerlambat = "baris-terlambat";
           }
         } catch (e) {
-          console.error("Format estimasi waktu salah:", e);
+          console.error("Format tanggal estimasi tidak valid:", e);
         }
+      }
+
+      const trUtama = document.createElement("tr");
+      trUtama.style.cursor = "pointer";
+      trUtama.setAttribute("onclick", `toggleShowFoto('${idBarisFoto}')`);
+      trUtama.title = "Klik untuk melihat foto dokumentasi";
+      
+      if (klasTerlambat) {
+        trUtama.classList.add(klasTerlambat);
+      }
+
+      // Format tampilan tanggal agar lebih rapi di tabel
+      let tanggalTeks = item.estimasi;
+      if (item.estimasi && !isNaN(Date.parse(item.estimasi))) {
+        const opsi = { year: 'numeric', month: 'short', day: 'numeric' };
+        tanggalTeks = new Date(item.estimasi).toLocaleDateString('id-ID', opsi);
+      }
+
+      trUtama.innerHTML = `
+        <td><b>${item.id}</b></td>
+        <td>${item.nama}</td>
+        <td>${item.lantai || '-'}</td>
+        <td>${item.zona || '-'}</td>
+        <td><span class="badge bg-dipinjam">${item.status}</span></td>
+        <td>${item.peminjam}</td>
+        <td style="${klasTerlambat ? 'color: #ca8a04; font-weight: bold;' : ''}">
+          ${tanggalTeks} 
+          <br><small style="color:var(--text-muted); font-size:10px;">(Klik untuk lihat foto)</small>
+        </td>
+      `;
+      body.appendChild(trUtama);
       }
 
       const trUtama = document.createElement("tr");
