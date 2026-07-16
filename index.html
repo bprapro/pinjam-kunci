@@ -874,15 +874,18 @@ function gantiTab(tipe) {
   }
 
   function matikanKamera() {
-    if (streamKameraAktif) {
-      streamKameraAktif.getTracks().forEach(track => track.stop());
-      streamKameraAktif = null;
-    }
-    document.querySelectorAll('video, canvas').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.btn-buka-cam').forEach(el => el.style.display = 'inline-flex');
-    document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
+  if (streamKameraAktif) {
+    streamKameraAktif.getTracks().forEach(track => track.stop());
+    streamKameraAktif = null;
   }
-
+  // Kosongkan srcObject di semua elemen video untuk efisiensi memori hardware
+  document.querySelectorAll('video').forEach(vid => {
+    vid.srcObject = null;
+  });
+  document.querySelectorAll('video, canvas').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.btn-buka-cam').forEach(el => el.style.display = 'inline-flex');
+  document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
+}
   function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
     document.getElementById(idForm).addEventListener('submit', function(e) {
       e.preventDefault();
