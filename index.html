@@ -765,7 +765,7 @@ function gantiTab(tipe) {
       
       trFoto.innerHTML = `
         <td colspan="7" style="padding: 15px; text-align: center;">
-          <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">📸 Foto Dokumentasi Peminjaman:</div>
+          <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">Foto Dokumentasi Peminjaman:</div>
           ${fotoValid ? 
             `<img src="${urlFoto}" alt="Dokumentasi Kunci ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid var(--primary);" onerror="this.onerror=null; this.parentNode.innerHTML='<p style=\'color: var(--danger); font-size: 13px; margin: 0;\'>⚠️ Gagal memuat gambar. Pastikan akses file di Google Drive telah diatur ke \\'Siapa saja yang memiliki link\\'.</p>';">` : 
             `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia atau format tidak didukung.</p>`
