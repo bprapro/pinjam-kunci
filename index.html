@@ -45,14 +45,32 @@
       --text-muted: #619A7E;
     }
 
-    body { 
-      font-family: 'Poppins', sans-serif;
-      margin: 0; 
-      padding: 30px 15px;
-      background-color: var(--bg-body); 
-      color: var(--dark); 
-      line-height: 1.5;
-    }
+   body { 
+  font-family: 'Poppins', sans-serif;
+  margin: 0; 
+  padding: 30px 15px;
+  /* Mengubah background body asli agar video di bawahnya terlihat */
+  background-color: #003830; 
+  color: var(--dark); 
+  line-height: 1.5;
+  position: relative;
+}
+
+.video-bg {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  /* Naikkan z-index ke -1 agar berada persis di atas background body hijau */
+  z-index: -1; 
+  object-fit: cover;
+  opacity: 0.25; /* Naikkan sedikit opacity menjadi 0.25 agar lebih terlihat jelas */
+  filter: grayscale(30%) contrast(110%);
+  pointer-events: none;
+}
 
     /* Efek Fade untuk Perpindahan Form */
 .form-section {
