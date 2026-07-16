@@ -384,11 +384,16 @@ select:focus {
   </style>
 </head>
 <body>
+  <!-- Taruh paling atas setelah tag <body> -->
+  <video autoplay loop muted playsinline style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -100; object-fit: cover;">
+    <source src="videoplayback.mp4" type="video/mp4">
+  </video>
 
-<!-- Background Video YouTube Anti-Iklan -->
-<video autoplay loop muted playsinline style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -100; object-fit: cover;">
-  <source src="videoplayback.mp4" type="video/mp4">
-</video>
+  <!-- Baru di bawahnya konten web Anda (container, div, dll) -->
+  <div class="container">
+     ...
+  </div>
+</body>
   
   <div class="container">
     <div id="navTabsContainer" class="nav-tabs">
