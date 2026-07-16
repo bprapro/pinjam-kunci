@@ -727,40 +727,33 @@ function gantiTab(tipe) {
       const hariIni = new Date();
       hariIni.setHours(0,0,0,0);
 
-      // 2. Fungsi pembaca tanggal aman untuk format DD/MM/YYYY atau DD-MM-YYYY
-      let tanggalEstimasi = new Date(item.estimasi);
-      
-      // Jika hasil pembacaan standar gagal (Invalid Date), kita bongkar string-nya secara manual
-      if (isNaN(tanggalEstimasi.getTime()) && typeof item.estimasi === 'string') {
-        // Pisahkan string berdasarkan garis miring atau strip
-        const bagian = item.estimasi.split(/[\/\-]/);
-        if (bagian.length === 3) {
-          // Asumsi format: DD MM YYYY (Indonesian format)
-          const hari = parseInt(bagian[0], 10);
-          const bulan = parseInt(bagian[1], 10) - 1; // Bulan di JS dimulai dari 0
-          const tahun = parseInt(bagian[2].split(' ')[0], 10); // Buang info jam jika ada sisa string
-          tanggalEstimasi = new Date(tahun, bulan, hari);
-        }
+      // 2. Baca tanggal aman dari format YYYY-MM-DD atau abaikan jika berisi "-"
+      let tanggalEstimasi = new Date();
+      let apakahTerlambat = false;
+
+      if (item.estimasi && item.estimasi !== "-") {
+        tanggalEstimasi = new Date(item.estimasi);
+        tanggalEstimasi.setHours(0,0,0,0);
+        
+        // Cek jika statusnya dipinjam dan tanggalnya valid serta sudah terlewat
+        apakahTerlambat = !isNaN(tanggalEstimasi.getTime()) && 
+                          item.status.toLowerCase() === 'dipinjam' && 
+                          tanggalEstimasi < hariIni;
       }
-      tanggalEstimasi.setHours(0,0,0,0);
 
-      // 3. Cek apakah terlambat (Hanya jika tanggal valid)
-      const apakahTerlambat = !isNaN(tanggalEstimasi.getTime()) && 
-                              item.status.toLowerCase() === 'dipinjam' && 
-                              tanggalEstimasi < hariIni;
-
-      // 4. Buat elemen barisnya
+      // 3. Buat elemen barisnya
       const trUtama = document.createElement("tr");
-      trUtama.id = idBarisUtama;
+      
+      // Menggunakan idBarisFoto sebagai patokan onclick agar fungsi toggleShowFoto berjalan
       trUtama.style.cursor = "pointer";
       trUtama.onclick = () => toggleShowFoto(idBarisFoto);
       
-      // 5. Pasang class kedip jika terlambat
+      // 4. Pasang class kedip jika terlambat
       if (apakahTerlambat) {
         trUtama.classList.add("row-terlambat");
       }
 
-      // 6. Isi konten baris tabel
+      // 5. Isi konten baris tabel
       trUtama.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
