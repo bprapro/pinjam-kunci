@@ -723,22 +723,27 @@ function gantiTab(tipe) {
       }
     }
 
-    const trUtama = document.createElement("tr");
-    trUtama.style.cursor = "pointer";
-    trUtama.setAttribute("onclick", `toggleShowFoto('${idBarisFoto}')`);
-    trUtama.title = "Klik untuk melihat foto dokumentasi";
-    
-    if (klasTerlambat) {
-      trUtama.classList.add(klasTerlambat);
-    }
+    // 1. Tambah logika cek tanggal (Taruh sebelum document.createElement)
+      const hariIni = new Date();
+      hariIni.setHours(0,0,0,0);
 
-    let tanggalTeks = item.estimasi;
-    if (item.estimasi && !isNaN(Date.parse(item.estimasi))) {
-      const opsi = { year: 'numeric', month: 'short', day: 'numeric' };
-      tanggalTeks = new Date(item.estimasi).toLocaleDateString('id-ID', opsi);
-    }
+      const tanggalEstimasi = new Date(item.estimasi);
+      tanggalEstimasi.setHours(0,0,0,0);
 
-   // --- Lanjutan dari fungsi tampilkanHalamanMonitor() di bagian 1 ---
+      const apakahTerlambat = item.status.toLowerCase() === 'dipinjam' && tanggalEstimasi < hariIni;
+
+      // 2. Buat elemen barisnya
+      const trUtama = document.createElement("tr");
+      trUtama.id = idBarisUtama;
+      trUtama.style.cursor = "pointer";
+      trUtama.onclick = () => toggleShowFoto(idBarisFoto);
+      
+      // 3. Pasang class kedip jika terlambat
+      if (apakahTerlambat) {
+        trUtama.classList.add("row-terlambat");
+      }
+
+      // 4. Isi konten baris tabel
       trUtama.innerHTML = `
         <td><b>${item.id}</b></td>
         <td>${item.nama}</td>
@@ -746,8 +751,8 @@ function gantiTab(tipe) {
         <td>${item.zona || '-'}</td>
         <td><span class="badge bg-dipinjam">${item.status}</span></td>
         <td>${item.peminjam}</td>
-        <td style="${klasTerlambat ? 'color: #ca8a04; font-weight: bold;' : ''}">
-          ${tanggalTeks} 
+        <td style="${apakahTerlambat ? 'color: #ca8a04; font-weight: bold;' : ''}">
+          ${item.estimasi} 
           <br><small style="color:var(--text-muted); font-size:10px;">(Klik untuk lihat foto)</small>
         </td>
       `;
