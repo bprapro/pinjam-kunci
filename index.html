@@ -721,29 +721,29 @@ function gantiTab(tipe) {
         console.error("Format tanggal estimasi tidak valid:", e);
       }
     }
-
-   // 1. Ambil tanggal hari ini (set ke jam 00:00:00)
+// 1. Ambil tanggal hari ini (UTC jam 0)
       const hariIni = new Date();
-      hariIni.setHours(0,0,0,0);
+      hariIni.setUTCHours(0,0,0,0);
 
-      // 2. Baca tanggal aman dari format YYYY-MM-DD atau abaikan jika berisi "-"
-      let tanggalEstimasi = new Date();
+      // 2. Baca tanggal aman dari format YYYY-MM-DD
       let apakahTerlambat = false;
 
       if (item.estimasi && item.estimasi !== "-") {
-        tanggalEstimasi = new Date(item.estimasi);
-        tanggalEstimasi.setHours(0,0,0,0);
-        
-        // Cek jika statusnya dipinjam dan tanggalnya valid serta sudah terlewat
-        apakahTerlambat = !isNaN(tanggalEstimasi.getTime()) && 
-                          item.status.toLowerCase() === 'dipinjam' && 
-                          tanggalEstimasi < hariIni;
+        const parts = item.estimasi.split('-'); // Memecah YYYY-MM-DD
+        if (parts.length === 3) {
+          const tahun = parseInt(parts[0], 10);
+          const bulan = parseInt(parts[1], 10) - 1; // Bulan JS dimulai dari 0
+          const hari = parseInt(parts[2], 10);
+          
+          const tanggalEstimasi = new Date(Date.UTC(tahun, bulan, hari));
+          
+          // Terlambat jika status dipinjam DAN tanggal estimasi lebih lampau dari hari ini
+          apakahTerlambat = item.status.toLowerCase() === 'dipinjam' && tanggalEstimasi < hariIni;
+        }
       }
 
       // 3. Buat elemen barisnya
       const trUtama = document.createElement("tr");
-      
-      // Menggunakan idBarisFoto sebagai patokan onclick agar fungsi toggleShowFoto berjalan
       trUtama.style.cursor = "pointer";
       trUtama.onclick = () => toggleShowFoto(idBarisFoto);
       
