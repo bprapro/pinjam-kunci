@@ -407,10 +407,11 @@ select:focus {
 </head>
 <body>
 
-  <!-- SIMPAN INI TEPAT DI BAWAH BODY (DI LUAR CONTAINER) -->
-  <video autoplay loop muted playsinline class="video-bg">
-    <source src="[https://www.w3schools.com/html/mov_bbb.mp4](https://www.w3schools.com/html/mov_bbb.mp4)" type="video/mp4">
-  </video>
+<!-- Buka blokir autoplay browser & paksa muat ulang -->
+<video autoplay loop muted playsinline webkit-playsinline id="bgVideo" class="video-bg" poster="">
+  <source src="./videoplayback.mp4" type="video/mp4">
+  <source src="videoplayback.mp4" type="video/mp4">
+</video>
 
 </body>
   
