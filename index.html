@@ -19,6 +19,20 @@
   animation: pulse-warning 3s infinite ease-in-out !important;
   /* Garis kuning tua di sebelah kiri sudah dihapus total di sini */
 }
+    .video-bg {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  object-fit: cover;
+  opacity: 0.15;
+  filter: grayscale(30%) contrast(110%);
+  pointer-events: none;
+}
 
     :root {
       --primary: #619A7E;
@@ -78,9 +92,9 @@ button:hover:not(:disabled) {
   padding: 30px; 
   border-radius: 16px; 
   margin: 0 auto 30px auto; 
-  
-  /* SHADOW BARU YANG ELEGAN */
   box-shadow: 0 10px 30px -5px rgba(0, 56, 48, 0.15), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+  position: relative; /* Wajib */
+  z-index: 1;         /* Wajib */
 }
 
     .monitor-container { 
@@ -182,7 +196,15 @@ input:focus, select:focus {
     .search-box { margin-bottom: 10px; background-color: #fff; }
     
     /* Kamera Dokumentasi */
-    video, canvas { display: none; width: 100%; max-width: 100%; border-radius: 12px; background: #0f172a; margin: 12px auto 0 auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    video:not(.video-bg), canvas { 
+  display: none; 
+  width: 100%; 
+  max-width: 100%; 
+  border-radius: 12px; 
+  background: #0f172a; 
+  margin: 12px auto 0 auto; 
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); 
+}
     .foto-container { text-align: center; margin-top: 10px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
    .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang {
   border: none;
@@ -384,13 +406,15 @@ select:focus {
   </style>
 </head>
 <body>
-  <!-- Taruh paling atas setelah tag <body> -->
-  <video autoplay loop muted playsinline style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -100; object-fit: cover;">
+
+  <!-- SIMPAN INI TEPAT DI BAWAH BODY (DI LUAR CONTAINER) -->
+  <video autoplay loop muted playsinline class="video-bg">
     <source src="videoplayback.mp4" type="video/mp4">
   </video>
 
-  <!-- Baru di bawahnya konten web Anda (container, div, dll) -->
-
+  <!-- Area Utama Konten Aplikasi -->
+  <div class="container">
+     <!-- Seluruh form pinjam kunci Anda berada di sini -->
   </div>
 </body>
   
