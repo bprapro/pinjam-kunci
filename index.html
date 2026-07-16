@@ -570,6 +570,30 @@ select:focus {
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
+  function gantiTab(tabName) {
+  // 1. Matikan kamera aktif terlebih dahulu agar tidak error saat pindah form
+  matikanKamera();
+
+  // 2. Ambil semua tombol tab dan semua section form
+  const semuaTombol = document.querySelectorAll('.tab-btn');
+  const semuaForm = document.querySelectorAll('.form-section');
+
+  // 3. Hapus kelas 'active' dari semua tombol dan form
+  semuaTombol.forEach(btn => btn.classList.remove('active'));
+  semuaForm.forEach(form => form.classList.remove('active'));
+
+  // 4. Aktifkan tombol dan form yang dipilih
+  if (tabName === 'pinjam') {
+    // Cari tombol pertama (index 0) atau tombol yang memiliki teks/fungsi pinjam
+    semuaTombol[0].classList.add('active');
+    document.getElementById('formPinjam').classList.add('active');
+  } else if (tabName === 'kembali') {
+    // Cari tombol kedua (index 1) atau tombol yang memiliki teks/fungsi kembali
+    semuaTombol[1].classList.add('active');
+    document.getElementById('formKembali').classList.add('active');
+  }
+}
+  
 function gantiTab(tipe) {
   // Jika tab yang diklik adalah tab yang sedang aktif, abaikan untuk menghindari stuttering animasi
   if (tabAktifSekarang === tipe && document.querySelector('.form-section.active')) return;
