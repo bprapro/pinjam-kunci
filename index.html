@@ -725,15 +725,16 @@ function gantiTab(tipe) {
       const hariIni = new Date();
       hariIni.setUTCHours(0,0,0,0);
 
-      // 2. Baca tanggal aman dari format YYYY-MM-DD
+      // 2. Baca tanggal aman dari format DD/MM/YYYY
       let apakahTerlambat = false;
 
       if (item.estimasi && item.estimasi !== "-") {
-        const parts = item.estimasi.split('-'); // Memecah YYYY-MM-DD
+        // Perbaikan: Memecah string menggunakan garis miring (/) bukan strip (-)
+        const parts = item.estimasi.split('/'); 
         if (parts.length === 3) {
-          const tahun = parseInt(parts[0], 10);
-          const bulan = parseInt(parts[1], 10) - 1; // Bulan JS dimulai dari 0
-          const hari = parseInt(parts[2], 10);
+          const hari = parseInt(parts[0], 10);
+          const bulan = parseInt(parts[1], 10) - 1; // Bulan di JavaScript mulai dari 0
+          const tahun = parseInt(parts[2], 10);
           
           const tanggalEstimasi = new Date(Date.UTC(tahun, bulan, hari));
           
