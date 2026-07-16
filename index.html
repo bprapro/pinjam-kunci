@@ -8,16 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Efek Kedip Kuning Lembut untuk Baris yang Terlambat */
-@keyframes kedipPeringatan {
-  0% { background-color: rgba(255, 193, 7, 0.05); }
-  50% { background-color: rgba(255, 193, 7, 0.35); }
-  100% { background-color: rgba(255, 193, 7, 0.05); }
-}
-
-.baris-terlambat {
-  animation: kedipPeringatan 2s infinite ease-in-out;
-}
     :root {
       --primary: #619A7E;
       --danger: #df2c3e;
@@ -678,96 +668,23 @@ function gantiTab(tipe) {
   }
 
   function tampilkanHalamanMonitor() {
-    const body = document.getElementById("tabelMonitorBody");
+    const body = document.getElementById("bodyTabel");
     body.innerHTML = "";
 
-    if (dataMonitorTerpinjam.length === 0) {
-      body.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #7c7c7d; padding: 30px;">
-        <div style="font-size: 24px; margin-bottom: 8px;">🎉</div>Semua kunci aman di rak. Tidak ada peminjaman aktif.
-      </td></tr>`;
-      document.getElementById("infoHalaman").textContent = "Halaman 0 dari 0";
-      return;
-    }
-
-    const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman);
+    const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
     if (halamanSekarang > totalHalaman) halamanSekarang = totalHalaman;
 
     const indeksAwal = (halamanSekarang - 1) * barisPerHalaman;
     const indeksAkhir = indeksAwal + barisPerHalaman;
-    const dataHalaman = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
+    const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
-    // Dapatkan waktu saat ini untuk pengecekan keterlambatan
-    const sekarang = new Date();
-
-    dataHalaman.forEach(item => {
-      const idBarisFoto = `foto-row-${item.id}`;
-      
-      // LOGIKA WARING KETERLAMBATAN:
-      // Memeriksa apakah estimasi kembali sudah terlewati
-      let classTerlambat = "";
-      if (item.estimasi) {
-        const waktuEstimasi = new Date(item.estimasi);
-        // Jika waktu estimasi valid dan sudah lebih kecil dari waktu sekarang, beri class warning
-        if (!isNaN(waktuEstimasi.getTime()) && waktuEstimasi < sekarang) {
-          classTerlambat = "baris-terlambat";
-        }
-      }
-
-      const tr = document.createElement("tr");
-      // Jika terlambat, class "baris-terlambat" akan memicu animasi CSS kedip kuning
-      if (classTerlambat) {
-        tr.classList.add(classTerlambat);
-      }
-
-      tr.innerHTML = `
-        <td><span class="badge-kunci">${item.id}</span></td>
-        <td style="font-weight: 600; color: var(--dark);">${item.nama}</td>
-        <td>${item.peminjam}</td>
-        <td style="font-size: 12px; color: #555;">${item.tgl_pinjam || '-'}</td>
-        <td style="font-size: 12px; font-weight: 600; color: ${classTerlambat ? 'var(--danger)' : '#555'};">
-          ${item.estimasi || '-'} ${classTerlambat ? '<span style="display:block; font-size:10px; color:var(--danger);">⚠️ TERLAMBAT</span>' : ''}
-        </td>
-        <td>${item.keperluan || '-'}</td>
-        <td>
-          <button type="button" class="btn-aksi btn-detail" onclick="toggleShowFoto('${idBarisFoto}')">
-            📸 Foto
-          </button>
-        </td>
-      `;
-      body.appendChild(tr);
-
-      // LOGIK PERBAIKAN URL FOTO
-      let urlFoto = (item.foto || "").trim(); 
-      if (urlFoto.includes("drive.google.com/file/d/")) {
-        const match = urlFoto.match(/file\/d\/(.*?)\//);
-        if (match && match[1]) urlFoto = `https://lh3.googleusercontent.com/d/${match[1]}`;
-      } else if (urlFoto.includes("id=")) {
-        const match = urlFoto.match(/id=(.*?)(&|$)/);
-        if (match && match[1]) urlFoto = `https://lh3.googleusercontent.com/d/${match[1]}`;
-      }
-      
-      const fotoValid = urlFoto && urlFoto !== "Tidak ada foto" && !urlFoto.startsWith("Gagal") && urlFoto.length > 20;
-      
-      const trFoto = document.createElement("tr");
-      trFoto.id = idBarisFoto;
-      trFoto.style.display = "none";
-      trFoto.style.backgroundColor = "#EFF1F0";
-      trFoto.innerHTML = `
-        <td colspan="7" style="padding: 15px; text-align: center;">
-          <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">📸 Foto Dokumentasi Peminjaman:</div>
-          ${fotoValid ? 
-            `<img src="${urlFoto}" alt="Dokumentasi Kunci ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid var(--primary);" onerror="this.onerror=null; this.parentNode.innerHTML='<p style=\'color: var(--danger); font-size: 13px; margin: 0;\'>⚠️ Gagal memuat gambar. Pastikan akses file di Google Drive telah diatur ke \\'Siapa saja yang memiliki link\\'.</p>';">` : 
-            `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia atau format tidak didukung.</p>`
-          }
-        </td>
-      `;
-      body.appendChild(trFoto);
-    });
-
-    document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
-    document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
-    document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
-  }
+    if (dataHalamanIni.length === 0) {
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;"> Seluruh kunci saat ini berada di rak.</td></tr>';
+      document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
+      document.getElementById("btnPrev").disabled = true;
+      document.getElementById("btnNext").disabled = true;
+      return;
+    }
 
     dataHalamanIni.forEach((item, indeks) => {
       const idBarisFoto = `foto-row-${indeks}`;
