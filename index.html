@@ -11,13 +11,17 @@
 /* ==========================================
    1. STRUKTUR UTAMA & LATAR BELAKANG
    ========================================== */
-html, body {
-  background-color: #F8FAFC !important; /* Abu-abu sangat terang khas dashboard moderen */
+html {
+  background-color: #F8FAFC !important; 
+}
+
+body {
   font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0; 
-  padding: 30px 15px;
+  padding: 0 !important; /* UBAH JADI 0 AGAR BACKGROUND MENUTUP PENUH LAYAR */
   color: #1E293B; 
   line-height: 1.5;
+  background: transparent !important; /* Paksa transparan agar video tembus */
 }
 
 /* Video dibuat sangat tipis nyaris tak terlihat agar dashboard tetap bersih solid */
@@ -76,29 +80,23 @@ html, body {
    ========================================== */
 .container { 
   max-width: 600px; 
-  background: #FFFFFF !important; /* Form utama tetap putih bersih */
+  background: #FFFFFF !important; 
   padding: 32px; 
   border-radius: 16px; 
-  margin: 0 auto 30px auto; 
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 40px auto 30px auto; /* Ditambah margin 40px atas bawah */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
   border: 1px solid #E2E8F0;
-  position: relative; 
-  z-index: 1; 
 }
 
-/* Memaksa kontainer monitor di tengah & menghapus background putih pembungkus luar */
 .monitor-container { 
   max-width: 1100px; 
   overflow-x: auto;
   background: transparent !important; 
   box-shadow: none !important;        
   border: none !important;            
-  padding: 0px 16px 32px 16px; 
-  margin: 0 auto !important; /* MEMAKSA TABEL KE TENGAH */
-  position: relative;
-  z-index: 1;
+  padding: 16px; 
+  margin: 20px auto 40px auto !important; /* Diberi margin luar agar seimbang */
 }
-
 /* Trik pamungkas: Paksa semua elemen layout utama (kecuali card form & baris data) 
    agar tidak memblokir background video */
 main, section, .wrapper, .content, .main-content {
