@@ -421,23 +421,27 @@ select:focus {
   transition: background-color 0.5s ease;
 }
 
-    /* Memaksa body transparan agar video di belakangnya kelihatan */
 body {
   background: transparent !important;
 }
 
-/* Memastikan area luar kontainer tidak berwarna putih */
 html {
-  background-color: #003830 !important; /* Warna dasar jika video loading */
+  background-color: #003830 !important;
 }
 
-/* Menyesuaikan kontainer form agar melayang dengan efek kaca */
 .container, .monitor-container {
   background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   position: relative;
-  z-index: 1; /* Menaikkan form di atas video */
+  z-index: 1;
+}
+
+/* Tambahkan ini untuk memaksa video keluar */
+.video-bg {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 0.25 !important;
 }
   </style>
 </head>
