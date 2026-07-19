@@ -74,9 +74,9 @@ html, body {
 /* ==========================================
    2. KONTAINER UTAMA (CARD WHITE DASHBOARD)
    ========================================== */
-.container, .monitor-container { 
+.container { 
   max-width: 600px; 
-  background: #FFFFFF !important; /* Putih bersih solid tanpa efek kaca gelap */
+  background: #FFFFFF !important; /* Form utama tetap putih bersih */
   padding: 32px; 
   border-radius: 16px; 
   margin: 0 auto 30px auto; 
@@ -86,9 +86,20 @@ html, body {
   z-index: 1; 
 }
 
+/* Pisahkan monitor-container agar latarnya transparan jika sedang kosong/sembunyi */
 .monitor-container { 
   max-width: 1100px; 
   overflow-x: auto;
+  background: transparent !important; /* Mengubah kotak putih background menjadi transparan */
+  position: relative;
+  z-index: 1;
+}
+
+/* Jika monitor sedang menampilkan tabel data baru diberi warna putih */
+.monitor-container table {
+  background: #FFFFFF !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
 }
 
 h2 { text-align: center; margin-top: 0; font-weight: 700; font-size: 24px; letter-spacing: -0.5px; }
