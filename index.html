@@ -423,13 +423,6 @@ select:focus {
   </style>
 </head>
 <body>
-
-<!-- Menggunakan Jalur Relatif yang Pasti Aman Saat di-Deploy -->
-<video autoplay loop muted playsinline class="video-bg" style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -1 !important; object-fit: cover; opacity: 0.25; pointer-events: none;">
-  <source src="./drone.mp4" type="video/mp4">
-</video>
-
-</body>
   
   <div class="container">
     <div id="navTabsContainer" class="nav-tabs">
@@ -1050,5 +1043,11 @@ function gantiTab(tipe) {
     pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
 </script>
+
+  <!-- Pindahkan video ke paling bawah agar dimuat sebagai layer dasar -->
+<video autoplay loop muted playsinline class="video-bg" style="position: fixed; top: 0; left: 0; min-width: 100%; min-height: 100%; width: 100%; height: 100%; z-index: -100 !important; object-fit: cover; opacity: 0.25; pointer-events: none; background-color: #003830;">
+  <source src="./drone.mp4" type="video/mp4">
+</video>
+  
 </body>
 </html>
