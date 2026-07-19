@@ -86,11 +86,14 @@ html, body {
   z-index: 1; 
 }
 
-/* Pisahkan monitor-container agar latarnya transparan jika sedang kosong/sembunyi */
+/* Hilangkan warna latar belakang kontainer monitor agar video tembus */
 .monitor-container { 
   max-width: 1100px; 
   overflow-x: auto;
-  background: transparent !important; /* Mengubah kotak putih background menjadi transparan */
+  background: transparent !important; /* Membuat latar belakang tabel transparan */
+  box-shadow: none !important;        /* Hilangkan bayangan kotak putih besar */
+  border: none !important;            /* Hilangkan garis tepi kotak putih besar */
+  padding: 0px 32px 32px 32px; 
   position: relative;
   z-index: 1;
 }
