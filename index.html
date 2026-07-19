@@ -86,23 +86,25 @@ html, body {
   z-index: 1; 
 }
 
-/* Hilangkan warna latar belakang kontainer monitor agar video tembus */
+/* Memaksa kontainer monitor di tengah & menghapus background putih pembungkus luar */
 .monitor-container { 
   max-width: 1100px; 
   overflow-x: auto;
-  background: transparent !important; /* Membuat latar belakang tabel transparan */
-  box-shadow: none !important;        /* Hilangkan bayangan kotak putih besar */
-  border: none !important;            /* Hilangkan garis tepi kotak putih besar */
-  padding: 0px 32px 32px 32px; 
+  background: transparent !important; 
+  box-shadow: none !important;        
+  border: none !important;            
+  padding: 0px 16px 32px 16px; 
+  margin: 0 auto !important; /* MEMAKSA TABEL KE TENGAH */
   position: relative;
   z-index: 1;
 }
 
-/* Jika monitor sedang menampilkan tabel data baru diberi warna putih */
-.monitor-container table {
-  background: #FFFFFF !important;
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+/* Trik pamungkas: Paksa semua elemen layout utama (kecuali card form & baris data) 
+   agar tidak memblokir background video */
+main, section, .wrapper, .content, .main-content {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 h2 { text-align: center; margin-top: 0; font-weight: 700; font-size: 24px; letter-spacing: -0.5px; }
