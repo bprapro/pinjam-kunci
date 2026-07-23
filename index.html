@@ -639,9 +639,12 @@ function gantiTab(tipe) {
   setTimeout(() => {
     formAktifLama.style.display = 'none';
     
-    // Reset konten select khusus untuk tab pengembalian saat dibuka
+    // Reset kontainer checklist khusus untuk tab pengembalian saat dibuka
     if (tipe === 'kembali') {
-      document.getElementById('kunci_kembali').innerHTML = '<option value="">Klik tombol \'Cari Kunci Saya\' di atas</option>';
+      const kontainer = document.getElementById('kontainerKunciKembaliChecklist');
+      if (kontainer) {
+        kontainer.innerHTML = '<p style="color: #64748b; font-size: 13px; margin: 0;">Klik tombol \'Cari Kunci Saya\' di atas terlebih dahulu.</p>';
+      }
     }
 
     // Tampilkan form baru
