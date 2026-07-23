@@ -531,30 +531,17 @@ video:not(.video-bg), canvas {
   </button>
 </div>
         <div class="form-group">
-          <label for="kunci_kembali">Kunci yang Dikembalikan:</label>
-          <select id="kunci_kembali" name="kunci" required>
-            <option value="">Klik tombol 'Cari Kunci Saya' di atas</option>
-          </select>
-        </div>
-        <input type="hidden" id="nohp_kembali" name="nohp">
-        <div class="form-group foto-container">
-          <label>Dokumentasi Foto Kembalikan Kunci:</label>
-          <button type="button" id="btnBukaKameraK" class="btn-buka-cam">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
-            Buka Kamera
-          </button>
-          <video id="videoK" autoplay playsinline></video>
-          <canvas id="canvasK"></canvas>
-          <button type="button" id="btnAmbilFotoK" class="btn-ambil-foto">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
-            Ambil Foto
-          </button>
-          <button type="button" id="btnFotoUlangK" class="btn-foto-ulang">
-            <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
-            Foto Ulang
-          </button>
-          <input type="hidden" id="fotoK" name="foto" required>
-        </div>
+  <label style="font-weight: bold; margin-bottom: 8px; display: block;">
+    Pilih Kunci yang Dikembalikan & Ambil Foto Masing-Masing:
+  </label>
+  
+  <!-- Kontainer tempat daftar kunci & tombol kamera tiap kunci akan muncul -->
+  <div id="kontainerKunciKembaliChecklist" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+    <p style="color: #64748b; font-size: 13px; margin: 0;">
+      Klik tombol 'Cari Kunci Saya' di atas terlebih dahulu.
+    </p>
+  </div>
+</div>
         <button type="submit" id="btnSubmitKembali" class="btn-submit-kembali" style="margin: 25px auto 0 auto; display: flex;">
           <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
           Proses Pengembalian Kunci
@@ -895,33 +882,57 @@ function gantiTab(tipe) {
   }
 
   document.getElementById('btnCariKunci').addEventListener('click', () => {
-    const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
-    if (!namaInput) { alert("Masukkan nama Anda!"); return; }
-    
-    const btnCari = document.getElementById('btnCariKunci');
-    btnCari.textContent = "Mencari...";
-    
-    const kunciDitemukan = dataMonitorTerpinjam.filter(item => item.peminjam.toLowerCase() === namaInput);
-    const select = document.getElementById('kunci_kembali');
-    select.innerHTML = "";
-    
-    setTimeout(() => {
-      // Perbaikan: Mengubah btnCariKunci menjadi variabel yang valid (btnCari)
-      btnCari.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
-      
-      if (kunciDitemukan.length === 0) {
-        select.innerHTML = '<option value="">-- Tidak ada kunci terpinjam --</option>';
-        alert("Sistem tidak menemukan kunci aktif yang sedang Anda pinjam. Pastikan nama sesuai dengan tabel di bawah.");
-        return;
-      }
-      
-      document.getElementById('nohp_kembali').value = kunciDitemukan[0].nohp || "-";
-      
-      kunciDitemukan.forEach(k => { 
-        select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama}</option>`; 
-      });
-    }, 450); // Dinaikkan menjadi 450ms agar animasi transisi teks pencarian terasa lebih halus
-  });
+  const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
+  if (!namaInput) { alert("Masukkan nama Anda!"); return; }
+
+  const btnCari = document.getElementById('btnCariKunci');
+  btnCari.textContent = "Mencari...";
+
+  const kontainer = document.getElementById("kontainerKunciKembaliChecklist");
+  kontainer.innerHTML = "";
+
+  setTimeout(() => {
+    btnCari.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.791-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
+
+    const kunciDitemukan = dataMonitorTerpinjam.filter(item => 
+      item.peminjam && item.peminjam.toLowerCase().includes(namaInput)
+    );
+
+    if (kunciDitemukan.length === 0) {
+      kontainer.innerHTML = '<p style="font-size:13px; color:#ef4444; margin:0;">Sistem tidak menemukan kunci aktif yang sedang Anda pinjam. Pastikan nama sesuai!</p>';
+      return;
+    }
+
+    kunciDitemukan.forEach(k => {
+      const card = document.createElement("div");
+      card.className = "item-kunci-kembali";
+      card.style.cssText = "border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff;";
+      card.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom: 6px;">
+          <input type="checkbox" name="kunci_kembali" value="${k.id}" id="chk_kembali_${k.id}" checked style="width:auto; cursor:pointer;" onchange="toggleKameraRow('${k.id}')">
+          <label for="chk_kembali_${k.id}" style="margin:0; font-size:14px; cursor:pointer;">
+            <b>${k.id}</b> - ${k.nama}
+          </label>
+        </div>
+        <div id="box_cam_${k.id}" style="margin-left: 24px;">
+          <input type="hidden" name="foto_kembali_${k.id}" id="foto_kembali_${k.id}">
+          <button type="button" class="btn-buka-cam" onclick="bukaKameraKhusus('${k.id}')" style="font-size:12px; padding:4px 10px; cursor:pointer;">
+            📷 Ambil Foto Kunci ${k.id}
+          </button>
+          <span id="status_foto_${k.id}" style="font-size:12px; color:#ef4444; margin-left:8px;">(Wajib Foto)</span>
+        </div>
+      `;
+      kontainer.appendChild(card);
+    });
+  }, 450);
+});
+
+// Fungsi untuk menyembunyikan/menampilkan baris kamera jika centang diubah
+function toggleKameraRow(id) {
+  const chk = document.getElementById(`chk_kembali_${id}`);
+  const boxCam = document.getElementById(`box_cam_${id}`);
+  if (boxCam) boxCam.style.display = chk.checked ? "block" : "none";
+}
 
   function aturKamera(suffix) {
     const video = document.getElementById('video' + suffix);
@@ -982,24 +993,51 @@ function gantiTab(tipe) {
   document.getElementById(idForm).addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // 1. Validasi Foto
-    const inputFoto = this.querySelector('input[name="foto"]').value;
-    if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
-
-    // 2. Buat objek FormData
+    // 1. Buat objek FormData
     const formData = new FormData(this);
 
-    // 3. Khusus Form Pinjam: Ambil semua kunci yang dicentang
+    // 2. Logika Khusus Form Pinjam
     if (konteksAksi === 'pinjam') {
+      const inputFoto = this.querySelector('input[name="foto"]')?.value;
+      if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
+
       const kunciTerpilih = Array.from(document.querySelectorAll('input[name="kunci"]:checked')).map(cb => cb.value);
-      
       if (kunciTerpilih.length === 0) {
         alert("Pilih minimal satu kunci yang ingin dipinjam!");
         return;
       }
-      
-      // Gabungkan array kunci menjadi teks terpisah koma (contoh: "K01, K02")
       formData.set('kunci', kunciTerpilih.join(', '));
+    }
+
+    // 3. Logika Khusus Form Pengembalian (Multi-Kunci & Multi-Foto)
+    if (konteksAksi === 'kembali') {
+      const chks = Array.from(document.querySelectorAll('input[name="kunci_kembali"]:checked'));
+      if (chks.length === 0) {
+        alert("Pilih minimal satu kunci yang ingin dikembalikan!");
+        return;
+      }
+
+      const listDataKembali = [];
+      let adaFotoKosong = false;
+
+      chks.forEach(cb => {
+        const idKunci = cb.value;
+        const inputFotoEl = document.getElementById(`foto_kembali_${idKunci}`);
+        const fotoVal = inputFotoEl ? inputFotoEl.value : "";
+
+        if (!fotoVal) {
+          adaFotoKosong = true;
+        }
+        listDataKembali.push({ id: idKunci, foto: fotoVal });
+      });
+
+      if (adaFotoKosong) {
+        alert("Setiap kunci yang dicentang WAJIB diambil fotonya satu per satu!");
+        return;
+      }
+
+      // Kirim payload khusus pengembalian ke Apps Script
+      formData.set('payload_kembali', JSON.stringify(listDataKembali));
     }
 
     const btn = document.getElementById(idBtn);
