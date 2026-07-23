@@ -1136,8 +1136,7 @@ function toggleKameraRow(id) {
   const inputDinamis = document.createElement('input');
   inputDinamis.type = 'file';
   inputDinamis.accept = 'image/*';
-  
-  // Jika memilih mode kamera, paksa membuka kamera HP (environment)
+
   if (sumber === 'camera') {
     inputDinamis.capture = 'environment';
   }
@@ -1147,10 +1146,10 @@ function toggleKameraRow(id) {
     if (file) {
       const reader = new FileReader();
       reader.onload = function(evt) {
-        inputFotoHidden.value = evt.target.result; // Simpan Base64 foto
+        if (inputFotoHidden) inputFotoHidden.value = evt.target.result;
         if (statusSpan) {
           statusSpan.textContent = "✓ Foto Berhasil Ditangkap";
-          statusSpan.style.color = "#10b981"; // Ubah teks status jadi hijau
+          statusSpan.style.color = "#10b981";
         }
       };
       reader.readAsDataURL(file);
