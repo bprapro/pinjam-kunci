@@ -941,7 +941,7 @@ function toggleKameraRow(id) {
     const btnBuka = document.getElementById('btnBukaKamera' + suffix);
     const btnAmbil = document.getElementById('btnAmbilFoto' + suffix);
     const btnUlang = document.getElementById('btnFotoUlang' + suffix);
-
+    if (!btnBuka) return;
     btnBuka.addEventListener('click', () => {
       matikanKamera();
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
@@ -1117,6 +1117,33 @@ function toggleKameraRow(id) {
     pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman', 'pinjam');
     pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
+
+  function bukaKameraKhusus(idKunci) {
+  const inputFotoHidden = document.getElementById(`foto_kembali_${idKunci}`);
+  const statusSpan = document.getElementById(`status_foto_${idKunci}`);
+
+  const inputDinamis = document.createElement('input');
+  inputDinamis.type = 'file';
+  inputDinamis.accept = 'image/*';
+  inputDinamis.capture = 'environment'; // Langsung trigger kamera HP
+  
+  inputDinamis.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        inputFotoHidden.value = evt.target.result; // Simpan data Base64
+        if (statusSpan) {
+          statusSpan.textContent = "✓ Foto Berhasil Ditangkap";
+          statusSpan.style.color = "#10b981"; // Ubah warna jadi hijau
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  inputDinamis.click();
+}
 </script>
 
 <!-- Tag video dengan ID khusus untuk dikontrol JS -->
