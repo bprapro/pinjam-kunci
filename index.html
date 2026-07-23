@@ -485,23 +485,42 @@
         </div>
         
         <div class="form-group foto-container">
-          <label>Dokumentasi Foto Ambil Kunci:</label>
-          <button type="button" id="btnBukaKameraP" class="btn-buka-cam">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
-            Buka Kamera
-          </button>
-          <video id="videoP" autoplay playsinline></video>
-          <canvas id="canvasP"></canvas>
-          <button type="button" id="btnAmbilFotoP" class="btn-ambil-foto">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
-            Ambil Foto
-          </button>
-          <button type="button" id="btnFotoUlangP" class="btn-foto-ulang">
-            <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
-            Foto Ulang
-          </button>
-          <input type="hidden" id="fotoP" name="foto" required>
-        </div>
+  <label style="font-size: 13px; font-weight: 600; color: var(--dark); display: block; margin-bottom: 8px;">
+    Dokumentasi Foto Ambil Kunci:
+  </label>
+  
+  <input type="hidden" name="foto" id="fotoP" required>
+  
+  <!-- Opsi Tombol Kamera & Galeri -->
+  <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+    <!-- Tombol Kamera -->
+    <button type="button" class="btn-opt-foto" onclick="ambilFotoPinjam('camera')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+        <circle cx="12" cy="13" r="3"/>
+      </svg>
+      Ambil Kamera
+    </button>
+    
+    <!-- Tombol Galeri -->
+    <button type="button" class="btn-opt-foto" onclick="ambilFotoPinjam('file')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #64748b; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Pilih Galeri
+    </button>
+    
+    <!-- Indicator Status -->
+    <span id="status_fotoP" style="font-size: 12px; color: #ef4444; font-weight: 500;">(Wajib Foto)</span>
+  </div>
+
+  <!-- Area Preview Gambar -->
+  <div id="previewBoxP" style="display: none; margin-top: 8px;">
+    <img id="imgPreviewP" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+  </div>
+</div>
         
         <button type="submit" id="btnSubmitPinjam" class="btn-submit-pinjam" style="margin: 25px auto 0 auto; display: flex;">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -934,6 +953,71 @@
     if (boxCam) boxCam.style.display = chk.checked ? "block" : "none";
   }
 
+    function ambilFotoPinjam(sumber) {
+    const inputFotoHidden = document.getElementById('fotoP');
+    const statusSpan = document.getElementById('status_fotoP');
+    const previewBox = document.getElementById('previewBoxP');
+    const imgPreview = document.getElementById('imgPreviewP');
+
+    const inputDinamis = document.createElement('input');
+    inputDinamis.type = 'file';
+    inputDinamis.accept = 'image/*';
+
+    if (sumber === 'camera') {
+      inputDinamis.setAttribute('capture', 'environment');
+    }
+
+    inputDinamis.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (statusSpan) {
+          statusSpan.textContent = "⏳ Memproses foto...";
+          statusSpan.style.color = "#3b82f6";
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          // Kompresi Gambar
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800;
+            const scaleFactor = MAX_WIDTH / img.width;
+            
+            if (scaleFactor < 1) {
+              canvas.width = MAX_WIDTH;
+              canvas.height = img.height * scaleFactor;
+            } else {
+              canvas.width = img.width;
+              canvas.height = img.height;
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+            // Set data ke input hidden
+            if (inputFotoHidden) inputFotoHidden.value = dataUrl;
+            
+            // Tampilkan preview foto yang dipilih
+            if (imgPreview) imgPreview.src = dataUrl;
+            if (previewBox) previewBox.style.display = "block";
+
+            if (statusSpan) {
+              statusSpan.textContent = "✓ Foto Ditangkap";
+              statusSpan.style.color = "#10b981";
+            }
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    inputDinamis.click();
+  }
+    
   function ambilFotoKunci(idKunci, sumber) {
     const inputFotoHidden = document.getElementById(`foto_kembali_${idKunci}`);
     const statusSpan = document.getElementById(`status_foto_${idKunci}`);
