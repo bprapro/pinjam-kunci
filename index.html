@@ -909,9 +909,9 @@ function gantiTab(tipe) {
     kunciDitemukan.forEach(k => {
       const card = document.createElement("div");
       card.className = "item-kunci-kembali";
-      card.style.cssText = "border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff;";
+      card.style.cssText = "border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; background: #fff;";
       card.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom: 6px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
           <input type="checkbox" name="kunci_kembali" value="${k.id}" id="chk_kembali_${k.id}" checked style="width:auto; cursor:pointer;" onchange="toggleKameraRow('${k.id}')">
           <label for="chk_kembali_${k.id}" style="margin:0; font-size:14px; cursor:pointer;">
             <b>${k.id}</b> - ${k.nama}
@@ -919,16 +919,24 @@ function gantiTab(tipe) {
         </div>
         <div id="box_cam_${k.id}" style="margin-left: 24px;">
           <input type="hidden" name="foto_kembali_${k.id}" id="foto_kembali_${k.id}">
-          <button type="button" class="btn-buka-cam" onclick="bukaKameraKhusus('${k.id}')" style="font-size:12px; padding:4px 10px; cursor:pointer;">
-            📷 Ambil Foto Kunci ${k.id}
-          </button>
-          <span id="status_foto_${k.id}" style="font-size:12px; color:#ef4444; margin-left:8px;">(Wajib Foto)</span>
+          
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <!-- Tombol Buka Kamera Langsung -->
+            <button type="button" class="btn-buka-cam" onclick="ambilFotoKunci('${k.id}', 'camera')" style="font-size:12px; padding:6px 10px; cursor:pointer;">
+              📷 Ambil Foto Kamera
+            </button>
+            
+            <!-- Tombol Upload Dari Galeri -->
+            <button type="button" class="btn-buka-cam" onclick="ambilFotoKunci('${k.id}', 'file')" style="font-size:12px; padding:6px 10px; cursor:pointer; background-color: #64748b;">
+              📁 Pilih Dari Galeri
+            </button>
+            
+            <span id="status_foto_${k.id}" style="font-size:12px; color:#ef4444;">(Wajib Foto)</span>
+          </div>
         </div>
       `;
       kontainer.appendChild(card);
     });
-  }, 450);
-});
 
 // Fungsi untuk menyembunyikan/menampilkan baris kamera jika centang diubah
 function toggleKameraRow(id) {
@@ -1121,30 +1129,34 @@ function toggleKameraRow(id) {
     pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
 
-  function bukaKameraKhusus(idKunci) {
+  function ambilFotoKunci(idKunci, sumber) {
   const inputFotoHidden = document.getElementById(`foto_kembali_${idKunci}`);
   const statusSpan = document.getElementById(`status_foto_${idKunci}`);
 
   const inputDinamis = document.createElement('input');
   inputDinamis.type = 'file';
   inputDinamis.accept = 'image/*';
-  inputDinamis.capture = 'environment'; // Langsung trigger kamera HP
   
+  // Jika memilih mode kamera, paksa membuka kamera HP (environment)
+  if (sumber === 'camera') {
+    inputDinamis.capture = 'environment';
+  }
+
   inputDinamis.onchange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = function(evt) {
-        inputFotoHidden.value = evt.target.result; // Simpan data Base64
+        inputFotoHidden.value = evt.target.result; // Simpan Base64 foto
         if (statusSpan) {
           statusSpan.textContent = "✓ Foto Berhasil Ditangkap";
-          statusSpan.style.color = "#10b981"; // Ubah warna jadi hijau
+          statusSpan.style.color = "#10b981"; // Ubah teks status jadi hijau
         }
       };
       reader.readAsDataURL(file);
     }
   };
-  
+
   inputDinamis.click();
 }
 </script>
