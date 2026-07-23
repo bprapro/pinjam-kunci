@@ -942,25 +942,56 @@
     inputDinamis.type = 'file';
     inputDinamis.accept = 'image/*';
 
+    // Perbaikan: Pakai capture langsung ke 'environment' (kamera belakang)
     if (sumber === 'camera') {
-      inputDinamis.capture = 'environment';
+      inputDinamis.setAttribute('capture', 'environment');
     }
 
     inputDinamis.onchange = (e) => {
       const file = e.target.files[0];
       if (file) {
+        // Tampilkan status kompresi/proses
+        if (statusSpan) {
+          statusSpan.textContent = "⏳ Memproses foto...";
+          statusSpan.style.color = "#3b82f6";
+        }
+
         const reader = new FileReader();
         reader.onload = function(evt) {
-          if (inputFotoHidden) inputFotoHidden.value = evt.target.result;
-          if (statusSpan) {
-            statusSpan.textContent = "✓ Foto Berhasil Ditangkap";
-            statusSpan.style.color = "#10b981";
-          }
+          // Kompresi sederhana menggunakan HTML Canvas agar upload ringan
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // Resolusi pas untuk dokumen HP
+            const scaleFactor = MAX_WIDTH / img.width;
+            
+            if (scaleFactor < 1) {
+              canvas.width = MAX_WIDTH;
+              canvas.height = img.height * scaleFactor;
+            } else {
+              canvas.width = img.width;
+              canvas.height = img.height;
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            // Hasil Base64 JPEG dengan kualitas 0.7
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+            if (inputFotoHidden) inputFotoHidden.value = dataUrl;
+            if (statusSpan) {
+              statusSpan.textContent = "✓ Foto Berhasil Ditangkap";
+              statusSpan.style.color = "#10b981";
+            }
+          };
+          img.src = evt.target.result;
         };
         reader.readAsDataURL(file);
       }
     };
 
+    // Pemicu Klik
     inputDinamis.click();
   }
 
