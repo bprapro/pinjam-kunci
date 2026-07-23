@@ -471,9 +471,9 @@ video:not(.video-bg), canvas {
             </select>
           </div>
           <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
-          <select id="kunci_pinjam" name="kunci" required>
-            <option value="">Memuat data kunci...</option>
-          </select>
+          <div id="kontainerKunciChecklist" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: #fff;">
+  <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Memuat data kunci...</p>
+</div>
         </div>
         <div class="form-group">
           <label for="estimasi_tgl">Estimasi Tanggal Pengembalian:</label>
@@ -694,26 +694,33 @@ function gantiTab(tipe) {
   const lantai = document.getElementById("filterLantai").value.toLowerCase();
   const zona = document.getElementById("filterZona").value.toLowerCase();
   const cari = document.getElementById("kotakCari").value.toLowerCase();
-  const select = document.getElementById("kunci_pinjam");
-  
-  // Beri kelas animasi sebelum mengubah data
-  select.classList.remove("drop-animasi");
-  
-  select.innerHTML = '<option value="">Pilih Kunci / Ruangan</option>';
-  
+  const kontainer = document.getElementById("kontainerKunciChecklist");
+
+  if (!kontainer) return;
+  kontainer.innerHTML = "";
+
   const hasilSaring = semuaDataKunci.filter(k => {
     return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
            (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
            (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
   });
 
-  hasilSaring.forEach(k => {
-    select.innerHTML += `<option value="${k.id}">${k.id} - ${k.nama} [Lantai ${k.lantai} - ${k.zona}]</option>`;
-  });
+  if (hasilSaring.length === 0) {
+    kontainer.innerHTML = '<p style="font-size:13px; color:var(--danger); margin:0;">Tidak ada kunci yang cocok / tersedia.</p>';
+    return;
+  }
 
-  // Memicu ulang render animasi CSS
-  void select.offsetWidth; 
-  select.classList.add("drop-animasi");
+  hasilSaring.forEach(k => {
+    const itemDiv = document.createElement("div");
+    itemDiv.style.cssText = "display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;";
+    itemDiv.innerHTML = `
+      <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" style="width: auto; cursor: pointer;">
+      <label for="chk_${k.id}" style="margin: 0; font-weight: normal; cursor: pointer; font-size: 14px;">
+        <b>${k.id}</b> - ${k.nama} <small style="color:var(--text-muted);">[Lantai ${k.lantai} - ${k.zona}]</small>
+      </label>
+    `;
+    kontainer.appendChild(itemDiv);
+  });
 }
   function muatMonitorData() {
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
@@ -972,52 +979,70 @@ function gantiTab(tipe) {
   }
 
   function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
-    document.getElementById(idForm).addEventListener('submit', function(e) {
-      e.preventDefault();
-      const inputFoto = this.querySelector('input[name="foto"]').value;
-      if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
-      
-      const btn = document.getElementById(idBtn);
-      btn.disabled = true; 
-      btn.textContent = "Memproses...";
-      
-      const formatUlangTombol = (konteksAksi === 'pinjam') 
-        ? `<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
-        : `<svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
+  document.getElementById(idForm).addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // 1. Validasi Foto
+    const inputFoto = this.querySelector('input[name="foto"]').value;
+    if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
 
-      fetch(scriptUrl, { method: 'POST', body: new FormData(this) })
-        .then(res => res.json()).then(res => {
-          if(res.status === 'success') { 
-            document.getElementById(idForm).reset();
-            matikanKamera();
-            muatKunciTersedia();
-            muatMonitorData();
-            
-            document.getElementById('navTabsContainer').style.display = 'none';
-            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-            
-            const teksPesan = (konteksAksi === 'pinjam') 
-              ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
-              : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
-            
-            document.getElementById('pesanSukses').textContent = teksPesan;
-            document.getElementById('screenSukses').style.display = 'block';
-            
-            btn.disabled = false;
-            btn.innerHTML = formatUlangTombol;
-          }
-          else { 
-            alert("Gagal: " + res.message); 
-            btn.disabled = false; 
-            btn.innerHTML = formatUlangTombol; 
-          }
-        }).catch(() => { 
-          alert("Kendala Jaringan atau Server Timeout."); 
+    // 2. Buat objek FormData
+    const formData = new FormData(this);
+
+    // 3. Khusus Form Pinjam: Ambil semua kunci yang dicentang
+    if (konteksAksi === 'pinjam') {
+      const kunciTerpilih = Array.from(document.querySelectorAll('input[name="kunci"]:checked')).map(cb => cb.value);
+      
+      if (kunciTerpilih.length === 0) {
+        alert("Pilih minimal satu kunci yang ingin dipinjam!");
+        return;
+      }
+      
+      // Gabungkan array kunci menjadi teks terpisah koma (contoh: "K01, K02")
+      formData.set('kunci', kunciTerpilih.join(', '));
+    }
+
+    const btn = document.getElementById(idBtn);
+    btn.disabled = true;
+    btn.textContent = "Memproses...";
+
+    const formatUlangTombol = (konteksAksi === 'pinjam')
+      ? `<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
+      : `<svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
+
+    fetch(scriptUrl, { method: 'POST', body: formData })
+      .then(res => res.json()).then(res => {
+        if(res.status === 'success') { 
+          document.getElementById(idForm).reset();
+          matikanKamera();
+          muatKunciTersedia();
+          muatMonitorData();
+          
+          document.getElementById('navTabsContainer').style.display = 'none';
+          document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+          
+          const teksPesan = (konteksAksi === 'pinjam') 
+            ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
+            : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
+          
+          document.getElementById('pesanSukses').textContent = teksPesan;
+          document.getElementById('screenSukses').style.display = 'block';
+          
+          btn.disabled = false;
+          btn.innerHTML = formatUlangTombol;
+        }
+        else { 
+          alert("Gagal: " + res.message); 
           btn.disabled = false; 
           btn.innerHTML = formatUlangTombol; 
-        });
-    });
-  }
+        }
+      }).catch(() => { 
+        alert("Kendala Jaringan atau Server Timeout."); 
+        btn.disabled = false; 
+        btn.innerHTML = formatUlangTombol; 
+      });
+  });
+}
 
   function resetKeHalamanForm() {
     document.getElementById('screenSukses').style.display = 'none';
