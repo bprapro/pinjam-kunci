@@ -433,6 +433,19 @@
       0% { opacity: 0.5; transform: scale(0.98) translateY(2px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
+
+    /* Style untuk item kunci yang sedang dipinjam / disabled */
+    .disabled-item {
+      background-color: #f8fafc;
+      pointer-events: none; /* Mencegah klik sama sekali */
+      user-select: none;    /* Mencegah teks di-block */
+      border-radius: 4px;
+    }
+
+    .disabled-item input[type="checkbox"] {
+      opacity: 0.5;
+    }
+    /* =========================================== */
   </style>
 </head>
 <body>
@@ -689,7 +702,8 @@
     fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
       .then(res => res.json())
       .then(data => {
-        semuaDataKunci = data.filter(k => k.status.toLowerCase() === 'tersedia');
+        // UBAH BARIS INI: simpan semua data kunci (tidak di-filter lagi)
+        semuaDataKunci = data;
         
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
@@ -732,17 +746,27 @@
     }
 
     hasilSaring.forEach(k => {
+      // Cek apakah kunci sedang dipinjam
+      const isDipinjam = k.status && k.status.toLowerCase() !== 'tersedia';
+
       const itemDiv = document.createElement("div");
-      itemDiv.style.cssText = "display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;";
+      
+      // Mengatur tampilan CSS jika kunci sedang dipinjam
+      itemDiv.style.cssText = `display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDipinjam ? 'opacity: 0.55; cursor: not-allowed;' : ''}`;
+      
       itemDiv.innerHTML = `
-        <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" style="width: auto; cursor: pointer;">
-        <label for="chk_${k.id}" style="margin: 0; font-weight: normal; cursor: pointer; font-size: 14px;">
+        <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" 
+               ${isDipinjam ? 'disabled' : ''} 
+               style="width: auto; ${isDipinjam ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+               
+        <label for="chk_${k.id}" style="margin: 0; font-weight: normal; ${isDipinjam ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
           <b>${k.id}</b> - ${k.nama} <small style="color:var(--text-muted);">[Lantai ${k.lantai} - ${k.zona}]</small>
+          ${isDipinjam ? '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>' : ''}
         </label>
       `;
       kontainer.appendChild(itemDiv);
     });
-  }
+}
 
   /* ==========================================
      3. TABEL MONITORING & PAGINASI
