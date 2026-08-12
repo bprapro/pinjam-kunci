@@ -838,14 +838,34 @@
      3. TABEL MONITORING & PAGINASI
      ========================================== */
   function muatMonitorData() {
-    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-      .then(res => res.json())
-      .then(data => {
-        dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
-        halamanSekarang = 1;
-        tampilkanHalamanMonitor();
-      });
+  const body = document.getElementById("bodyTabel");
+  if (body) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 20px 0;">
+          <div class="dots-loader-wrapper">
+            <div class="dots-loader">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <p class="dots-loader-text">Memuat status transaksi aktif...</p>
+          </div>
+        </td>
+      </tr>
+    `;
   }
+
+  fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
+    .then(res => res.json())
+    .then(data => {
+      dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
+      halamanSekarang = 1;
+      tampilkanHalamanMonitor();
+    });
+}
 
   function tampilkanHalamanMonitor() {
     const body = document.getElementById("bodyTabel");
