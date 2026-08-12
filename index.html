@@ -10,6 +10,56 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
+    /* Container Loading Dots */
+.dots-loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  gap: 12px;
+}
+
+.dots-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Bulatan Titik */
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  animation: pulseDot 1.2s infinite ease-in-out;
+}
+
+/* Gradasi Warna 5 Titik (Orange -> Merah -> Pink -> Magenta) */
+.dot:nth-child(1) { background-color: #ff9100; animation-delay: 0s; }
+.dot:nth-child(2) { background-color: #ff5722; animation-delay: 0.15s; }
+.dot:nth-child(3) { background-color: #f44336; animation-delay: 0.3s; }
+.dot:nth-child(4) { background-color: #e91e63; animation-delay: 0.45s; }
+.dot:nth-child(5) { background-color: #d500f9; animation-delay: 0.6s; }
+
+/* Keyframe Membesar & Mengecil */
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.dots-loader-text {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
     /* ==========================================
        1. STRUKTUR UTAMA & LATAR BELAKANG
        ========================================== */
@@ -699,17 +749,28 @@
      2. AMBIL & FILTER DATA KUNCI TERSEDIA
      ========================================== */
   function muatKunciTersedia() {
-  // === TAMBAHKAN 4 BARIS INI (Di atas baris fetch) ===
   const kontainer = document.getElementById("kontainerKunciChecklist");
   if (kontainer) {
-    kontainer.innerHTML = '<p style="font-size:13px; color:#3b82f6; margin:0;">Sedang memuat daftar kunci...</p>';
+    // Tampilkan Animasi 5 Dots
+    kontainer.innerHTML = `
+      <div class="dots-loader-wrapper">
+        <div class="dots-loader">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <p class="dots-loader-text">Memuat daftar kunci...</p>
+      </div>
+    `;
   }
-  // ===================================================
-    fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-      .then(res => res.json())
-      .then(data => {
-        // UBAH BARIS INI: simpan semua data kunci (tidak di-filter lagi)
-        semuaDataKunci = data;
+
+  fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
+    .then(res => res.json())
+    .then(data => {
+      semuaDataKunci = data;
+      // ... sisa kode kamu di bawahnya tetap sama ...
         
         const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
         const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
