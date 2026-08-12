@@ -519,10 +519,9 @@
   width: 100% !important;
   white-space: normal !important;
 }
-
-/* === TAMPILAN RESPOSIF MOBILE: TEKS KIRI, FOTO KANAN === */
-/* === PERBAIKAN RESPONSIVE MOBILE: FOTO MENYATU DALAM 1 CARD === */
+/* === TAMPILAN MOBILE: KARTU TUNGGAL (TEKS KIRI & FOTO KANAN) === */
 @media screen and (max-width: 768px) {
+  /* 1. Sembunyikan Header Tabel */
   table thead {
     display: none !important;
   }
@@ -532,57 +531,67 @@
     width: 100% !important;
   }
 
-  /* 1. Card Utama Kunci */
+  /* 2. Kartu Utama (Grid 2 Kolom: Kiri 1fr Teks, Kanan 110px Foto) */
   tbody tr {
-    display: block !important;
+    display: grid !important;
+    grid-template-columns: 1fr 110px !important;
+    gap: 2px 10px !important;
     background: #ffffff !important;
     border-radius: 12px !important;
-    padding: 12px 14px !important;
+    padding: 12px !important;
     margin-bottom: 12px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
     border: 1px solid #cbd5e1 !important;
-  }
-
-  /* 2. Format Teks Agar Gelap & Jelas Dibaca */
-  tbody td {
-    display: flex !important;
-    justify-content: space-between !important;
     align-items: center !important;
-    padding: 6px 0 !important;
-    border-bottom: 1px dashed #e2e8f0 !important;
-    font-size: 13px !important;
-    color: #1e293b !important; /* Warna teks gelap */
-    text-align: right !important;
   }
 
-  tbody td:last-child {
+  /* 3. Semua Informasi Teks Ditumpuk di Kolom Kiri (Column 1) */
+  tbody tr > td {
+    grid-column: 1 !important;
+    display: block !important;
+    padding: 3px 0 !important;
+    border-bottom: 1px dashed #f1f5f9 !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    text-align: left !important;
+  }
+
+  /* Hilangkan garis bawah di baris teks terakhir */
+  tbody tr > td:nth-last-child(2) {
     border-bottom: none !important;
   }
 
-  /* 3. Baris Foto Tambahan (Jika Di-klik) Menyatu ke Card Atasnya */
-  tbody tr.row-foto,
-  tbody tr[id*="foto"],
-  tbody tr:nth-child(even) {
-    margin-top: -13px !important; /* Tarik ke atas menempel card */
-    border-top: 1px dashed #cbd5e1 !important;
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-    background: #f8fafc !important; /* Warna beda tipis untuk area foto */
-    box-shadow: none !important;
+  /* 4. Kolom Foto / Tombol Foto Dipaksa Masuk ke Kolom Kanan (Column 2) */
+  tbody tr > td:last-child {
+    grid-column: 2 !important;
+    grid-row: 1 / span 10 !important; /* Menjangkau dari paling atas ke bawah */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
   }
 
-  /* 4. Ukuran & Posisi Foto */
-  tbody td img {
+  /* 5. Tampilan Gambar Foto di Kolom Kanan */
+  tbody tr > td:last-child img {
     width: 100% !important;
-    max-width: 130px !important;
-    height: auto !important;
-    max-height: 150px !important;
+    height: 100% !important;
+    max-height: 160px !important;
     object-fit: cover !important;
     border-radius: 8px !important;
     border: 1px solid #cbd5e1 !important;
-    margin-left: auto !important;
+  }
+
+  /* 6. Sembunyikan Baris Tambahan atau Teks Tiga Baris Foto Ekstra */
+  tbody tr.row-foto,
+  tbody tr[id*="foto"] {
+    display: none !important;
   }
 }
+
 
   </style>
 </head>
