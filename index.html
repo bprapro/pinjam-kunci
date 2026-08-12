@@ -496,6 +496,55 @@
       opacity: 0.5;
     }
     /* =========================================== */
+    /* === TAMPILAN RESPOSIF KHUSUS LAYAR HP (S/M/L Mobile) === */
+@media screen and (max-width: 768px) {
+  /* 1. Hilangkan header tabel yang kaku */
+  #tabelMonitor thead,
+  .table-container table thead {
+    display: none;
+  }
+
+  /* 2. Ubah struktur tabel menjadi blok kartu */
+  #tabelMonitor, 
+  #tabelMonitor tbody, 
+  #tabelMonitor tr, 
+  #tabelMonitor td {
+    display: block;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* 3. Desain setiap baris kunci menjadi Kartu (Card) */
+  #tabelMonitor tbody tr {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+  }
+
+  /* 4. Atur tata letak isi kartu */
+  #tabelMonitor td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0 !important;
+    border-bottom: 1px dashed #f1f5f9;
+    font-size: 13px !important;
+    text-align: right;
+  }
+
+  #tabelMonitor td:last-child {
+    border-bottom: none;
+  }
+
+  /* 5. Teks & Badge disesuaikan agar pas di HP */
+  #tabelMonitor td small {
+    font-size: 11px;
+  }
+}
+
   </style>
 </head>
 <body>
