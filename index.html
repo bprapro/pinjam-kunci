@@ -495,55 +495,82 @@
     .disabled-item input[type="checkbox"] {
       opacity: 0.5;
     }
-    /* =========================================== */
-    /* === TAMPILAN RESPOSIF KHUSUS LAYAR HP (S/M/L Mobile) === */
+/* === PERBAIKAN LOADING DOTS RATA TENGAH === */
+.dots-loader-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 15px 0 !important;
+  box-sizing: border-box !important;
+}
+
+.dots-loader {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.dots-loader-text {
+  text-align: center !important;
+  width: 100% !important;
+  white-space: normal !important;
+}
+
+/* === TAMPILAN RESPOSIF KHUSUS LAYAR HP === */
 @media screen and (max-width: 768px) {
-  /* 1. Hilangkan header tabel yang kaku */
-  #tabelMonitor thead,
-  .table-container table thead {
-    display: none;
-  }
-
-  /* 2. Ubah struktur tabel menjadi blok kartu */
-  #tabelMonitor, 
-  #tabelMonitor tbody, 
-  #tabelMonitor tr, 
-  #tabelMonitor td {
-    display: block;
+  /* Hilangkan scroll samping & paksa container pas dengan layar */
+  .table-container, 
+  div[style*="overflow"], 
+  table {
     width: 100% !important;
-    box-sizing: border-box;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
-  /* 3. Desain setiap baris kunci menjadi Kartu (Card) */
-  #tabelMonitor tbody tr {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
+  /* Sembunyikan Header Tabel di HP */
+  table thead {
+    display: none !important;
   }
 
-  /* 4. Atur tata letak isi kartu */
-  #tabelMonitor td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* Ubah Elemen Tabel Menjadi Kartu Ringkas */
+  table, tbody, tr, td {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Kartu Per Kunci */
+  tbody tr {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Baris Informasi Di Dalam Kartu */
+  tbody td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     padding: 6px 0 !important;
-    border-bottom: 1px dashed #f1f5f9;
+    border-bottom: 1px dashed #f1f5f9 !important;
     font-size: 13px !important;
-    text-align: right;
+    text-align: right !important;
+    white-space: normal !important;
   }
 
-  #tabelMonitor td:last-child {
-    border-bottom: none;
-  }
-
-  /* 5. Teks & Badge disesuaikan agar pas di HP */
-  #tabelMonitor td small {
-    font-size: 11px;
+  tbody td:last-child {
+    border-bottom: none !important;
   }
 }
+
 
   </style>
 </head>
