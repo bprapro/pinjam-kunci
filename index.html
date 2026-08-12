@@ -520,57 +520,71 @@
   white-space: normal !important;
 }
 
-/* === TAMPILAN RESPOSIF KHUSUS LAYAR HP === */
+/* === TAMPILAN RESPOSIF MOBILE: TEKS KIRI, FOTO KANAN === */
 @media screen and (max-width: 768px) {
-  /* Hilangkan scroll samping & paksa container pas dengan layar */
-  .table-container, 
-  div[style*="overflow"], 
-  table {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  /* Sembunyikan Header Tabel di HP */
+  /* 1. Hilangkan header tabel */
   table thead {
     display: none !important;
   }
 
-  /* Ubah Elemen Tabel Menjadi Kartu Ringkas */
-  table, tbody, tr, td {
+  /* 2. Ubah baris (TR) menjadi Grid 2 Kolom (Kolom 2 khusus Foto = 120px) */
+  table, tbody {
     display: block !important;
     width: 100% !important;
-    box-sizing: border-box !important;
   }
 
-  /* Kartu Per Kunci */
   tbody tr {
+    display: grid !important;
+    grid-template-columns: 1fr 120px !important; /* Kiri: Otomatis, Kanan: 120px Foto */
+    gap: 4px 10px !important;
+    align-items: center !important;
     background: #ffffff !important;
     border-radius: 12px !important;
-    padding: 12px 14px !important;
+    padding: 12px !important;
     margin-bottom: 12px !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
     border: 1px solid #e2e8f0 !important;
   }
 
-  /* Baris Informasi Di Dalam Kartu */
+  /* 3. Semua TD teks masuk ke Kolom Kiri (Column 1) */
   tbody td {
+    grid-column: 1 !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 6px 0 !important;
+    padding: 4px 0 !important;
     border-bottom: 1px dashed #f1f5f9 !important;
-    font-size: 13px !important;
-    text-align: right !important;
+    font-size: 12px !important;
     white-space: normal !important;
   }
 
-  tbody td:last-child {
+  /* Hilangkan garis bawah di baris teks terakhir */
+  tbody td:nth-last-child(2) {
     border-bottom: none !important;
   }
-}
 
+  /* 4. TD Foto dipaksa masuk ke Kolom Kanan (Column 2) menjangkau dari atas ke bawah */
+  tbody td:last-child {
+    grid-column: 2 !important;
+    grid-row: 1 / span 10 !important; /* Menjangkau tinggi seluruh teks di kiri */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    height: 100% !important;
+  }
+
+  /* 5. Ukuran & Bentuk Foto di Kolom Kanan */
+  tbody td:last-child img {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 160px !important;
+    object-fit: cover !important; /* Foto pas & tidak gepeng */
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+}
 
   </style>
 </head>
