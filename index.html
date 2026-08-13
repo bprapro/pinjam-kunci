@@ -519,75 +519,101 @@
   width: 100% !important;
   white-space: normal !important;
 }
-/* === PERBAIKAN TOTAL MOBILE (FIT 100% LAYAR & TANPA KLIK FOTO) === */
+/* === TAMPILAN MOBILE: 1 CARD UTUH + FOTO LANGSUNG MUNCUL DI KANAN === */
 @media screen and (max-width: 768px) {
-  /* 1. Paksa Seluruh Pembungkus Utama Pas 100% Lebar Layar HP */
+  /* Pembungkus utama fit 100% lebar layar */
   html, body, 
   .container, 
   .table-container, 
   div[class*="container"],
-  div[style*="overflow"],
   #tabelMonitor {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
   }
 
-  /* 2. Sembunyikan Header Tabel */
-  #tabelMonitor thead,
-  table thead {
+  /* Sembunyikan Header Tabel */
+  #tabelMonitor thead, table thead {
     display: none !important;
   }
 
-  /* 3. Blok Tabel & Baris Kartu */
-  #tabelMonitor, 
-  #tabelMonitor tbody, 
-  #tabelMonitor tr {
+  #tabelMonitor, #tabelMonitor tbody {
     display: block !important;
     width: 100% !important;
-    box-sizing: border-box !important;
   }
 
-  /* 4. Tampilan Kartu Kunci (Lebar Pas 100%) */
+  /* 1 CARD UTUH: Grid 2 Kolom (Kiri: Teks Detail, Kanan: Foto langsung) */
   #tabelMonitor tbody tr {
+    display: grid !important;
+    grid-template-columns: 1fr 105px !important; /* Kolom kanan khusus foto 105px */
+    gap: 2px 10px !important;
     background: #ffffff !important;
     border-radius: 12px !important;
-    padding: 12px 14px !important;
+    padding: 12px !important;
     margin: 0 0 12px 0 !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07) !important;
     border: 1px solid #cbd5e1 !important;
+    align-items: center !important;
   }
 
-  /* 5. Teks Informasi (Warna Gelap & Sangat Jelas) */
-  #tabelMonitor tbody td {
+  /* Baris Teks Detail di Kolom Kiri */
+  #tabelMonitor tbody tr > td:not(.col-foto) {
+    grid-column: 1 !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 8px 0 !important;
+    padding: 4px 0 !important;
     border-bottom: 1px dashed #e2e8f0 !important;
-    font-size: 13px !important;
-    color: #0f172a !important; /* Warna teks gelap pekat */
+    font-size: 12px !important;
+    color: #0f172a !important;
     font-weight: 500 !important;
-    text-align: right !important;
-    width: 100% !important;
   }
 
-  #tabelMonitor tbody td:last-child {
+  #tabelMonitor tbody tr > td:nth-last-child(2) {
     border-bottom: none !important;
   }
 
-  /* 6. HILANGKAN TEKS & FITUR KLIK FOTO DI MOBILE */
-  #tabelMonitor td small,
-  #tabelMonitor td a,
-  #tabelMonitor tr.row-foto,
-  #tabelMonitor tr[id*="foto"] {
-    display: none !important;
+  /* Kolom Foto di Kolom Kanan (Menjangkau Atas-Bawah) */
+  #tabelMonitor tbody tr > td.col-foto,
+  #tabelMonitor tbody tr > td:last-child {
+    grid-column: 2 !important;
+    grid-row: 1 / span 10 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  /* Gambar Foto Langsung Tampil Pas di Card Kanan */
+  .foto-card-mobile,
+  #tabelMonitor td img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 110px !important;
+    max-height: 150px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  /* Placeholder jika tidak ada foto */
+  .no-foto-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 100px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
   }
 }
 
