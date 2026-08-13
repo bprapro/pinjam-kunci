@@ -616,6 +616,111 @@
     border: 1px dashed #cbd5e1;
   }
 }
+    /* ==========================================
+   1. ATURAN TAMPILAN DESKTOP / LANDSCAPE
+   ========================================== */
+/* Sembunyikan elemen foto mobile di layar komputer/desktop */
+.col-foto-mobile {
+  display: none !important;
+}
+
+.btn-toggle-foto-desktop {
+  display: inline-block;
+}
+
+
+/* ==========================================
+   2. ATURAN TAMPILAN MOBILE / PORTRAIT (<768px)
+   ========================================== */
+@media screen and (max-width: 768px) {
+  /* Pembungkus pas 100% lebar layar */
+  html, body, .container, .table-container, #tabelMonitor {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Sembunyikan header tabel & teks "Klik untuk lihat foto" di mobile */
+  #tabelMonitor thead,
+  .btn-toggle-foto-desktop,
+  .row-foto-desktop {
+    display: none !important; /* Baris dropdown foto desktop TIDAK MUNCUL di mobile */
+  }
+
+  #tabelMonitor, #tabelMonitor tbody {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* KARTU MOBILE: Grid 2 Kolom (Kiri Teks, Kanan Foto Langsung) */
+  #tabelMonitor tbody tr.row-main-kunci {
+    display: grid !important;
+    grid-template-columns: 1fr 105px !important; /* Kolom kanan khusus foto 105px */
+    gap: 2px 10px !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07) !important;
+    border: 1px solid #cbd5e1 !important;
+    align-items: center !important;
+  }
+
+  /* Kolom Teks di Kiri */
+  #tabelMonitor tbody tr.row-main-kunci > td:not(.col-foto-mobile) {
+    grid-column: 1 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 4px 0 !important;
+    border-bottom: 1px dashed #e2e8f0 !important;
+    font-size: 12px !important;
+    color: #0f172a !important;
+    font-weight: 500 !important;
+  }
+
+  #tabelMonitor tbody tr.row-main-kunci > td:nth-last-child(2) {
+    border-bottom: none !important;
+  }
+
+  /* Kolom Foto Langsung di Kanan */
+  #tabelMonitor tbody tr.row-main-kunci > td.col-foto-mobile {
+    grid-column: 2 !important;
+    grid-row: 1 / span 10 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  /* Ukuran Gambar Foto di Mobile Card */
+  .img-card-mobile {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 110px !important;
+    max-height: 150px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  .no-foto-mobile {
+    width: 100%;
+    height: 100%;
+    min-height: 100px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+  }
+}
 
   </style>
 </head>
@@ -1008,54 +1113,85 @@
     return;
   }
 
-  let html = "";
   const hariIni = new Date();
   hariIni.setUTCHours(0, 0, 0, 0);
 
-  dataHalamanIni.forEach((item) => {
+  dataHalamanIni.forEach((item, indeks) => {
+    const idBarisFoto = `foto-row-${indeks}`;
+    
+    // Cek status keterlambatan
     let apakahTerlambat = false;
-
     if (item.estimasi && item.estimasi !== "-") {
       const parts = item.estimasi.split('/'); 
       if (parts.length === 3) {
         const hari = parseInt(parts[0], 10);
         const bulan = parseInt(parts[1], 10) - 1;
         const tahun = parseInt(parts[2], 10);
-        
         const tanggalEstimasi = new Date(Date.UTC(tahun, bulan, hari));
         apakahTerlambat = item.status.toLowerCase() === 'dipinjam' && tanggalEstimasi < hariIni;
       }
     }
 
-    // Cek ketersediaan foto
     const urlFoto = item.foto || item.fotoPinjam || "";
-    const elemenFoto = urlFoto 
-      ? `<img src="${urlFoto}" alt="Foto Kunci ${item.id}" class="foto-card-mobile">`
-      : `<div class="no-foto-placeholder">Foto tidak tersedia</div>`;
+    const fotoValid = urlFoto && urlFoto.trim() !== "" && urlFoto !== "-";
 
-    // Gabungkan seluruh detail + foto ke dalam 1 TR (1 Card Utuh)
-    html += `
-      <tr>
-        <td><b>${item.id}</b></td>
-        <td>${item.nama}</td>
-        <td>${item.lantai || '-'}</td>
-        <td>${item.zona || '-'}</td>
-        <td><span class="badge-dipinjam">${item.status}</span></td>
-        <td>${item.peminjam || '-'}</td>
-        <td style="${apakahTerlambat ? 'color: var(--danger); font-weight: bold;' : ''}">
-          ${item.estimasi || '-'} ${apakahTerlambat ? '<br><small style="color:#ef4444; font-weight:bold;">(Terlambat)</small>' : ''}
-        </td>
-        <td class="col-foto">${elemenFoto}</td>
-      </tr>
+    // 1. Baris Utama (Table Desktop & Card Mobile)
+    const trMain = document.createElement("tr");
+    trMain.className = "row-main-kunci";
+    trMain.innerHTML = `
+      <td><b>${item.id}</b></td>
+      <td>${item.nama}</td>
+      <td>${item.lantai || '-'}</td>
+      <td>${item.zona || '-'}</td>
+      <td><span class="badge-dipinjam">${item.status}</span></td>
+      <td>${item.peminjam || '-'}</td>
+      <td style="${apakahTerlambat ? 'color: var(--danger); font-weight: bold;' : ''}">
+        ${item.estimasi || '-'}
+        ${apakahTerlambat ? '<br><small style="color:#ef4444; font-weight:bold;">(Terlambat)</small>' : ''}
+        <br>
+        <small class="btn-toggle-foto-desktop" onclick="toggleFoto('${idBarisFoto}')" style="cursor:pointer; color:#64748b; text-decoration:underline;">
+          (Klik untuk lihat foto)
+        </small>
+      </td>
+      <td class="col-foto-mobile">
+        ${fotoValid 
+          ? `<img src="${urlFoto}" alt="Foto Kunci" class="img-card-mobile">` 
+          : `<div class="no-foto-mobile">Tanpa Foto</div>`}
+      </td>
     `;
-  });
 
-  body.innerHTML = html;
+    // 2. Baris Foto Khusus Desktop (Accordion Dropdown)
+    const trFoto = document.createElement("tr");
+    trFoto.id = idBarisFoto;
+    trFoto.className = "row-foto-desktop";
+    trFoto.style.display = "none";
+    trFoto.innerHTML = `
+      <td colspan="8" style="text-align: center; background-color: #f8fafc; padding: 15px;">
+        <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">
+          Foto Dokumentasi Peminjaman:
+        </div>
+        ${fotoValid 
+          ? `<img src="${urlFoto}" alt="Dokumentasi ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; border: 1px solid #cbd5e1;">` 
+          : `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia</p>`}
+      </td>
+    `;
+
+    body.appendChild(trMain);
+    body.appendChild(trFoto);
+  });
 
   // Update Navigasi Halaman
   document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
   document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
   document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
+}
+
+// Fungsi Toggle Klik Foto untuk Desktop
+function toggleFoto(idRow) {
+  const el = document.getElementById(idRow);
+  if (el) {
+    el.style.display = (el.style.display === "none" || el.style.display === "") ? "table-row" : "none";
+  }
 }
 
   function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
