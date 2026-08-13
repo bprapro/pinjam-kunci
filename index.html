@@ -964,6 +964,7 @@
 
   function tampilkanHalamanMonitor() {
     const body = document.getElementById("bodyTabel");
+    if (!body) return;
     body.innerHTML = "";
 
     const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
@@ -974,18 +975,18 @@
     const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
 
     if (dataHalamanIni.length === 0) {
-      body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;">Seluruh kunci saat ini berada di rak.</td></tr>';
+      body.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;">Seluruh kunci saat ini berada di rak.</td></tr>';
       document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
       document.getElementById("btnPrev").disabled = true;
       document.getElementById("btnNext").disabled = true;
       return;
     }
 
-    dataHalamanIni.forEach((item, indeks) => {
-      const idBarisFoto = `foto-row-${indeks}`;
-      const hariIni = new Date();
-      hariIni.setUTCHours(0,0,0,0);
+    let html = "";
+    const hariIni = new Date();
+    hariIni.setUTCHours(0,0,0,0);
 
+    dataHalamanIni.forEach((item) => {
       let apakahTerlambat = false;
 
       if (item.estimasi && item.estimasi !== "-") {
@@ -999,6 +1000,37 @@
           apakahTerlambat = item.status.toLowerCase() === 'dipinjam' && tanggalEstimasi < hariIni;
         }
       }
+
+      // 1. Elemen foto langsung dimuat tanpa butuh klik
+      const fotoSrc = item.foto || item.fotoPinjam || "";
+      const elemenFoto = fotoSrc 
+        ? `<img src="${fotoSrc}" alt="Foto ${item.nama}" class="foto-card-mobile">`
+        : `<div class="no-foto-placeholder">Tanpa Foto</div>`;
+
+      // 2. Cetak 1 baris tr utuh berisi data & foto
+      html += `
+        <tr>
+          <td><b>${item.id}</b></td>
+          <td>${item.nama}</td>
+          <td>${item.lantai || '-'}</td>
+          <td>${item.zona || '-'}</td>
+          <td><span class="badge-dipinjam">${item.status}</span></td>
+          <td>${item.peminjam || '-'}</td>
+          <td style="${apakahTerlambat ? 'color: var(--danger); font-weight: bold;' : ''}">
+            ${item.estimasi || '-'} ${apakahTerlambat ? '<br><small style="color:#ef4444; font-weight:bold;">(Terlambat)</small>' : ''}
+          </td>
+          <td class="col-foto">${elemenFoto}</td>
+        </tr>
+      `;
+    });
+
+    body.innerHTML = html;
+
+    // Update Navigasi Halaman
+    document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
+    document.getElementById("btnPrev").disabled = halamanSekarang === 1;
+    document.getElementById("btnNext").disabled = halamanSekarang === totalHalaman;
+}
 
       const trUtama = document.createElement("tr");
       trUtama.style.cursor = "pointer";
