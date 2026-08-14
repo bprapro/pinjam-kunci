@@ -519,100 +519,98 @@
   width: 100% !important;
   white-space: normal !important;
 }
-/* === TAMPILAN MOBILE: 1 CARD UTUH + FOTO LANGSUNG MUNCUL DI KANAN === */
-@media screen and (max-width: 768px) {
-  /* Pembungkus utama fit 100% lebar layar */
-  html, body, 
-  .container, 
-  .table-container, 
-  div[class*="container"],
-  #tabelMonitor {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    overflow-x: hidden !important;
-  }
+/* ==========================================
+   1. ATURAN DESKTOP (TETAP SEPERTI AWAL)
+   ========================================== */
+.col-foto-mobile {
+  display: none !important;
+}
 
-  /* Sembunyikan Header Tabel */
-  #tabelMonitor thead, table thead {
+.btn-toggle-foto-desktop {
+  display: inline-block;
+}
+
+
+/* ==========================================
+   2. ATURAN MOBILE (PRESISI SESUAI GAMBAR)
+   ========================================== */
+@media screen and (max-width: 768px) {
+  /* Sembunyikan elemen tabel desktop */
+  #tabelMonitor thead,
+  .btn-toggle-foto-desktop,
+  .row-foto-desktop {
     display: none !important;
   }
 
-  #tabelMonitor, #tabelMonitor tbody {
+  #tabelMonitor, 
+  #tabelMonitor tbody {
     display: block !important;
     width: 100% !important;
   }
 
-  /* 1 CARD UTUH: Grid 2 Kolom (Kiri: Teks Detail, Kanan: Foto langsung) */
-  #tabelMonitor tbody tr {
+  /* WADAH KARTU (Bentuk Card persis gambar: Border melengkung 20px) */
+  #tabelMonitor tbody tr.row-main-kunci {
     display: grid !important;
-    grid-template-columns: 1fr 105px !important; /* Kolom kanan khusus foto 105px */
-    gap: 2px 10px !important;
+    grid-template-columns: 1fr 140px !important; /* Kiri: Teks | Kanan: Foto 140px */
+    gap: 12px !important;
     background: #ffffff !important;
-    border-radius: 12px !important;
-    padding: 12px !important;
-    margin: 0 0 12px 0 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07) !important;
-    border: 1px solid #cbd5e1 !important;
+    border: 2px solid #64748b !important; /* Garis tepi luar kartu */
+    border-radius: 20px !important; /* Sudut melengkung halus */
+    padding: 16px !important;
+    margin-bottom: 16px !important;
     align-items: center !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   }
 
-  /* Baris Teks Detail di Kolom Kiri */
-  #tabelMonitor tbody tr > td:not(.col-foto) {
-    grid-column: 1 !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 4px 0 !important;
-    border-bottom: 1px dashed #e2e8f0 !important;
-    font-size: 12px !important;
+  /* KOLOM KIRI: Teks Menumpuk Vertikal Sesuai Sketsa (Tanpa Garis Pembatas) */
+  #tabelMonitor tbody tr.row-main-kunci > td:not(.col-foto-mobile) {
+    display: block !important;
+    border: none !important; /* Menghapus semua garis pembatas antar baris */
+    padding: 2px 0 !important;
+    font-size: 14px !important;
+    color: #1e293b !important;
+    text-align: left !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Baris Pertama (Nomor Kunci) Dibuat Lebih Tebal */
+  #tabelMonitor tbody tr.row-main-kunci > td:first-child {
+    font-size: 16px !important;
+    font-weight: 700 !important;
     color: #0f172a !important;
-    font-weight: 500 !important;
   }
 
-  #tabelMonitor tbody tr > td:nth-last-child(2) {
-    border-bottom: none !important;
-  }
-
-  /* Kolom Foto di Kolom Kanan (Menjangkau Atas-Bawah) */
-  #tabelMonitor tbody tr > td.col-foto,
-  #tabelMonitor tbody tr > td:last-child {
-    grid-column: 2 !important;
-    grid-row: 1 / span 10 !important;
+  /* KOLOM KANAN: Foto Penuh Sejajar Kartu */
+  #tabelMonitor tbody tr.row-main-kunci > td.col-foto-mobile {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     height: 100% !important;
     padding: 0 !important;
     border: none !important;
-    background: transparent !important;
   }
 
-  /* Gambar Foto Langsung Tampil Pas di Card Kanan */
-  .foto-card-mobile,
-  #tabelMonitor td img {
+  /* Tampilan Gambar di Dalam Kartu Mobile */
+  .img-card-mobile {
     width: 100% !important;
     height: 100% !important;
-    min-height: 110px !important;
-    max-height: 150px !important;
+    min-height: 150px !important;
+    max-height: 200px !important;
     object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 1px solid #cbd5e1 !important;
+    border-radius: 12px !important; /* Sudut foto melengkung */
   }
 
-  /* Placeholder jika tidak ada foto */
-  .no-foto-placeholder {
+  .no-foto-mobile {
     width: 100%;
     height: 100%;
-    min-height: 100px;
+    min-height: 140px;
     background: #f1f5f9;
     color: #94a3b8;
-    font-size: 11px;
+    font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px dashed #cbd5e1;
   }
 }
