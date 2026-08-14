@@ -719,6 +719,102 @@
     border: 1px dashed #cbd5e1;
   }
 }
+    /* ============================================================
+   OVERRIDE KHUSUS MOBILE (MEMAKSA TABEL JADI KARTU PRESISI)
+   ============================================================ */
+@media screen and (max-width: 768px) {
+
+  /* 1. SEMBUNYIKAN HEADER TABEL & ELEMEN DESKTOP TOTAL */
+  #tabelMonitor thead,
+  table#tabelMonitor thead,
+  .btn-toggle-foto-desktop,
+  .row-foto-desktop {
+    display: none !important;
+  }
+
+  /* 2. RESET STRUKTUR TABEL MENJADI BLOCK */
+  #tabelMonitor,
+  table#tabelMonitor,
+  #tabelMonitor tbody,
+  table#tabelMonitor tbody {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. UBAH SETIAP BARIS (TR) MENJADI BENTUK KARTU (CARD) */
+  #tabelMonitor tbody tr,
+  #tabelMonitor tbody tr.row-main-kunci {
+    display: grid !important;
+    grid-template-columns: 1fr 125px !important; /* Kiri: Detail Teks | Kanan: Foto 125px */
+    gap: 4px 12px !important;
+    background: #ffffff !important;
+    border: 2px solid #94a3b8 !important; /* Bingkai luar melengkung persis gambar */
+    border-radius: 18px !important;
+    padding: 14px !important;
+    margin-bottom: 16px !important;
+    align-items: center !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 4. SETIAP TD (DETAIL KIRI) DIPAKSA TUMPUK VERTIKAL TANPA GARIS */
+  #tabelMonitor tbody tr.row-main-kunci > td {
+    display: block !important;
+    width: 100% !important;
+    padding: 2px 0 !important;
+    border: none !important; /* Menghapus garis pembatas antar cell */
+    background: transparent !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    text-align: left !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Kunci Pertama (Nomor Kunci) Dibuat Tebal & Menonjol */
+  #tabelMonitor tbody tr.row-main-kunci > td:first-child {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+
+  /* 5. WADAH FOTO DI SEBELAH KANAN (SPANS DARI ATAS KE BAWAH) */
+  #tabelMonitor tbody tr.row-main-kunci > td.col-foto-mobile {
+    display: flex !important;
+    grid-column: 2 !important;
+    grid-row: 1 / span 10 !important; /* Posisi di kanan penuh */
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    min-height: 140px !important;
+    padding: 0 !important;
+  }
+
+  /* GAMBAR FOTO MOBILE */
+  .img-card-mobile {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 180px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  .no-foto-mobile {
+    width: 100%;
+    height: 100%;
+    min-height: 130px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+  }
+}
 
   </style>
 </head>
