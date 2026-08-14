@@ -10,9 +10,492 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-/* ==========================================
-   1. LOADING DOTS & BASE STYLES
-   ========================================== */
+    /* Container Loading Dots */
+.dots-loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  gap: 12px;
+}
+
+.dots-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Bulatan Titik */
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  animation: pulseDot 1.2s infinite ease-in-out;
+}
+
+/* Gradasi Warna 5 Titik (Orange -> Merah -> Pink -> Magenta) */
+.dot:nth-child(1) { background-color: #ff9100; animation-delay: 0s; }
+.dot:nth-child(2) { background-color: #ff5722; animation-delay: 0.15s; }
+.dot:nth-child(3) { background-color: #f44336; animation-delay: 0.3s; }
+.dot:nth-child(4) { background-color: #e91e63; animation-delay: 0.45s; }
+.dot:nth-child(5) { background-color: #d500f9; animation-delay: 0.6s; }
+
+/* Keyframe Membesar & Mengecil */
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.dots-loader-text {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+    /* ==========================================
+       1. STRUKTUR UTAMA & LATAR BELAKANG
+       ========================================== */
+    html {
+      background-color: #F8FAFC !important; 
+    }
+
+    body {
+      font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0; 
+      padding: 0 !important;
+      color: #0d9488; 
+      line-height: 1.5;
+      background: transparent !important;
+    }
+
+    .video-bg {
+      display: block !important;
+      visibility: visible !important;
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -100 !important; 
+      object-fit: cover;
+      opacity: 0.25 !important; 
+      filter: grayscale(30%) contrast(110%);
+      pointer-events: none;
+    }
+
+    .video-background-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -100;
+      overflow: hidden;
+      pointer-events: none;
+      background-color: #F8FAFC; 
+    }
+
+    .video-background-container iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 56.25vw;
+      min-height: 100vh;
+      min-width: 177.77vh;
+      transform: translate(-50%, -50%);
+      opacity: 0.25; 
+      filter: grayscale(40%) contrast(110%);
+    }
+
+    :root {
+      --primary: #0052FF;
+      --danger: #EF4444; 
+      --success: #22C55E;
+      --dark: #0F172A;
+      --text-muted: #64748B;
+    }
+
+    /* ==========================================
+       2. KONTAINER UTAMA (CARD WHITE DASHBOARD)
+       ========================================== */
+    .container { 
+      max-width: 600px; 
+      background: #FFFFFF !important; 
+      padding: 32px; 
+      border-radius: 16px; 
+      margin: 40px auto 30px auto;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+      border: 1px solid #E2E8F0;
+    }
+
+    .monitor-container { 
+      max-width: 1100px; 
+      overflow-x: auto;
+      background: transparent !important; 
+      box-shadow: none !important;        
+      border: none !important;            
+      padding: 16px; 
+      margin: 20px auto 40px auto !important;
+    }
+
+    main, section, .wrapper, .content, .main-content {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    h2 { 
+      text-align: center; 
+      margin-top: 0; 
+      font-weight: 700; 
+      font-size: 24px; 
+      letter-spacing: -0.5px; 
+    }
+    h2.pinjam-title { color: var(--primary); }
+    h2.kembali-title { color: var(--danger); }
+    h2.monitor-title { color: var(--dark); margin-bottom: 20px; }
+
+    /* ==========================================
+       3. STRUKTUR TABEL (GAYA KARTU MELAYANG/SPACED)
+       ========================================== */
+    table { 
+      width: 100%; 
+      border-collapse: separate !important; 
+      border-spacing: 0 8px !important; 
+      min-width: 700px; 
+      margin-top: 15px; 
+    }
+
+    th { 
+      background-color: transparent !important;
+      color: #64748B !important; 
+      font-size: 13px;
+      font-weight: 500;
+      padding: 12px 16px;
+      border-bottom: 1px solid #E2E8F0;
+      text-transform: none;
+      text-align: left;
+    }
+
+    tr { background: #FFFFFF; }
+
+    td { 
+      padding: 16px; 
+      font-size: 14px;
+      color: #334155;
+      border-top: 1px solid #F1F5F9 !important;
+      border-bottom: 1px solid #F1F5F9 !important;
+    }
+
+    td:first-child {
+      border-left: 1px solid #F1F5F9 !important;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      color: #64748B;
+    }
+
+    td:last-child {
+      border-right: 1px solid #F1F5F9 !important;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .monitor-container table tbody tr:hover td {
+      background-color: #F8FAFC !important;
+    }
+
+    .monitor-container table tbody tr {
+      transition: background-color 0.2s ease;
+    }
+
+    /* ==========================================
+       4. BADGE STATUS PASTEL (SOFT BADGES)
+       ========================================== */
+    .badge { 
+      padding: 6px 12px; 
+      border-radius: 20px; 
+      font-size: 12px; 
+      font-weight: 500; 
+      display: inline-block; 
+    }
+
+    .bg-dipinjam { 
+      background-color: #FEE2E2 !important; 
+      color: #EF4444 !important; 
+      border: none !important;
+    }
+
+    .bg-tersedia { 
+      background-color: #DCFCE7 !important; 
+      color: #22C55E !important; 
+      border: none !important;
+    }
+
+    @keyframes kedipWarning {
+      0% { background-color: #FFFFFF; }
+      50% { background-color: #FEF08A; }
+      100% { background-color: #FFFFFF; }
+    }
+
+    .baris-terlambat td {
+      animation: kedipWarning 2.5s infinite ease-in-out;
+    }
+    .baris-terlambat td:first-child {
+      border-left: 4px solid #EAB308 !important;
+    }
+
+    @keyframes pulse-warning {
+      0% { background-color: rgba(254, 240, 138, 0.2); }
+      50% { background-color: rgba(254, 240, 138, 0.5); }
+      100% { background-color: rgba(254, 240, 138, 0.2); }
+    }
+    .row-terlambat td {
+      animation: pulse-warning 3s infinite ease-in-out !important;
+    }
+
+    /* ==========================================
+       5. FORM INPUT & DROPDOWN MODEREN
+       ========================================== */
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #334155; }
+
+    input, select { 
+      width: 100%; 
+      padding: 12px 16px; 
+      border: 1px solid #E2E8F0; 
+      border-radius: 8px; 
+      box-sizing: border-box; 
+      font-size: 15px;
+      background-color: #F8FAFC;
+      color: #0d9488;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary) !important;
+      background-color: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.1);
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748B' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 20px;
+      padding-right: 45px !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    select:focus {
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%230052FF' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M12 8l-5 5h10z'/></svg>");
+    }
+
+    .search-box, .filter-row select {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-box:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.1);
+    }
+
+    .autocomplete-wrapper { position: relative; width: 100%; }
+
+    #nama_kembali, #nama_hint {
+      font-family: 'Poppins', sans-serif !important;
+      font-size: 15px !important;      
+      font-weight: 400 !important;      
+      letter-spacing: normal !important;
+      line-height: 1.5 !important;      
+      padding: 12px 16px !important;    
+      box-sizing: border-box !important;
+    }
+
+    #nama_kembali {
+      position: relative;
+      width: 100%;
+      background: transparent !important;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      color: var(--dark);
+      z-index: 2;
+    }
+
+    #nama_hint {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      color: #94A3B8;
+      background-color: #F8FAFC;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      white-space: pre;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ==========================================
+       6. NAV TABS & TOMBOL-TOMBOL
+       ========================================== */
+    .nav-tabs { 
+      display: flex; 
+      background-color: #F1F5F9; 
+      padding: 6px; 
+      border-radius: 12px; 
+      margin-bottom: 30px; 
+      border: none;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .tab-btn { 
+      flex: 1; 
+      padding: 10px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: all 0.25s ease; 
+      background-color: transparent; 
+      color: var(--text-muted); 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .tab-btn svg { width: 18px; height: 18px; fill: var(--text-muted); transition: fill 0.25s; }
+
+    .tab-btn.active-pinjam { background-color: #619A7E; color: white; box-shadow: 0 4px 12px rgba(97,154,126,0.2); }
+    .tab-btn.active-pinjam svg { fill: white; }
+
+    .tab-btn.active-kembali { background-color: #be123c; color: white; box-shadow: 0 4px 12px rgba(223,44,62,0.2); }
+    .tab-btn.active-kembali svg { fill: white; }
+
+    button {
+      transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form, .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang, #btnCariKunci, .btn-refresh, .btn-page { 
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-submit-pinjam svg, .btn-submit-kembali svg, .btn-kembali-form svg, .btn-buka-cam svg, .btn-ambil-foto svg, .btn-foto-ulang svg, #btnCariKunci svg {
+      width: 18px; height: 18px; fill: white;
+    }
+
+    .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form { 
+      border: none; font-size: 15px; cursor: pointer; font-weight: 600; padding: 14px; border-radius: 8px;
+    }
+    .btn-submit-pinjam { background-color: #619A7E; color: white; }
+    .btn-submit-kembali { background-color: #DF2C3E; color: white; }
+    .btn-kembali-form { background-color: #64748B; color: white; width: auto; padding: 12px 24px; }
+    .btn-submit-pinjam:hover, .btn-submit-kembali:hover, .btn-kembali-form:hover { opacity: 0.9; }
+
+    .filter-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .search-box { margin-bottom: 10px; background-color: #FFFFFF; border: 1px solid #E2E8F0; }
+
+    .btn-refresh { background-color: #FFFFFF; color: var(--text-muted); border: 1px solid #E2E8F0; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; float: right; width: auto; }
+    .btn-refresh svg { width: 14px; height: 14px; fill: var(--text-muted); }
+    .btn-refresh:hover { background-color: #F1F5F9; color: var(--dark); }
+    .btn-refresh:hover svg { fill: var(--dark); }
+
+    /* ==========================================
+       7. NAVIGASI PAGINASI (PAGINATION)
+       ========================================== */
+    .pagination-controls { 
+      display: flex; 
+      justify-content: space-between;
+      align-items: center; 
+      margin-top: 24px; 
+      padding-top: 16px; 
+      border-top: 1px solid #E2E8F0; 
+    }
+
+    .btn-page { 
+      background-color: #FFFFFF; 
+      border: 1px solid #E2E8F0; 
+      padding: 8px 16px; 
+      font-size: 13px; 
+      font-weight: 500; 
+      cursor: pointer; 
+      width: auto; 
+      border-radius: 8px; 
+      color: #475569; 
+    }
+    .btn-page svg { width: 14px; height: 14px; fill: #475569; }
+    .btn-page:hover:not(:disabled) { background-color: #F1F5F9; color: #0d9488; }
+    .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+    #infoHalaman { font-size: 14px; font-weight: 500; color: #64748B; }
+
+    /* ==========================================
+       8. ELEMEN PENDUKUNG (KAMERA, ANIMASI, ETC)
+       ========================================== */
+    video:not(.video-bg), canvas { 
+      display: none; 
+      width: 100%; 
+      max-width: 100%; 
+      border-radius: 12px; 
+      background: #0F172A; 
+      margin: 12px auto 0 auto; 
+    }
+
+    .foto-container { text-align: center; margin-top: 10px; background: #F1F5F9; padding: 15px; border-radius: 12px; border: 1px dashed #CBD5E1; }
+    .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang { border: none; border-radius: 8px; padding: 12px 20px; font-weight: 600; cursor: pointer; }
+    .btn-buka-cam { background-color: #475569; color: white; }
+    .btn-buka-cam:hover { background-color: #334155; }
+    .btn-ambil-foto { background-color: #619A7E; color: white; display: none; margin-top: 10px; }
+    .btn-foto-ulang { background-color: #94A3B8; color: white; display: none; margin-top: 10px; }
+
+    .form-section { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease, transform 0.35s ease; }
+    .form-section.active { display: block; opacity: 1; transform: translateY(0); }
+    [id^="foto-row-"] { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+    .success-screen { display: none; text-align: center; padding: 20px 10px; }
+    .success-screen h3 { color: var(--dark); font-size: 28px; margin-bottom: 12px; font-weight: 700; }
+    .success-screen p { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; }
+    .hint-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: block; }
+
+    .drop-animasi { animation: saringMasuk 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    @keyframes saringMasuk {
+      0% { opacity: 0.5; transform: scale(0.98) translateY(2px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Style untuk item kunci yang sedang dipinjam / disabled */
+    .disabled-item {
+      background-color: #f8fafc;
+      pointer-events: none; /* Mencegah klik sama sekali */
+      user-select: none;    /* Mencegah teks di-block */
+      border-radius: 4px;
+    }
+
+    .disabled-item input[type="checkbox"] {
+      opacity: 0.5;
+    }
+/* === PERBAIKAN LOADING DOTS RATA TENGAH === */
 .dots-loader-wrapper {
   display: flex !important;
   flex-direction: column !important;
@@ -31,214 +514,135 @@
   gap: 8px !important;
 }
 
-.dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  animation: pulseDot 1.2s infinite ease-in-out;
-}
-
-.dot:nth-child(1) { background-color: #ff9100; animation-delay: 0s; }
-.dot:nth-child(2) { background-color: #ff5722; animation-delay: 0.15s; }
-.dot:nth-child(3) { background-color: #f44336; animation-delay: 0.3s; }
-.dot:nth-child(4) { background-color: #e91e63; animation-delay: 0.45s; }
-.dot:nth-child(5) { background-color: #d500f9; animation-delay: 0.6s; }
-
-@keyframes pulseDot {
-  0%, 100% { transform: scale(0.6); opacity: 0.4; }
-  50% { transform: scale(1.25); opacity: 1; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); }
-}
-
 .dots-loader-text {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-  font-weight: 500;
   text-align: center !important;
   width: 100% !important;
   white-space: normal !important;
 }
+/* ==========================================
+   1. ATURAN DESKTOP (TETAP SEPERTI AWAL)
+   ========================================== */
+.col-foto-mobile {
+  display: none !important;
+}
+
+.btn-toggle-foto-desktop {
+  display: inline-block;
+}
+
 
 /* ==========================================
-   2. STRUKTUR UTAMA & LATAR BELAKANG
+   2. ATURAN MOBILE (PRESISI SESUAI GAMBAR)
    ========================================== */
-html {
-  background-color: #F8FAFC !important; 
+@media screen and (max-width: 768px) {
+  /* Sembunyikan elemen tabel desktop */
+  #tabelMonitor thead,
+  .btn-toggle-foto-desktop,
+  .row-foto-desktop {
+    display: none !important;
+  }
+
+  #tabelMonitor, 
+  #tabelMonitor tbody {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* WADAH KARTU (Bentuk Card persis gambar: Border melengkung 20px) */
+  #tabelMonitor tbody tr.row-main-kunci {
+    display: grid !important;
+    grid-template-columns: 1fr 140px !important; /* Kiri: Teks | Kanan: Foto 140px */
+    gap: 12px !important;
+    background: #ffffff !important;
+    border: 2px solid #64748b !important; /* Garis tepi luar kartu */
+    border-radius: 20px !important; /* Sudut melengkung halus */
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    align-items: center !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* KOLOM KIRI: Teks Menumpuk Vertikal Sesuai Sketsa (Tanpa Garis Pembatas) */
+  #tabelMonitor tbody tr.row-main-kunci > td:not(.col-foto-mobile) {
+    display: block !important;
+    border: none !important; /* Menghapus semua garis pembatas antar baris */
+    padding: 2px 0 !important;
+    font-size: 14px !important;
+    color: #1e293b !important;
+    text-align: left !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Baris Pertama (Nomor Kunci) Dibuat Lebih Tebal */
+  #tabelMonitor tbody tr.row-main-kunci > td:first-child {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  /* KOLOM KANAN: Foto Penuh Sejajar Kartu */
+  #tabelMonitor tbody tr.row-main-kunci > td.col-foto-mobile {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  /* Tampilan Gambar di Dalam Kartu Mobile */
+  .img-card-mobile {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 150px !important;
+    max-height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important; /* Sudut foto melengkung */
+  }
+
+  .no-foto-mobile {
+    width: 100%;
+    height: 100%;
+    min-height: 140px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+  }
+}
+    /* ==========================================
+   1. ATURAN TAMPILAN DESKTOP / LANDSCAPE
+   ========================================== */
+/* Sembunyikan elemen foto mobile di layar komputer/desktop */
+.col-foto-mobile {
+  display: none !important;
 }
 
-body {
-  font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
-  margin: 0; 
-  padding: 0 !important;
-  color: #0d9488; 
-  line-height: 1.5;
-  background: transparent !important;
-}
-
-.video-bg {
-  display: block !important;
-  visibility: visible !important;
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  z-index: -100 !important; 
-  object-fit: cover;
-  opacity: 0.25 !important; 
-  filter: grayscale(30%) contrast(110%);
-  pointer-events: none;
-}
-
-.video-background-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -100;
-  overflow: hidden;
-  pointer-events: none;
-  background-color: #F8FAFC; 
-}
-
-.video-background-container iframe {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100vw;
-  height: 56.25vw;
-  min-height: 100vh;
-  min-width: 177.77vh;
-  transform: translate(-50%, -50%);
-  opacity: 0.25; 
-  filter: grayscale(40%) contrast(110%);
-}
-
-:root {
-  --primary: #0052FF;
-  --danger: #EF4444; 
-  --success: #22C55E;
-  --dark: #0F172A;
-  --text-muted: #64748B;
+.btn-toggle-foto-desktop {
+  display: inline-block;
 }
 
 /* ==========================================
-   3. KONTAINER UTAMA & TABEL DESKTOP
+   DESKTOP RULE (Sembunyikan foto mobile di layar laptop/PC)
    ========================================== */
-.container { 
-  max-width: 600px; 
-  background: #FFFFFF !important; 
-  padding: 32px; 
-  border-radius: 16px; 
-  margin: 40px auto 30px auto;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-  border: 1px solid #E2E8F0;
+.col-foto-mobile {
+  display: none !important;
 }
 
-.monitor-container { 
-  max-width: 1100px; 
-  overflow-x: auto;
-  background: transparent !important; 
-  box-shadow: none !important;        
-  border: none !important;            
-  padding: 16px; 
-  margin: 20px auto 40px auto !important;
-}
-
-main, section, .wrapper, .content, .main-content {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-h2 { 
-  text-align: center; 
-  margin-top: 0; 
-  font-weight: 700; 
-  font-size: 24px; 
-  letter-spacing: -0.5px; 
-}
-h2.pinjam-title { color: var(--primary); }
-h2.kembali-title { color: var(--danger); }
-h2.monitor-title { color: var(--dark); margin-bottom: 20px; }
-
-table { 
-  width: 100%; 
-  border-collapse: separate !important; 
-  border-spacing: 0 8px !important; 
-  min-width: 700px; 
-  margin-top: 15px; 
-}
-
-th { 
-  background-color: transparent !important;
-  color: #64748B !important; 
-  font-size: 13px;
-  font-weight: 500;
-  padding: 12px 16px;
-  border-bottom: 1px solid #E2E8F0;
-  text-transform: none;
-  text-align: left;
-}
-
-tr { background: #FFFFFF; }
-
-td { 
-  padding: 16px; 
-  font-size: 14px;
-  color: #334155;
-  border-top: 1px solid #F1F5F9 !important;
-  border-bottom: 1px solid #F1F5F9 !important;
-}
-
-td:first-child {
-  border-left: 1px solid #F1F5F9 !important;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  color: #64748B;
-}
-
-td:last-child {
-  border-right: 1px solid #F1F5F9 !important;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-
-.monitor-container table tbody tr:hover td {
-  background-color: #F8FAFC !important;
-}
-
-.col-foto-mobile { display: none !important; }
-.btn-toggle-foto-desktop { display: inline-block; }
-
-/* BADGES & FORM INPUT */
-.badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
-.bg-dipinjam { background-color: #FEE2E2 !important; color: #EF4444 !important; border: none !important; }
-.bg-tersedia { background-color: #DCFCE7 !important; color: #22C55E !important; border: none !important; }
-
-.form-group { margin-bottom: 20px; }
-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #334155; }
-input, select { 
-  width: 100%; padding: 12px 16px; border: 1px solid #E2E8F0; border-radius: 8px; 
-  box-sizing: border-box; font-size: 15px; background-color: #F8FAFC; color: #0d9488;
+.btn-toggle-foto-desktop {
+  display: inline-block;
 }
 
 /* ============================================================
-   4. TAMPILAN KHUSUS MOBILE / PORTRAIT (<768px) - KARTU PRESISI
+   KHUSUS MOBILE / PORTRAIT (<768px) - KARTU PRESISI PRESISI 100%
    ============================================================ */
 @media screen and (max-width: 768px) {
-  /* Pembungkus pas 100% lebar layar */
-  html, body, .container, .monitor-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    overflow-x: hidden !important;
-  }
 
-  /* Sembunyikan header tabel & elemen foto desktop */
+  /* 1. Sembunyikan elemen tabel desktop */
   #tabelMonitor thead,
   table#tabelMonitor thead,
   .btn-toggle-foto-desktop,
@@ -246,7 +650,7 @@ input, select {
     display: none !important;
   }
 
-  /* Reset struktur tabel menjadi block */
+  /* 2. Reset struktur tabel menjadi block/bebas */
   #tabelMonitor,
   table#tabelMonitor,
   #tabelMonitor tbody,
@@ -256,29 +660,29 @@ input, select {
     box-sizing: border-box !important;
   }
 
-  /* WADAH KARTU UTAMA (Bingkai Luar Melengkung) */
+  /* 3. UBAH BARIS TABEL JADI BENTUK KARTU (CARD) */
   #tabelMonitor tbody tr,
   #tabelMonitor tbody tr.row-main-kunci {
     display: grid !important;
-    grid-template-columns: 1fr 130px !important; /* Kolom Kiri: Teks | Kolom Kanan: Foto 130px */
+    grid-template-columns: 1fr 130px !important; /* Kiri: Teks | Kanan: Foto 130px */
     gap: 2px 12px !important;
     background: #ffffff !important;
-    border: 2px solid #64748b !important; /* Garis tepi luar kartu */
-    border-radius: 20px !important; /* Sudut melengkung */
-    padding: 16px !important;
+    border: 2px solid #64748b !important; /* Bingkai melengkung presisi gambar */
+    border-radius: 18px !important;
+    padding: 14px !important;
     margin-bottom: 16px !important;
     align-items: center !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
     box-sizing: border-box !important;
   }
 
-  /* PAKSA SEMUA TD TEKS MASUK KE KOLOM KIRI (KOLOM 1) SEHINGGA MENUMPUK VERTIKAL */
+  /* 4. PAKSA SEMUA TD TEKS BERTUMPUK DI SEBELAH KIRI (KOLOM 1) */
   #tabelMonitor tbody tr.row-main-kunci > td:not(.col-foto-mobile) {
-    grid-column: 1 !important; /* Mencegah item lompat ke sebelah kanan */
+    grid-column: 1 !important; /* Kunci utama agar teks tidak lompat ke kanan */
     display: block !important;
     width: 100% !important;
     padding: 2px 0 !important;
-    border: none !important; /* Menghapus semua garis pembatas antar sel */
+    border: none !important; /* Menghapus garis pembatas antar cell */
     background: transparent !important;
     font-size: 13px !important;
     color: #1e293b !important;
@@ -287,17 +691,17 @@ input, select {
     box-sizing: border-box !important;
   }
 
-  /* Baris Pertama (Nomor Kunci) Tebal & Lebih Besar */
+  /* Kunci Pertama (Nomor Kunci) dibuat Tebal */
   #tabelMonitor tbody tr.row-main-kunci > td:first-child {
     font-size: 16px !important;
     font-weight: 800 !important;
     color: #0f172a !important;
   }
 
-  /* WADAH FOTO SEBELAH KANAN (SPANS DARI ATAS KE BAWAH) */
+  /* 5. WADAH FOTO DI SEBELAH KANAN (MENUTUP DARI ATAS KE BAWAH) */
   #tabelMonitor tbody tr.row-main-kunci > td.col-foto-mobile {
     grid-column: 2 !important;
-    grid-row: 1 / span 10 !important; /* Menutup tinggi kartu dari atas ke bawah */
+    grid-row: 1 / span 10 !important; /* Posisi di kanan dari atas sampai bawah */
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -307,7 +711,7 @@ input, select {
     border: none !important;
   }
 
-  /* GAMBAR FOTO MOBILE */
+  /* Tampilan Gambar Mobile */
   .img-card-mobile {
     width: 100% !important;
     height: 100% !important;
@@ -331,6 +735,7 @@ input, select {
     border: 1px dashed #cbd5e1;
   }
 }
+    
 </style>
 </head>
 <body>
