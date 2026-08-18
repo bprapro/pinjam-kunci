@@ -745,6 +745,39 @@
     border-radius: 10px !important;
   }
 }
+    /* ==========================================
+   FIX ELEMEN MEMUAT/LOADING AGAR PAS DI TENGAH
+   ========================================== */
+/* Memaksa wadah loading mengambil seluruh lebar kartu */
+tbody tr td:has(.dots-loader-wrapper),
+tbody tr:has(.dots-loader-wrapper) {
+  grid-column: 1 / -1 !important; /* Membentang penuh dari kolom 1 ke kanan */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Memastikan wrapper dan teks loading benar-benar di tengah */
+.dots-loader-wrapper {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 20px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.dots-loader-text {
+  text-align: center !important;
+  width: 100% !important;
+}
     
 </style>
 </head>
