@@ -745,6 +745,73 @@
     border-radius: 10px !important;
   }
 }
+
+    /* ==========================================
+   EFEK ZOOM FOTO (MODAL + BLUR BACKDROP)
+   ========================================== */
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.55); /* Latar belakang transparan gelap */
+  backdrop-filter: blur(12px); /* EFEK BLUR BACKGROUND */
+  -webkit-backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-modal.show {
+  display: flex !important;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* GAMBAR BESAR DI MODAL */
+.modal-content {
+  max-width: 85vw;
+  max-height: 75vh;
+  border-radius: 20px !important; /* SUDUT MEMBULAT / ROUNDED */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  transform: scale(0.85);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); /* TRANSIKSI POP-UP HALUS */
+  object-fit: contain;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-modal.show .modal-content {
+  transform: scale(1);
+}
+
+/* TOMBOL CLOSING (X) */
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 300;
+  cursor: pointer;
+  z-index: 100000;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+/* INDIKATOR FOTO BISA DIKLIK */
+tbody tr td img, .img-card-mobile {
+  cursor: pointer !important;
+  transition: transform 0.2s ease !important;
+}
+
+tbody tr td img:active, .img-card-mobile:active {
+  transform: scale(0.94) !important;
+}
     /* ==========================================
    FIX ELEMEN MEMUAT/LOADING AGAR PAS DI TENGAH
    ========================================== */
@@ -1775,11 +1842,50 @@ function toggleFoto(idRow) {
       });
     }
   });
+    // EVENT LISTENER UNTUK PREVIEW FOTO
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('imgModalTarget');
+  const closeBtn = document.querySelector('.modal-close');
+
+  // Deteksi klik pada foto (termasuk foto yang dimuat secara dinamis)
+  document.body.addEventListener('click', function(e) {
+    if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget') {
+      if (e.target.src && e.target.src !== '') {
+        modalImg.src = e.target.src;
+        modal.classList.add('show');
+      }
+    }
+  });
+
+  // Fungsi menutup modal
+  function closeModal() {
+    if (modal) {
+      modal.classList.remove('show');
+    }
+  }
+
+  // Klik tombol X atau klik area latar blur untuk menutup
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal || e.target === closeBtn) {
+        closeModal();
+      }
+    });
+  }
+});
 </script>
 
 <video id="bgVideo" loop muted playsinline class="video-bg">
   <source src="drone.mp4" type="video/mp4">
 </video>
 
+  <!-- MODAL PREVIEW FOTO -->
+<div id="imageModal" class="image-modal">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
+</div>
+  
 </body>
 </html>
