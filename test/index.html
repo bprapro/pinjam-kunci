@@ -909,6 +909,50 @@ tbody tr:has(.dots-loader-wrapper) {
         Kembalikan Kunci
       </button>
     </div>
+    <!-- TOMBOL TOGGLE LAYOUT DENAH -->
+<div style="text-align: center; margin: -10px 0 20px 0;">
+  <button type="button" id="btnToggleLayout" onclick="toggleDenahLayout()" style="
+    background: #F1F5F9;
+    color: #0F172A;
+    border: 1px solid #CBD5E1;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  ">
+    🗺️ Lihat Layout Mall
+  </button>
+</div>
+
+<!-- CONTAINER DENAH (Sembunyi Secara Bawaan) -->
+<div class="map-card" id="mapCardContainer" style="display: none;">
+  <h3 style="margin-top: 0; text-align: center; color: #1E293B; font-size: 16px;">Denah Pintu & Ruangan Mall</h3>
+  <p style="text-align: center; font-size: 12px; color: #64748B; margin-bottom: 12px;">
+    Klik titik pada denah untuk memilih kunci secara otomatis
+  </p>
+  
+  <div class="map-container">
+    <img src="LG.jpg" alt="Layout Mall" class="map-image">
+
+    <!-- Titik Pintu -->
+    <button type="button" class="pin-point" style="top: 40%; left: 30%;" data-kunci="B3 Room" title="B3 Room">
+      <span>1</span>
+    </button>
+
+    <button type="button" class="pin-point" style="top: 55%; left: 50%;" data-kunci="R. BTS" title="R. BTS">
+      <span>2</span>
+    </button>
+
+    <button type="button" class="pin-point" style="top: 70%; left: 75%;" data-kunci="R. PANEL SURYA" title="R. PANEL SURYA">
+      <span>3</span>
+    </button>
+  </div>
+</div>
 
     <div id="sectionPinjam" class="form-section active">
       <div class="map-card">
@@ -1976,6 +2020,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+    // Kode-kode JavaScript Anda yang lama...
+
+    // TARUH FUNGSI TOGGLE LAYOUT DI SINI
+    function toggleDenahLayout() {
+      const mapContainer = document.getElementById('mapCardContainer');
+      const btn = document.getElementById('btnToggleLayout');
+
+      if (mapContainer.style.display === 'none') {
+        mapContainer.style.display = 'block';
+        btn.innerHTML = '❌ Tutup Layout Mall';
+        btn.style.background = '#FEE2E2';
+        btn.style.borderColor = '#FCA5A5';
+        btn.style.color = '#991B1B';
+      } else {
+        mapContainer.style.display = 'none';
+        btn.innerHTML = '🗺️ Lihat Layout Mall';
+        btn.style.background = '#F1F5F9';
+        btn.style.borderColor = '#CBD5E1';
+        btn.style.color = '#0F172A';
+      }
+    }
 </script>
 </body>
 </html>
