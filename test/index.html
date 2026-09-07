@@ -10,104 +10,63 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-.map-card {
-  background: #FFFFFF;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-  border: 1px solid #E2E8F0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-
-.map-container {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 8px;
-  border: 1px solid #CBD5E1;
-}
-
-.map-image {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.pin-point {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  background-color: #2563EB;
-  color: #FFFFFF;
-  border: 2px solid #FFFFFF;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: bold;
-  cursor: pointer;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pin-point:hover, .pin-point.active {
-  background-color: #16A34A;
-  transform: translate(-50%, -50%) scale(1.25);
-  z-index: 10;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3);
-}   
     /* Container Loading Dots */
-.dots-loader-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 0;
-  gap: 12px;
-}
+    .dots-loader-wrapper {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 20px 0 !important;
+      box-sizing: border-box !important;
+    }
 
-.dots-loader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+    .dots-loader {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
 
-/* Bulatan Titik */
-.dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  animation: pulseDot 1.2s infinite ease-in-out;
-}
+    /* Bulatan Titik */
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      animation: pulseDot 1.2s infinite ease-in-out;
+    }
 
-/* Gradasi Warna 5 Titik (Orange -> Merah -> Pink -> Magenta) */
-.dot:nth-child(1) { background-color: #ff9100; animation-delay: 0s; }
-.dot:nth-child(2) { background-color: #ff5722; animation-delay: 0.15s; }
-.dot:nth-child(3) { background-color: #f44336; animation-delay: 0.3s; }
-.dot:nth-child(4) { background-color: #e91e63; animation-delay: 0.45s; }
-.dot:nth-child(5) { background-color: #d500f9; animation-delay: 0.6s; }
+    /* Gradasi Warna 5 Titik (Orange -> Merah -> Pink -> Magenta) */
+    .dot:nth-child(1) { background-color: #ff9100; animation-delay: 0s; }
+    .dot:nth-child(2) { background-color: #ff5722; animation-delay: 0.15s; }
+    .dot:nth-child(3) { background-color: #f44336; animation-delay: 0.3s; }
+    .dot:nth-child(4) { background-color: #e91e63; animation-delay: 0.45s; }
+    .dot:nth-child(5) { background-color: #d500f9; animation-delay: 0.6s; }
 
-/* Keyframe Membesar & Mengecil */
-@keyframes pulseDot {
-  0%, 100% {
-    transform: scale(0.6);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.25);
-    opacity: 1;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  }
-}
+    /* Keyframe Membesar & Mengecil */
+    @keyframes pulseDot {
+      0%, 100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+      }
+      50% {
+        transform: scale(1.25);
+        opacity: 1;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
 
-.dots-loader-text {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-  font-weight: 500;
-}
+    .dots-loader-text {
+      font-size: 13px;
+      color: #64748b;
+      margin: 10px 0 0 0;
+      font-weight: 500;
+      text-align: center !important;
+      width: 100% !important;
+      white-space: normal !important;
+    }
+
     /* ==========================================
        1. STRUKTUR UTAMA & LATAR BELAKANG
        ========================================== */
@@ -139,31 +98,6 @@
       opacity: 0.25 !important; 
       filter: grayscale(30%) contrast(110%);
       pointer-events: none;
-    }
-
-    .video-background-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -100;
-      overflow: hidden;
-      pointer-events: none;
-      background-color: #F8FAFC; 
-    }
-
-    .video-background-container iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 56.25vw;
-      min-height: 100vh;
-      min-width: 177.77vh;
-      transform: translate(-50%, -50%);
-      opacity: 0.25; 
-      filter: grayscale(40%) contrast(110%);
     }
 
     :root {
@@ -215,7 +149,7 @@
     h2.monitor-title { color: var(--dark); margin-bottom: 20px; }
 
     /* ==========================================
-       3. STRUKTUR TABEL (GAYA KARTU MELAYANG/SPACED)
+       3. STRUKTUR TABEL DESKTOP
        ========================================== */
     table { 
       width: 100%; 
@@ -263,53 +197,17 @@
       background-color: #F8FAFC !important;
     }
 
-    .monitor-container table tbody tr {
-      transition: background-color 0.2s ease;
-    }
-
     /* ==========================================
-       4. BADGE STATUS PASTEL (SOFT BADGES)
+       4. BADGE STATUS
        ========================================== */
-    .badge { 
-      padding: 6px 12px; 
-      border-radius: 20px; 
-      font-size: 12px; 
-      font-weight: 500; 
-      display: inline-block; 
-    }
-
-    .bg-dipinjam { 
-      background-color: #FEE2E2 !important; 
-      color: #EF4444 !important; 
-      border: none !important;
-    }
-
-    .bg-tersedia { 
-      background-color: #DCFCE7 !important; 
-      color: #22C55E !important; 
-      border: none !important;
-    }
-
-    @keyframes kedipWarning {
-      0% { background-color: #FFFFFF; }
-      50% { background-color: #FEF08A; }
-      100% { background-color: #FFFFFF; }
-    }
-
-    .baris-terlambat td {
-      animation: kedipWarning 2.5s infinite ease-in-out;
-    }
-    .baris-terlambat td:first-child {
-      border-left: 4px solid #EAB308 !important;
-    }
-
-    @keyframes pulse-warning {
-      0% { background-color: rgba(254, 240, 138, 0.2); }
-      50% { background-color: rgba(254, 240, 138, 0.5); }
-      100% { background-color: rgba(254, 240, 138, 0.2); }
-    }
-    .row-terlambat td {
-      animation: pulse-warning 3s infinite ease-in-out !important;
+    .badge-dipinjam { 
+      background-color: #EF4444 !important; 
+      color: #FFFFFF !important; 
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
     }
 
     /* ==========================================
@@ -348,26 +246,12 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    select:focus {
-      background-image: url("data:image/svg+xml;utf8,<svg fill='%230052FF' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M12 8l-5 5h10z'/></svg>");
-    }
-
-    .search-box, .filter-row select {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .search-box:focus {
-      border-color: var(--primary) !important;
-      box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.1);
-    }
-
     .autocomplete-wrapper { position: relative; width: 100%; }
 
     #nama_kembali, #nama_hint {
       font-family: 'Poppins', sans-serif !important;
       font-size: 15px !important;      
       font-weight: 400 !important;      
-      letter-spacing: normal !important;
       line-height: 1.5 !important;      
       padding: 12px 16px !important;    
       box-sizing: border-box !important;
@@ -445,34 +329,28 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form, .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang, #btnCariKunci, .btn-refresh, .btn-page { 
+    .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form, .btn-buka-cam, .btn-refresh, .btn-page { 
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
-    .btn-submit-pinjam svg, .btn-submit-kembali svg, .btn-kembali-form svg, .btn-buka-cam svg, .btn-ambil-foto svg, .btn-foto-ulang svg, #btnCariKunci svg {
-      width: 18px; height: 18px; fill: white;
-    }
 
     .btn-submit-pinjam, .btn-submit-kembali, .btn-kembali-form { 
-      border: none; font-size: 15px; cursor: pointer; font-weight: 600; padding: 14px; border-radius: 8px;
+      border: none; font-size: 15px; cursor: pointer; font-weight: 600; padding: 14px; border-radius: 8px; width: 100%;
     }
     .btn-submit-pinjam { background-color: #619A7E; color: white; }
     .btn-submit-kembali { background-color: #DF2C3E; color: white; }
     .btn-kembali-form { background-color: #64748B; color: white; width: auto; padding: 12px 24px; }
-    .btn-submit-pinjam:hover, .btn-submit-kembali:hover, .btn-kembali-form:hover { opacity: 0.9; }
 
     .filter-row { display: flex; gap: 10px; margin-bottom: 10px; }
     .search-box { margin-bottom: 10px; background-color: #FFFFFF; border: 1px solid #E2E8F0; }
 
     .btn-refresh { background-color: #FFFFFF; color: var(--text-muted); border: 1px solid #E2E8F0; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; float: right; width: auto; }
     .btn-refresh svg { width: 14px; height: 14px; fill: var(--text-muted); }
-    .btn-refresh:hover { background-color: #F1F5F9; color: var(--dark); }
-    .btn-refresh:hover svg { fill: var(--dark); }
 
     /* ==========================================
-       7. NAVIGASI PAGINASI (PAGINATION)
+       7. PAGINASI
        ========================================== */
     .pagination-controls { 
       display: flex; 
@@ -495,406 +373,176 @@
       color: #475569; 
     }
     .btn-page svg { width: 14px; height: 14px; fill: #475569; }
-    .btn-page:hover:not(:disabled) { background-color: #F1F5F9; color: #0d9488; }
     .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
     #infoHalaman { font-size: 14px; font-weight: 500; color: #64748B; }
 
     /* ==========================================
-       8. ELEMEN PENDUKUNG (KAMERA, ANIMASI, ETC)
+       8. ELEMEN PENDUKUNG & TRANSISI
        ========================================== */
-    video:not(.video-bg), canvas { 
-      display: none; 
-      width: 100%; 
-      max-width: 100%; 
-      border-radius: 12px; 
-      background: #0F172A; 
-      margin: 12px auto 0 auto; 
-    }
-
     .foto-container { text-align: center; margin-top: 10px; background: #F1F5F9; padding: 15px; border-radius: 12px; border: 1px dashed #CBD5E1; }
-    .btn-buka-cam, .btn-ambil-foto, .btn-foto-ulang { border: none; border-radius: 8px; padding: 12px 20px; font-weight: 600; cursor: pointer; }
-    .btn-buka-cam { background-color: #475569; color: white; }
-    .btn-buka-cam:hover { background-color: #334155; }
-    .btn-ambil-foto { background-color: #619A7E; color: white; display: none; margin-top: 10px; }
-    .btn-foto-ulang { background-color: #94A3B8; color: white; display: none; margin-top: 10px; }
 
     .form-section { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease, transform 0.35s ease; }
     .form-section.active { display: block; opacity: 1; transform: translateY(0); }
-    [id^="foto-row-"] { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+    
     .success-screen { display: none; text-align: center; padding: 20px 10px; }
     .success-screen h3 { color: var(--dark); font-size: 28px; margin-bottom: 12px; font-weight: 700; }
     .success-screen p { color: var(--text-muted); font-size: 15px; margin-bottom: 25px; }
     .hint-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: block; }
 
-    .drop-animasi { animation: saringMasuk 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    @keyframes saringMasuk {
-      0% { opacity: 0.5; transform: scale(0.98) translateY(2px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
+    /* RULES DESKTOP & MOBILE RESPONSIVE */
+    .col-foto-mobile { display: none !important; }
+    .btn-toggle-foto-desktop { display: inline-block; }
+
+    @media screen and (max-width: 768px) {
+      html, body, .container, .monitor-container, table, #tabelMonitor {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+      }
+
+      .monitor-container table thead,
+      .btn-toggle-foto-desktop,
+      .row-foto-desktop {
+        display: none !important;
+      }
+
+      .monitor-container table, 
+      .monitor-container tbody {
+        display: block !important;
+        width: 100% !important;
+      }
+
+      .monitor-container tbody tr.row-main-kunci {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 95px !important; 
+        gap: 0 10px !important;
+        background: #ffffff !important;
+        border: 2px solid #64748b !important;
+        border-radius: 16px !important;
+        padding: 12px !important;
+        margin-bottom: 14px !important;
+        align-items: stretch !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        box-sizing: border-box !important;
+      }
+
+      .monitor-container tbody tr.row-main-kunci > td {
+        grid-column: 1 !important;
+        display: block !important;
+        width: 100% !important;
+        padding: 2px 0 !important;
+        border: none !important;
+        background: transparent !important;
+        font-size: 13px !important;
+        color: #334155 !important;
+        text-align: left !important;
+        word-break: break-word !important;
+      }
+
+      .monitor-container tbody tr.row-main-kunci > td:first-child {
+        font-size: 16px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+      }
+
+      .monitor-container tbody tr.row-main-kunci > td.col-foto-mobile {
+        grid-column: 2 !important;
+        grid-row: 1 / span 10 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 100% !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+
+      .img-card-mobile {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        border-radius: 10px !important;
+      }
+
+      .no-foto-mobile {
+        width: 100%;
+        height: 100%;
+        min-height: 100px;
+        background: #f1f5f9;
+        color: #94a3b8;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        border: 1px dashed #cbd5e1;
+      }
     }
 
-    /* Style untuk item kunci yang sedang dipinjam / disabled */
-    .disabled-item {
-      background-color: #f8fafc;
-      pointer-events: none; /* Mencegah klik sama sekali */
-      user-select: none;    /* Mencegah teks di-block */
-      border-radius: 4px;
+    /* ==========================================
+       EFEK ZOOM FOTO (MODAL)
+       ========================================== */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 99999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
     }
 
-    .disabled-item input[type="checkbox"] {
-      opacity: 0.5;
+    .image-modal.show {
+      display: flex !important;
+      opacity: 1;
+      pointer-events: auto;
     }
-/* === PERBAIKAN LOADING DOTS RATA TENGAH === */
-.dots-loader-wrapper {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 15px 0 !important;
-  box-sizing: border-box !important;
-}
 
-.dots-loader {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
+    .modal-content {
+      max-width: 85vw;
+      max-height: 75vh;
+      border-radius: 20px !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      transform: scale(0.85);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      object-fit: contain;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
 
-.dots-loader-text {
-  text-align: center !important;
-  width: 100% !important;
-  white-space: normal !important;
-}
-/* ==========================================
-   1. ATURAN DESKTOP (TETAP SEPERTI AWAL)
-   ========================================== */
-.col-foto-mobile {
-  display: none !important;
-}
+    .image-modal.show .modal-content {
+      transform: scale(1);
+    }
 
-.btn-toggle-foto-desktop {
-  display: inline-block;
-}
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      color: #ffffff;
+      font-size: 36px;
+      font-weight: 300;
+      cursor: pointer;
+      z-index: 100000;
+      line-height: 1;
+    }
 
+    tbody tr td img, .img-card-mobile {
+      cursor: pointer !important;
+      transition: transform 0.2s ease !important;
+    }
 
-/* ==========================================
-   2. ATURAN MOBILE (PRESISI SESUAI GAMBAR)
-   ========================================== */
-@media screen and (max-width: 768px) {
-  /* Sembunyikan elemen tabel desktop */
-  #tabelMonitor thead,
-  .btn-toggle-foto-desktop,
-  .row-foto-desktop {
-    display: none !important;
-  }
-
-  #tabelMonitor, 
-  #tabelMonitor tbody {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  /* WADAH KARTU (Bentuk Card persis gambar: Border melengkung 20px) */
-  #tabelMonitor tbody tr.row-main-kunci {
-    display: grid !important;
-    grid-template-columns: 1fr 140px !important; /* Kiri: Teks | Kanan: Foto 140px */
-    gap: 12px !important;
-    background: #ffffff !important;
-    border: 2px solid #64748b !important; /* Garis tepi luar kartu */
-    border-radius: 20px !important; /* Sudut melengkung halus */
-    padding: 16px !important;
-    margin-bottom: 16px !important;
-    align-items: center !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-  }
-
-  /* KOLOM KIRI: Teks Menumpuk Vertikal Sesuai Sketsa (Tanpa Garis Pembatas) */
-  #tabelMonitor tbody tr.row-main-kunci > td:not(.col-foto-mobile) {
-    display: block !important;
-    border: none !important; /* Menghapus semua garis pembatas antar baris */
-    padding: 2px 0 !important;
-    font-size: 14px !important;
-    color: #1e293b !important;
-    text-align: left !important;
-    line-height: 1.4 !important;
-  }
-
-  /* Baris Pertama (Nomor Kunci) Dibuat Lebih Tebal */
-  #tabelMonitor tbody tr.row-main-kunci > td:first-child {
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    color: #0f172a !important;
-  }
-
-  /* KOLOM KANAN: Foto Penuh Sejajar Kartu */
-  #tabelMonitor tbody tr.row-main-kunci > td.col-foto-mobile {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 100% !important;
-    padding: 0 !important;
-    border: none !important;
-  }
-
-  /* Tampilan Gambar di Dalam Kartu Mobile */
-  .img-card-mobile {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 150px !important;
-    max-height: 200px !important;
-    object-fit: cover !important;
-    border-radius: 12px !important; /* Sudut foto melengkung */
-  }
-
-  .no-foto-mobile {
-    width: 100%;
-    height: 100%;
-    min-height: 140px;
-    background: #f1f5f9;
-    color: #94a3b8;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    border: 1px dashed #cbd5e1;
-  }
-}
-    /* ==========================================
-   1. ATURAN TAMPILAN DESKTOP / LANDSCAPE
-   ========================================== */
-/* Sembunyikan elemen foto mobile di layar komputer/desktop */
-.col-foto-mobile {
-  display: none !important;
-}
-
-.btn-toggle-foto-desktop {
-  display: inline-block;
-}
-
-/* ==========================================
-   DESKTOP RULE (Sembunyikan foto mobile di layar laptop/PC)
-   ========================================== */
-.col-foto-mobile {
-  display: none !important;
-}
-
-.btn-toggle-foto-desktop {
-  display: inline-block;
-}
-
-@media screen and (max-width: 768px) {
-
-  /* 0. MATIKAN LEBAR MINIMAL SEMUA WADAH / CONTAINER AGAR TIDAK SCROLL */
-  html, body, .container, .monitor-container, table, #tabelMonitor {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important; /* KUNCI: Menghapus paksa min-width 700px dari desktop */
-    box-sizing: border-box !important;
-    overflow-x: hidden !important;
-  }
-
-  /* 1. SEMBUNYIKAN HEADER TABEL & ELEMEN DESKTOP */
-  #tabelMonitor thead,
-  table thead,
-  .btn-toggle-foto-desktop,
-  .row-foto-desktop {
-    display: none !important;
-  }
-
-  /* 2. RESET STRUKTUR TABEL */
-  #tabelMonitor, table, tbody {
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 3. BINGKAI KARTU UTAMA (FLEKSIBEL 100% LAYAR) */
-  tbody tr {
-    display: grid !important;
-    /* minmax(0, 1fr) mencegah teks panjang mendorong lebar kartu ke luar layar */
-    grid-template-columns: minmax(0, 1fr) 95px !important; 
-    gap: 0 10px !important;
-    background: #ffffff !important;
-    border: 2px solid #64748b !important;
-    border-radius: 16px !important;
-    padding: 12px !important;
-    margin-bottom: 14px !important;
-    align-items: stretch !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-    box-sizing: border-box !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  /* 4. HILANGKAN GARIS TEPI & STRIPING LATAR DALAM TABEL */
-  tbody tr td {
-    grid-column: 1 !important;
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    padding: 2px 0 !important;
-    border: none !important;
-    background: transparent !important;
-    font-size: 13px !important;
-    color: #334155 !important;
-    text-align: left !important;
-    box-shadow: none !important;
-    word-break: break-word !important; /* Mencegah teks panjang melebarkan kartu */
-  }
-
-  /* Nomor Kunci / Judul Paling Atas */
-  tbody tr td:first-child {
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    color: #0f172a !important;
-    padding-bottom: 4px !important;
-  }
-
-  /* 5. STABILO MERAH UNTUK STATUS DIPINJAM */
-  .bg-dipinjam, 
-  .badge-dipinjam,
-  .badge {
-    background-color: #EF4444 !important;
-    color: #FFFFFF !important;
-    padding: 3px 10px !important;
-    border-radius: 6px !important;
-    font-weight: 700 !important;
-    font-size: 12px !important;
-    display: inline-block !important;
-    width: fit-content !important;
-    margin: 2px 0 !important;
-  }
-
-  /* 6. FOTO FIT ATAS-BAWAH TANPA MERUBAH RASIO */
-  tbody tr td.col-foto-mobile,
-  tbody tr td:last-child {
-    grid-column: 2 !important;
-    grid-row: 1 / span 10 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 100% !important;
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    min-width: 0 !important;
-  }
-
-  .img-card-mobile,
-  tbody tr td.col-foto-mobile img,
-  tbody tr td:last-child img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 10px !important;
-  }
-}
-
-    /* ==========================================
-   EFEK ZOOM FOTO (MODAL + BLUR BACKDROP)
-   ========================================== */
-.image-modal {
-  display: none;
-  position: fixed;
-  z-index: 99999;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(15, 23, 42, 0.55); /* Latar belakang transparan gelap */
-  backdrop-filter: blur(12px); /* EFEK BLUR BACKGROUND */
-  -webkit-backdrop-filter: blur(12px);
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.image-modal.show {
-  display: flex !important;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* GAMBAR BESAR DI MODAL */
-.modal-content {
-  max-width: 85vw;
-  max-height: 75vh;
-  border-radius: 20px !important; /* SUDUT MEMBULAT / ROUNDED */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-  transform: scale(0.85);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); /* TRANSIKSI POP-UP HALUS */
-  object-fit: contain;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.image-modal.show .modal-content {
-  transform: scale(1);
-}
-
-/* TOMBOL CLOSING (X) */
-.modal-close {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  color: #ffffff;
-  font-size: 36px;
-  font-weight: 300;
-  cursor: pointer;
-  z-index: 100000;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-
-/* INDIKATOR FOTO BISA DIKLIK */
-tbody tr td img, .img-card-mobile {
-  cursor: pointer !important;
-  transition: transform 0.2s ease !important;
-}
-
-tbody tr td img:active, .img-card-mobile:active {
-  transform: scale(0.94) !important;
-}
-    /* ==========================================
-   FIX ELEMEN MEMUAT/LOADING AGAR PAS DI TENGAH
-   ========================================== */
-/* Memaksa wadah loading mengambil seluruh lebar kartu */
-tbody tr td:has(.dots-loader-wrapper),
-tbody tr:has(.dots-loader-wrapper) {
-  grid-column: 1 / -1 !important; /* Membentang penuh dari kolom 1 ke kanan */
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 100% !important;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-/* Memastikan wrapper dan teks loading benar-benar di tengah */
-.dots-loader-wrapper {
-  grid-column: 1 / -1 !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 20px 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center !important;
-}
-
-.dots-loader-text {
-  text-align: center !important;
-  width: 100% !important;
-}
-    
-</style>
+    tbody tr td img:active, .img-card-mobile:active {
+      transform: scale(0.94) !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -909,77 +557,12 @@ tbody tr:has(.dots-loader-wrapper) {
         Kembalikan Kunci
       </button>
     </div>
-    <!-- TOMBOL TOGGLE LAYOUT DENAH -->
-<div style="text-align: center; margin: -10px 0 20px 0;">
-  <button type="button" id="btnToggleLayout" onclick="toggleDenahLayout()" style="
-    background: #F1F5F9;
-    color: #0F172A;
-    border: 1px solid #CBD5E1;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  ">
-    🗺️ Lihat Layout Mall
-  </button>
-</div>
 
-<!-- CONTAINER DENAH (Sembunyi Secara Bawaan) -->
-<div class="map-card" id="mapCardContainer" style="display: none;">
-  <h3 style="margin-top: 0; text-align: center; color: #1E293B; font-size: 16px;">Denah Pintu & Ruangan Mall</h3>
-  <p style="text-align: center; font-size: 12px; color: #64748B; margin-bottom: 12px;">
-    Klik titik pada denah untuk memilih kunci secara otomatis
-  </p>
-  
-  <div class="map-container">
-    <img src="LG.jpg" alt="Layout Mall" class="map-image">
-
-    <!-- Titik Pintu -->
-    <button type="button" class="pin-point" style="top: 40%; left: 30%;" data-kunci="B3 Room" title="B3 Room">
-      <span>1</span>
-    </button>
-
-    <button type="button" class="pin-point" style="top: 55%; left: 50%;" data-kunci="R. BTS" title="R. BTS">
-      <span>2</span>
-    </button>
-
-    <button type="button" class="pin-point" style="top: 70%; left: 75%;" data-kunci="R. PANEL SURYA" title="R. PANEL SURYA">
-      <span>3</span>
-    </button>
-  </div>
-</div>
-
+    <!-- FORM PINJAM -->
     <div id="sectionPinjam" class="form-section active">
-      <div class="map-card">
-  <h3 style="margin-top: 0; text-align: center; color: #1E293B; font-size: 16px;">Denah Pintu & Ruangan Mall</h3>
-  <p style="text-align: center; font-size: 12px; color: #64748B; margin-bottom: 12px;">
-    Klik titik pada denah untuk memilih kunci secara otomatis
-  </p>
-  
-  <div class="map-container">
-    <img src="LG.jpg" alt="Layout Mall" class="map-image">
-
-    <button type="button" class="pin-point" style="top: 40%; left: 30%;" data-kunci="B3 Room" title="B3 Room">
-      <span>1</span>
-    </button>
-
-    <button type="button" class="pin-point" style="top: 55%; left: 50%;" data-kunci="R. BTS" title="R. BTS">
-      <span>2</span>
-    </button>
-
-    <button type="button" class="pin-point" style="top: 70%; left: 75%;" data-kunci="R. PANEL SURYA" title="R. PANEL SURYA">
-      <span>3</span>
-    </button>
-  </div>
-</div>
       <h2 style="color: #5e9e82 !important; font-weight: 700; text-align: center; margin-bottom: 20px;">
-  Form Kunci 23 Semarang
-</h2>
+        Form Kunci 23 Semarang
+      </h2>
       <form id="formPinjam">
         <input type="hidden" name="aksi" value="pinjam">
         
@@ -1014,55 +597,51 @@ tbody tr:has(.dots-loader-wrapper) {
           <input type="date" id="estimasi_tgl" name="estimasi_tgl" required>
         </div>
         
-        <div class="form-group foto-container" style="text-align: center;">
-  <label style="font-size: 13px; font-weight: 600; color: var(--dark); display: block; margin-bottom: 12px; text-align: center;">
-    Dokumentasi Foto Ambil Kunci:
-  </label>
-  
-  <input type="hidden" name="foto" id="fotoP" required>
-  
-  <!-- Opsi Tombol Kamera & Galeri (Di-set Center) -->
-  <div style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 10px;">
-    <!-- Tombol Kamera -->
-    <button type="button" class="btn-opt-foto" onclick="ambilFotoPinjam('camera')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #5e9e82; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#4e8970'" onmouseout="this.style.background='#5e9e82'">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-    <circle cx="12" cy="13" r="3"/>
-  </svg>
-  Buka Kamera
-</button>
-    
-    <!-- Tombol Galeri -->
-    <button type="button" class="btn-opt-foto" onclick="ambilFotoPinjam('file')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #64748b; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <polyline points="21 15 16 10 5 21"/>
-      </svg>
-      Pilih Galeri
-    </button>
-    
-    <!-- Indicator Status -->
-    <span id="status_fotoP" style="font-size: 12px; color: #ef4444; font-weight: 500;">(Wajib Foto)</span>
-  </div>
+        <div class="form-group foto-container">
+          <label style="font-size: 13px; font-weight: 600; color: var(--dark); display: block; margin-bottom: 12px;">
+            Dokumentasi Foto Ambil Kunci:
+          </label>
+          
+          <input type="hidden" name="foto" id="fotoP" required>
+          
+          <div style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 10px;">
+            <button type="button" class="btn-opt-foto" onclick="ambilFotoPinjam('camera')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #5e9e82; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                <circle cx="12" cy="13" r="3"/>
+              </svg>
+              Buka Kamera
+            </button>
+            
+            <button type="button" class="btn-opt-foto" onclick="ambilFotoPinjam('file')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #64748b; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              Pilih Galeri
+            </button>
+            
+            <span id="status_fotoP" style="font-size: 12px; color: #ef4444; font-weight: 500;">(Wajib Foto)</span>
+          </div>
 
-  <!-- Area Preview Gambar (Juga Di-set Center) -->
-  <div id="previewBoxP" style="display: none; margin-top: 10px; text-align: center;">
-    <img id="imgPreviewP" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 0 auto;">
-  </div>
-</div>
+          <div id="previewBoxP" style="display: none; margin-top: 10px; text-align: center;">
+            <img id="imgPreviewP" alt="Preview Pass" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 0 auto;">
+          </div>
+        </div>
         
-        <button type="submit" id="btnSubmitPinjam" class="btn-submit-pinjam" style="margin: 25px auto 0 auto; display: flex;">
-          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        <button type="submit" id="btnSubmitPinjam" class="btn-submit-pinjam" style="margin-top: 25px;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           Kirim Data Peminjaman
         </button>
       </form>
     </div>
 
+    <!-- FORM KEMBALI -->
     <div id="sectionKembali" class="form-section">
       <h2 class="kembali-title" style="color: #be123c; font-weight: 700; text-align: center; margin-bottom: 20px;">
-  Formulir Pengembalian Kunci
-</h2>
+        Formulir Pengembalian Kunci
+      </h2>
       <form id="formKembali">
         <input type="hidden" name="aksi" value="kembali">
         
@@ -1083,7 +662,7 @@ tbody tr:has(.dots-loader-wrapper) {
           </div>
           <span class="hint-text">Tekan tombol <b>Tab</b> atau <b>Panah Kanan</b> untuk melengkapi nama secara otomatis.</span>
           <button type="button" id="btnCariKunci" style="background-color: #619A7E; color:white; margin-top: 10px; font-size: 14px; padding: 10px; cursor:pointer; border:none; border-radius:6px; font-weight:600; width: 100%;">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             Cari Kunci Saya
           </button>
         </div>
@@ -1099,13 +678,14 @@ tbody tr:has(.dots-loader-wrapper) {
           </div>
         </div>
 
-        <button type="submit" id="btnSubmitKembali" class="btn-submit-kembali" style="margin: 25px auto 0 auto; display: flex;">
-          <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+        <button type="submit" id="btnSubmitKembali" class="btn-submit-kembali" style="margin-top: 25px;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
           Proses Pengembalian Kunci
         </button>
       </form>
     </div>
 
+    <!-- TAMPILAN SUKSES -->
     <div id="screenSukses" class="success-screen">
       <h3>✨ Terima Kasih!</h3>
       <p id="pesanSukses">Aktivitas Anda telah berhasil direkam ke dalam sistem database.</p>
@@ -1116,13 +696,14 @@ tbody tr:has(.dots-loader-wrapper) {
     </div>
   </div>
 
+  <!-- MONITOR TABLE -->
   <div class="monitor-container">
     <button class="btn-refresh" onclick="muatMonitorData()">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
       Segarkan Data
     </button>
     <h2 class="monitor-title" style="text-align: left;">Daftar Kunci Dipinjam</h2>
-    <table>
+    <table id="tabelMonitor">
       <thead>
         <tr>
           <th>ID Kunci</th>
@@ -1152,161 +733,77 @@ tbody tr:has(.dots-loader-wrapper) {
     </div>
   </div>
 
+  <video id="bgVideo" loop muted playsinline class="video-bg">
+    <source src="drone.mp4" type="video/mp4">
+  </video>
+
+  <!-- MODAL PREVIEW FOTO -->
+  <div id="imageModal" class="image-modal">
+    <span class="modal-close">&times;</span>
+    <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
+  </div>
+
   <script>
-    // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
     const scriptUrl = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
 
-  let semuaDataKunci = [];
-  let dataMonitorTerpinjam = [];
-  let streamKameraAktif = null;
-  let tabAktifSekarang = 'pinjam';
+    let semuaDataKunci = [];
+    let dataMonitorTerpinjam = [];
+    let tabAktifSekarang = 'pinjam';
 
-  let halamanSekarang = 1;
-  const barisPerHalaman = 10;
+    let halamanSekarang = 1;
+    const barisPerHalaman = 10;
 
-  /* ==========================================
-     1. NAVIGASI TAB & TRANSISI FORM
-     ========================================== */
-  function gantiTab(tipe) {
-    if (tabAktifSekarang === tipe && document.querySelector('.form-section.active')) return;
+    /* ==========================================
+       1. NAVIGASI TAB & TRANSISI FORM
+       ========================================== */
+    function gantiTab(tipe) {
+      if (tabAktifSekarang === tipe && document.querySelector('.form-section.active')) return;
 
-    tabAktifSekarang = tipe;
-    matikanKamera();
+      tabAktifSekarang = tipe;
 
-    document.querySelectorAll('.tab-btn').forEach(b => { 
-      b.classList.remove('active-pinjam', 'active-kembali'); 
-    });
+      document.querySelectorAll('.tab-btn').forEach(b => { 
+        b.classList.remove('active-pinjam', 'active-kembali'); 
+      });
 
-    if (tipe === 'pinjam') {
-      document.getElementById('tabPinjam').classList.add('active-pinjam');
-    } else {
-      document.getElementById('tabKembali').classList.add('active-kembali');
-    }
-
-    const formPinjam = document.getElementById('sectionPinjam');
-    const formKembali = document.getElementById('sectionKembali');
-    const formAktifLama = tipe === 'pinjam' ? formKembali : formPinjam;
-    const formAktifBaru = tipe === 'pinjam' ? formPinjam : formKembali;
-
-    formAktifLama.classList.remove('active');
-
-    setTimeout(() => {
-      formAktifLama.style.display = 'none';
-      
-      if (tipe === 'kembali') {
-        const kontainer = document.getElementById('kontainerKunciKembaliChecklist');
-        if (kontainer) {
-          kontainer.innerHTML = '<p style="color: #64748b; font-size: 13px; margin: 0;">Klik tombol \'Cari Kunci Saya\' di atas terlebih dahulu.</p>';
-        }
+      if (tipe === 'pinjam') {
+        document.getElementById('tabPinjam').classList.add('active-pinjam');
+      } else {
+        document.getElementById('tabKembali').classList.add('active-kembali');
       }
 
-      formAktifBaru.style.display = 'block';
-      
+      const formPinjam = document.getElementById('sectionPinjam');
+      const formKembali = document.getElementById('sectionKembali');
+      const formAktifLama = tipe === 'pinjam' ? formKembali : formPinjam;
+      const formAktifBaru = tipe === 'pinjam' ? formPinjam : formKembali;
+
+      formAktifLama.classList.remove('active');
+
       setTimeout(() => {
-        formAktifBaru.classList.add('active');
-      }, 20);
-
-    }, 350);
-  }
-
-  /* ==========================================
-     2. AMBIL & FILTER DATA KUNCI TERSEDIA
-     ========================================== */
-  function muatKunciTersedia() {
-  const kontainer = document.getElementById("kontainerKunciChecklist");
-  if (kontainer) {
-    // Tampilkan Animasi 5 Dots
-    kontainer.innerHTML = `
-      <div class="dots-loader-wrapper">
-        <div class="dots-loader">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-        <p class="dots-loader-text">Memuat daftar kunci...</p>
-      </div>
-    `;
-  }
-
-  fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-    .then(res => res.json())
-    .then(data => {
-      semuaDataKunci = data;
-      // ... sisa kode kamu di bawahnya tetap sama ...
+        formAktifLama.style.display = 'none';
         
-        const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
-        const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
-        
-        const selectLantai = document.getElementById("filterLantai");
-        selectLantai.innerHTML = '<option value="">All Floor</option>';
-        listLantai.forEach(l => { selectLantai.innerHTML += `<option value="${l}">${l}</option>`; });
-        
-        const selectZona = document.getElementById("filterZona");
-        selectZona.innerHTML = '<option value="">All Zone</option>';
-        listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
-        
-        saringKunci();
-      }).catch(err => {
-        const kontainer = document.getElementById("kontainerKunciChecklist");
-        if (kontainer) {
-          kontainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">❌ Gagal memuat data. Periksa koneksi atau Web App URL.</p>';
+        if (tipe === 'kembali') {
+          const kontainer = document.getElementById('kontainerKunciKembaliChecklist');
+          if (kontainer) {
+            kontainer.innerHTML = '<p style="color: #64748b; font-size: 13px; margin: 0;">Klik tombol \'Cari Kunci Saya\' di atas terlebih dahulu.</p>';
+          }
         }
-      });
-  }
 
-  function saringKunci() {
-  const lantai = document.getElementById("filterLantai").value.toLowerCase();
-  const zona = document.getElementById("filterZona").value.toLowerCase();
-  const cari = document.getElementById("kotakCari").value.toLowerCase();
-  const kontainer = document.getElementById("kontainerKunciChecklist");
-
-  if (!kontainer) return;
-
-  const hasilSaring = semuaDataKunci.filter(k => {
-    return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
-           (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
-           (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
-  });
-
-  if (hasilSaring.length === 0) {
-    kontainer.innerHTML = '<p style="font-size:13px; color:var(--danger); margin:0;">Tidak ada kunci yang cocok.</p>';
-    return;
-  }
-
-  // OPTIMASI: Buat string HTML utuh di memori lebih dulu
-  let html = '';
-  hasilSaring.forEach(k => {
-    const isDipinjam = k.status && k.status.toLowerCase() !== 'tersedia';
-
-    html += `
-      <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDipinjam ? 'opacity: 0.55; cursor: not-allowed;' : ''}">
-        <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" 
-               ${isDipinjam ? 'disabled' : ''} 
-               style="width: auto; ${isDipinjam ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+        formAktifBaru.style.display = 'block';
         
-        <label for="chk_${k.id}" style="margin: 0; font-weight: normal; ${isDipinjam ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
-          <b>${k.id}</b> - ${k.nama} <small style="color:var(--text-muted);">[Lantai ${k.lantai} - ${k.zona}]</small>
-          ${isDipinjam ? '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>' : ''}
-        </label>
-      </div>
-    `;
-  });
+        setTimeout(() => {
+          formAktifBaru.classList.add('active');
+        }, 20);
 
-  // Render ke DOM hanya 1x (Sangat Cepat)
-  kontainer.innerHTML = html;
-}
+      }, 350);
+    }
 
-  /* ==========================================
-     3. TABEL MONITORING & PAGINASI
-     ========================================== */
-  function muatMonitorData() {
-  const body = document.getElementById("bodyTabel");
-  if (body) {
-    body.innerHTML = `
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 20px 0;">
+    /* ==========================================
+       2. AMBIL & FILTER DATA KUNCI TERSEDIA
+       ========================================== */
+    function muatKunciTersedia() {
+      const kontainer = document.getElementById("kontainerKunciChecklist");
+      if (kontainer) {
+        kontainer.innerHTML = `
           <div class="dots-loader-wrapper">
             <div class="dots-loader">
               <div class="dot"></div>
@@ -1315,732 +812,660 @@ tbody tr:has(.dots-loader-wrapper) {
               <div class="dot"></div>
               <div class="dot"></div>
             </div>
-            <p class="dots-loader-text">Memuat status transaksi aktif...</p>
+            <p class="dots-loader-text">Memuat daftar kunci...</p>
           </div>
-        </td>
-      </tr>
-    `;
-  }
-
-  fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-    .then(res => res.json())
-    .then(data => {
-      dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
-      halamanSekarang = 1;
-      tampilkanHalamanMonitor();
-    });
-}
-
-  // 1. FUNGSI PEMBANTU (Letakkan tepat di atas baris 1096)
-function formatUrlFoto(url) {
-  if (!url || typeof url !== 'string') return "";
-  url = url.trim();
-  
-  if (url === "" || url === "-" || url.toLowerCase() === "undefined" || url.toLowerCase() === "null") {
-    return "";
-  }
-  
-  // Ubah link Google Drive ke Direct Image Link
-  if (url.includes("drive.google.com")) {
-    const match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
-    if (match && match[1]) {
-      return `https://lh3.googleusercontent.com/d/${match[1]}`;
-    }
-  }
-  
-  // Format jika berupa string Base64 tanpa header
-  if (!url.startsWith("http") && !url.startsWith("data:image")) {
-    return `data:image/jpeg;base64,${url}`;
-  }
-  
-  return url;
-}
-
-// 2. FUNGSI MONITOR (Gantikan fungsi lama dari baris 1096)
-function tampilkanHalamanMonitor() {
-  const body = document.getElementById("bodyTabel");
-  if (!body) return;
-  body.innerHTML = "";
-
-  const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
-  if (halamanSekarang > totalHalaman) halamanSekarang = totalHalaman;
-
-  const indeksAwal = (halamanSekarang - 1) * barisPerHalaman;
-  const indeksAkhir = indeksAwal + barisPerHalaman;
-  const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
-
-  if (dataHalamanIni.length === 0) {
-    body.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;">Seluruh kunci saat ini berada di rak.</td></tr>';
-    document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
-    document.getElementById("btnPrev").disabled = true;
-    document.getElementById("btnNext").disabled = true;
-    return;
-  }
-
-  const hariIni = new Date();
-  hariIni.setUTCHours(0, 0, 0, 0);
-
-  dataHalamanIni.forEach((item, indeks) => {
-    const idBarisFoto = `foto-row-${indeks}`;
-    
-    // Cek keterlambatan
-    let apakahTerlambat = false;
-    if (item.estimasi && item.estimasi !== "-") {
-      const parts = item.estimasi.split('/'); 
-      if (parts.length === 3) {
-        const hari = parseInt(parts[0], 10);
-        const bulan = parseInt(parts[1], 10) - 1;
-        const tahun = parseInt(parts[2], 10);
-        const tanggalEstimasi = new Date(Date.UTC(tahun, bulan, hari));
-        apakahTerlambat = item.status.toLowerCase() === 'dipinjam' && tanggalEstimasi < hariIni;
+        `;
       }
+
+      fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
+        .then(res => res.json())
+        .then(data => {
+          semuaDataKunci = data;
+          
+          const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
+          const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
+          
+          const selectLantai = document.getElementById("filterLantai");
+          selectLantai.innerHTML = '<option value="">All Floor</option>';
+          listLantai.forEach(l => { selectLantai.innerHTML += `<option value="${l}">${l}</option>`; });
+          
+          const selectZona = document.getElementById("filterZona");
+          selectZona.innerHTML = '<option value="">All Zone</option>';
+          listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
+          
+          saringKunci();
+        }).catch(err => {
+          if (kontainer) {
+            kontainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">❌ Gagal memuat data. Periksa koneksi.</p>';
+          }
+        });
     }
 
-    // Olah URL Foto
-    const urlFotoAwal = item.foto || item.fotoPinjam || "";
-    const urlFotoValid = formatUrlFoto(urlFotoAwal);
-    const fotoAda = urlFotoValid !== "";
+    function saringKunci() {
+      const lantai = document.getElementById("filterLantai").value.toLowerCase();
+      const zona = document.getElementById("filterZona").value.toLowerCase();
+      const cari = document.getElementById("kotakCari").value.toLowerCase();
+      const kontainer = document.getElementById("kontainerKunciChecklist");
 
-    // 1. Baris Utama (Tabel Desktop & Card Mobile)
-    const trMain = document.createElement("tr");
-    trMain.className = "row-main-kunci";
-    trMain.innerHTML = `
-      <td><b>${item.id}</b></td>
-      <td>${item.nama}</td>
-      <td>${item.lantai || '-'}</td>
-      <td>${item.zona || '-'}</td>
-      <td><span class="badge-dipinjam">${item.status}</span></td>
-      <td>${item.peminjam || '-'}</td>
-      <td style="${apakahTerlambat ? 'color: var(--danger); font-weight: bold;' : ''}">
-        ${item.estimasi || '-'}
-        ${apakahTerlambat ? '<br><small style="color:#ef4444; font-weight:bold;">(Terlambat)</small>' : ''}
-        <br>
-        <small class="btn-toggle-foto-desktop" onclick="toggleFoto('${idBarisFoto}')" style="cursor:pointer; color:#64748b; text-decoration:underline;">
-          (Klik untuk lihat foto)
-        </small>
-      </td>
-      <td class="col-foto-mobile">
-        ${fotoAda 
-          ? `<img src="${urlFotoValid}" alt="Foto ${item.id}" class="img-card-mobile">` 
-          : `<div class="no-foto-mobile">Tanpa Foto</div>`}
-      </td>
-    `;
+      if (!kontainer) return;
 
-    // 2. Baris Foto Desktop (Accordion)
-    const trFoto = document.createElement("tr");
-    trFoto.id = idBarisFoto;
-    trFoto.className = "row-foto-desktop";
-    trFoto.style.display = "none";
-    trFoto.innerHTML = `
-      <td colspan="8" style="text-align: center; background-color: #f8fafc; padding: 15px;">
-        <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">
-          Foto Dokumentasi Peminjaman:
-        </div>
-        ${fotoAda 
-          ? `<img src="${urlFotoValid}" alt="Dokumentasi ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; border: 1px solid #cbd5e1;">` 
-          : `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia</p>`}
-      </td>
-    `;
+      const hasilSaring = semuaDataKunci.filter(k => {
+        return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
+               (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
+               (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
+      });
 
-    body.appendChild(trMain);
-    body.appendChild(trFoto);
-  });
-
-  document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
-  document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
-  document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
-}
-
-// 3. FUNGSI TOGGLE KLIK FOTO DESKTOP
-function toggleFoto(idRow) {
-  const el = document.getElementById(idRow);
-  if (el) {
-    el.style.display = (el.style.display === "none" || el.style.display === "") ? "table-row" : "none";
-  }
-}
-
-// Fungsi Toggle Klik Foto untuk Desktop
-function toggleFoto(idRow) {
-  const el = document.getElementById(idRow);
-  if (el) {
-    el.style.display = (el.style.display === "none" || el.style.display === "") ? "table-row" : "none";
-  }
-}
-
-  function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
-  function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
-
-  /* ==========================================
-     4. INLINE AUTOCOMPLETE NAMA
-     ========================================== */
-  let rekomendasiNamaTerpilih = "";
-
-  function prosesInlineAutocomplete(nilaiInput) {
-    const hintEl = document.getElementById("nama_hint");
-    const teksCari = nilaiInput;
-    rekomendasiNamaTerpilih = "";
-    hintEl.textContent = "";
-
-    if (!teksCari.trim()) return;
-
-    const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
-    const kecocokan = listNamaUnik.find(nama => 
-      nama.toLowerCase().startsWith(teksCari.toLowerCase())
-    );
-
-    if (kecocokan) {
-      rekomendasiNamaTerpilih = kecocokan;
-      const bagianSama = kecocokan.substring(0, teksCari.length);
-      const sisaRekomendasi = kecocokan.substring(teksCari.length);
-      hintEl.innerHTML = `<span style="color: transparent;">${bagianSama}</span>${sisaRekomendasi}`;
-    }
-  }
-
-  function tanganiKeydownAutocomplete(e) {
-    const inputEl = document.getElementById("nama_kembali");
-    const hintEl = document.getElementById("nama_hint");
-
-    if ((e.key === "Tab" || e.key === "ArrowRight") && rekomendasiNamaTerpilih) {
-      e.preventDefault(); 
-      inputEl.value = rekomendasiNamaTerpilih;
-      hintEl.textContent = ""; 
-      rekomendasiNamaTerpilih = "";
-    }
-  }
-
-  /* ==========================================
-     5. AKSI CARI KUNCI & PENGEMBALIAN
-     ========================================== */
-  document.getElementById('btnCariKunci').addEventListener('click', () => {
-    const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
-    if (!namaInput) { alert("Masukkan nama Anda!"); return; }
-
-    const btnCari = document.getElementById('btnCariKunci');
-    btnCari.textContent = "Mencari...";
-
-    const kontainer = document.getElementById("kontainerKunciKembaliChecklist");
-    kontainer.innerHTML = "";
-
-    setTimeout(() => {
-      btnCari.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
-
-      const kunciDitemukan = dataMonitorTerpinjam.filter(item => 
-        item.peminjam && item.peminjam.toLowerCase().includes(namaInput)
-      );
-
-      if (kunciDitemukan.length === 0) {
-        kontainer.innerHTML = '<p style="font-size:13px; color:#ef4444; margin:0;">Sistem tidak menemukan kunci aktif yang sedang Anda pinjam. Pastikan nama sesuai!</p>';
+      if (hasilSaring.length === 0) {
+        kontainer.innerHTML = '<p style="font-size:13px; color:var(--danger); margin:0;">Tidak ada kunci yang cocok.</p>';
         return;
       }
 
-      kunciDitemukan.forEach(k => {
-        const card = document.createElement("div");
-        card.className = "item-kunci-kembali";
-        card.style.cssText = "border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; background: #fff;";
-        card.innerHTML = `
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
-            <input type="checkbox" name="kunci_kembali" value="${k.id}" id="chk_kembali_${k.id}" checked style="width:auto; cursor:pointer;" onchange="toggleKameraRow('${k.id}')">
-            <label for="chk_kembali_${k.id}" style="margin:0; font-size:14px; cursor:pointer;">
-              <b>${k.id}</b> - ${k.nama}
+      let html = '';
+      hasilSaring.forEach(k => {
+        const isDipinjam = k.status && k.status.toLowerCase() !== 'tersedia';
+
+        html += `
+          <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDipinjam ? 'opacity: 0.55; cursor: not-allowed;' : ''}">
+            <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" 
+                   ${isDipinjam ? 'disabled' : ''} 
+                   style="width: auto; ${isDipinjam ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+            
+            <label for="chk_${k.id}" style="margin: 0; font-weight: normal; ${isDipinjam ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
+              <b>${k.id}</b> - ${k.nama} <small style="color:var(--text-muted);">[Lantai ${k.lantai} - ${k.zona}]</small>
+              ${isDipinjam ? '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>' : ''}
             </label>
           </div>
-          <div id="box_cam_${k.id}" style="margin-left: 24px;">
-            <input type="hidden" name="foto_kembali_${k.id}" id="foto_kembali_${k.id}">
-            
-            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <button type="button" class="btn-buka-cam" onclick="ambilFotoKunci('${k.id}', 'camera')" style="font-size:12px; padding:6px 10px; cursor:pointer;">
-                📷 Ambil Foto Kamera
-              </button>
-              
-              <button type="button" class="btn-buka-cam" onclick="ambilFotoKunci('${k.id}', 'file')" style="font-size:12px; padding:6px 10px; cursor:pointer; background-color: #64748b;">
-                📁 Pilih Dari Galeri
-              </button>
-              
-              <span id="status_foto_${k.id}" style="font-size:12px; color:#ef4444;">(Wajib Foto)</span>
-            </div>
-          </div>
         `;
-        kontainer.appendChild(card);
       });
-    }, 400);
-  });
 
-  function toggleKameraRow(id) {
-    const chk = document.getElementById(`chk_kembali_${id}`);
-    const boxCam = document.getElementById(`box_cam_${id}`);
-    if (boxCam) boxCam.style.display = chk.checked ? "block" : "none";
-  }
-
-    function ambilFotoPinjam(sumber) {
-  const inputFotoHidden = document.getElementById('fotoP');
-  const statusSpan = document.getElementById('status_fotoP');
-  const previewBox = document.getElementById('previewBoxP');
-  const imgPreview = document.getElementById('imgPreviewP');
-
-  const inputDinamis = document.createElement('input');
-  inputDinamis.type = 'file';
-  inputDinamis.accept = 'image/*';
-
-  if (sumber === 'camera') {
-    inputDinamis.setAttribute('capture', 'environment');
-  }
-
-  inputDinamis.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (statusSpan) {
-        statusSpan.textContent = "⏳ Memproses foto & timestamp...";
-        statusSpan.style.color = "#3b82f6";
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const scaleFactor = MAX_WIDTH / img.width;
-          
-          if (scaleFactor < 1) {
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleFactor;
-          } else {
-            canvas.width = img.width;
-            canvas.height = img.height;
-          }
-
-          const ctx = canvas.getContext('2d');
-          
-          // 1. Gambar foto ke canvas (Kompresi)
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          // 2. Cetak Timestamp Waktu
-          const sekarang = new Date();
-          const options = { 
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-          };
-          const teksWaktu = `📍 ${sekarang.toLocaleString('id-ID', options).replace(/\./g, ':')} WIB`;
-
-          const fontSize = Math.max(14, Math.round(canvas.width * 0.035));
-          ctx.font = `bold ${fontSize}px sans-serif`;
-
-          const padding = fontSize * 0.5;
-          const textWidth = ctx.measureText(teksWaktu).width;
-          const margin = fontSize;
-          const x = margin;
-          const y = canvas.height - margin;
-
-          // Background hitam transparan di belakang teks
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-          ctx.fillRect(x - (padding / 2), y - fontSize, textWidth + padding, fontSize + (padding * 0.8));
-
-          // Teks warna kuning cerah
-          ctx.fillStyle = '#facc15';
-          ctx.fillText(teksWaktu, x, y - (padding * 0.2));
-
-          // 3. Konversi ke Data URL
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-          // Simpan & tampilkan
-          if (inputFotoHidden) inputFotoHidden.value = dataUrl;
-          if (imgPreview) imgPreview.src = dataUrl;
-          if (previewBox) previewBox.style.display = "block";
-
-          if (statusSpan) {
-            statusSpan.textContent = "✓ Foto + Timestamp Ditangkap";
-            statusSpan.style.color = "#10b981";
-          }
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
+      kontainer.innerHTML = html;
     }
-  };
 
-  inputDinamis.click();
-}
-    
-  function ambilFotoKunci(idKunci, sumber) {
-  const inputFotoHidden = document.getElementById(`foto_kembali_${idKunci}`);
-  const statusSpan = document.getElementById(`status_foto_${idKunci}`);
-  const imgPreview = document.getElementById(`img_preview_${idKunci}`);
-
-  const inputDinamis = document.createElement('input');
-  inputDinamis.type = 'file';
-  inputDinamis.accept = 'image/*';
-
-  if (sumber === 'camera') {
-    inputDinamis.setAttribute('capture', 'environment');
-  }
-
-  inputDinamis.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (statusSpan) {
-        statusSpan.textContent = "⏳ Memproses foto & timestamp...";
-        statusSpan.style.color = "#3b82f6";
+    /* ==========================================
+       3. TABEL MONITORING & PAGINASI
+       ========================================== */
+    function muatMonitorData() {
+      const body = document.getElementById("bodyTabel");
+      if (body) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 20px 0;">
+              <div class="dots-loader-wrapper">
+                <div class="dots-loader">
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                </div>
+                <p class="dots-loader-text">Memuat status transaksi aktif...</p>
+              </div>
+            </td>
+          </tr>
+        `;
       }
 
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const scaleFactor = MAX_WIDTH / img.width;
-
-          if (scaleFactor < 1) {
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleFactor;
-          } else {
-            canvas.width = img.width;
-            canvas.height = img.height;
-          }
-
-          const ctx = canvas.getContext('2d');
-
-          // 1. Gambar foto
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          // 2. Format Waktu Sederhana
-          const d = new Date();
-          const tgl = String(d.getDate()).padStart(2, '0') + '/' + 
-                      String(d.getMonth() + 1).padStart(2, '0') + '/' + 
-                      d.getFullYear();
-          const jam = String(d.getHours()).padStart(2, '0') + ':' + 
-                      String(d.getMinutes()).padStart(2, '0') + ':' + 
-                      String(d.getSeconds()).padStart(2, '0');
-          const teksWaktu = `${tgl} ${jam} WIB`;
-
-          // 3. Pengaturan Teks Canvas
-          const fontSize = Math.max(16, Math.round(canvas.width * 0.038));
-          ctx.font = `bold ${fontSize}px Arial, sans-serif`;
-          ctx.textBaseline = "bottom";
-          ctx.textAlign = "left";
-
-          const textWidth = ctx.measureText(teksWaktu).width;
-          const padding = 8;
-          const x = 15;
-          const y = canvas.height - 15;
-
-          // Background Kotak Hitam
-          ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
-          ctx.fillRect(x - padding, y - fontSize - (padding * 2), textWidth + (padding * 2), fontSize + (padding * 2));
-
-          // Teks Warna Kuning
-          ctx.fillStyle = "#FFD700";
-          ctx.fillText(teksWaktu, x, y - padding);
-
-          // 4. Export
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-          if (inputFotoHidden) inputFotoHidden.value = dataUrl;
-          if (imgPreview) imgPreview.src = dataUrl;
-
-          if (statusSpan) {
-            statusSpan.textContent = "✓ Foto + Timestamp Berhasil";
-            statusSpan.style.color = "#10b981";
-          }
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  inputDinamis.click();
-}
-
-  /* ==========================================
-     6. KONTROL KAMERA UTAMA (PEMINJAMAN)
-     ========================================== */
-  function aturKamera(suffix) {
-    const video = document.getElementById('video' + suffix);
-    const canvas = document.getElementById('canvas' + suffix);
-    const input = document.getElementById('foto' + suffix);
-    const btnBuka = document.getElementById('btnBukaKamera' + suffix);
-    const btnAmbil = document.getElementById('btnAmbilFoto' + suffix);
-    const btnUlang = document.getElementById('btnFotoUlang' + suffix);
-    if (!btnBuka) return;
-
-    btnBuka.addEventListener('click', () => {
-      matikanKamera();
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
-        streamKameraAktif = stream; 
-        video.srcObject = stream;
-        video.style.display = 'block'; 
-        btnAmbil.style.display = 'inline-flex'; 
-        btnBuka.style.display = 'none';
-        canvas.style.display = 'none'; 
-        btnUlang.style.display = 'none'; 
-        input.value = "";
-      }).catch(() => alert("Izin kamera ditolak atau perangkat kamera tidak ditemukan."));
-    });
-
-    btnAmbil.addEventListener('click', () => {
-      canvas.width = video.videoWidth; 
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      input.value = canvas.toDataURL('image/jpeg');
-      canvas.style.display = 'block'; 
-      video.style.display = 'none';
-      btnUlang.style.display = 'inline-flex'; 
-      btnAmbil.style.display = 'none';
-    });
-
-    btnUlang.addEventListener('click', () => {
-      input.value = "";
-      video.style.display = 'block'; 
-      canvas.style.display = 'none';
-      btnAmbil.style.display = 'inline-flex'; 
-      btnUlang.style.display = 'none';
-    });
-  }
-
-  function matikanKamera() {
-    if (streamKameraAktif) {
-      streamKameraAktif.getTracks().forEach(track => track.stop());
-      streamKameraAktif = null;
-    }
-    document.querySelectorAll('video:not(.video-bg)').forEach(vid => {
-      vid.srcObject = null;
-    });
-    document.querySelectorAll('video:not(.video-bg), canvas').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.btn-buka-cam').forEach(el => el.style.display = 'inline-flex');
-    document.querySelectorAll('.btn-ambil-foto, .btn-foto-ulang').forEach(el => el.style.display = 'none');
-  }
-
-  /* ==========================================
-     7. PENGIRIMAN FORM (SUBMIT API)
-     ========================================== */
-  function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
-    document.getElementById(idForm).addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-
-      if (konteksAksi === 'pinjam') {
-        const inputFoto = this.querySelector('input[name="foto"]')?.value;
-        if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
-
-        const kunciTerpilih = Array.from(document.querySelectorAll('input[name="kunci"]:checked')).map(cb => cb.value);
-        if (kunciTerpilih.length === 0) {
-          alert("Pilih minimal satu kunci yang ingin dipinjam!");
-          return;
-        }
-        formData.set('kunci', kunciTerpilih.join(', '));
-      }
-
-      if (konteksAksi === 'kembali') {
-        const chks = Array.from(document.querySelectorAll('input[name="kunci_kembali"]:checked'));
-        if (chks.length === 0) {
-          alert("Pilih minimal satu kunci yang ingin dikembalikan!");
-          return;
-        }
-
-        const listDataKembali = [];
-        let adaFotoKosong = false;
-
-        chks.forEach(cb => {
-          const idKunci = cb.value;
-          const inputFotoEl = document.getElementById(`foto_kembali_${idKunci}`);
-          const fotoVal = inputFotoEl ? inputFotoEl.value : "";
-
-          if (!fotoVal) {
-            adaFotoKosong = true;
-          }
-          listDataKembali.push({ id: idKunci, foto: fotoVal });
-        });
-
-        if (adaFotoKosong) {
-          alert("Setiap kunci yang dicentang WAJIB diambil fotonya satu per satu!");
-          return;
-        }
-
-        formData.set('payload_kembali', JSON.stringify(listDataKembali));
-      }
-
-      const btn = document.getElementById(idBtn);
-      btn.disabled = true;
-      btn.textContent = "Memproses...";
-
-      const formatUlangTombol = (konteksAksi === 'pinjam')
-        ? `<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
-        : `<svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
-
-      fetch(scriptUrl, { method: 'POST', body: formData })
+      fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
         .then(res => res.json())
-        .then(res => {
-          if(res.status === 'success') { 
-            document.getElementById(idForm).reset();
-            matikanKamera();
-            muatKunciTersedia();
-            muatMonitorData();
-            
-            document.getElementById('navTabsContainer').style.display = 'none';
-            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-            
-            const teksPesan = (konteksAksi === 'pinjam') 
-              ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
-              : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
-            
-            document.getElementById('pesanSukses').textContent = teksPesan;
-            document.getElementById('screenSukses').style.display = 'block';
-            
-            btn.disabled = false;
-            btn.innerHTML = formatUlangTombol;
+        .then(data => {
+          dataMonitorTerpinjam = data.filter(item => item.status.toLowerCase() === "dipinjam");
+          halamanSekarang = 1;
+          tampilkanHalamanMonitor();
+        });
+    }
+
+    function formatUrlFoto(url) {
+      if (!url || typeof url !== 'string') return "";
+      url = url.trim();
+      
+      if (url === "" || url === "-" || url.toLowerCase() === "undefined" || url.toLowerCase() === "null") {
+        return "";
+      }
+      
+      if (url.includes("drive.google.com")) {
+        const match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
+        if (match && match[1]) {
+          return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
+      }
+      
+      if (!url.startsWith("http") && !url.startsWith("data:image")) {
+        return `data:image/jpeg;base64,${url}`;
+      }
+      
+      return url;
+    }
+
+    function tampilkanHalamanMonitor() {
+      const body = document.getElementById("bodyTabel");
+      if (!body) return;
+      body.innerHTML = "";
+
+      const totalHalaman = Math.ceil(dataMonitorTerpinjam.length / barisPerHalaman) || 1;
+      if (halamanSekarang > totalHalaman) halamanSekarang = totalHalaman;
+
+      const indeksAwal = (halamanSekarang - 1) * barisPerHalaman;
+      const indeksAkhir = indeksAwal + barisPerHalaman;
+      const dataHalamanIni = dataMonitorTerpinjam.slice(indeksAwal, indeksAkhir);
+
+      if (dataHalamanIni.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--primary); font-weight: bold; padding: 25px;">Seluruh kunci saat ini berada di rak.</td></tr>';
+        document.getElementById("infoHalaman").textContent = `Halaman 1 dari 1`;
+        document.getElementById("btnPrev").disabled = true;
+        document.getElementById("btnNext").disabled = true;
+        return;
+      }
+
+      const hariIni = new Date();
+      hariIni.setUTCHours(0, 0, 0, 0);
+
+      dataHalamanIni.forEach((item, indeks) => {
+        const idBarisFoto = `foto-row-${indeks}`;
+        
+        let apakahTerlambat = false;
+        if (item.estimasi && item.estimasi !== "-") {
+          const parts = item.estimasi.split('/'); 
+          if (parts.length === 3) {
+            const hari = parseInt(parts[0], 10);
+            const bulan = parseInt(parts[1], 10) - 1;
+            const tahun = parseInt(parts[2], 10);
+            const tanggalEstimasi = new Date(Date.UTC(tahun, bulan, hari));
+            apakahTerlambat = item.status.toLowerCase() === 'dipinjam' && tanggalEstimasi < hariIni;
           }
-          else { 
-            alert("Gagal: " + res.message); 
+        }
+
+        const urlFotoAwal = item.foto || item.fotoPinjam || "";
+        const urlFotoValid = formatUrlFoto(urlFotoAwal);
+        const fotoAda = urlFotoValid !== "";
+
+        const trMain = document.createElement("tr");
+        trMain.className = "row-main-kunci";
+        trMain.innerHTML = `
+          <td><b>${item.id}</b></td>
+          <td>${item.nama}</td>
+          <td>${item.lantai || '-'}</td>
+          <td>${item.zona || '-'}</td>
+          <td><span class="badge-dipinjam">${item.status}</span></td>
+          <td>${item.peminjam || '-'}</td>
+          <td style="${apakahTerlambat ? 'color: var(--danger); font-weight: bold;' : ''}">
+            ${item.estimasi || '-'}
+            ${apakahTerlambat ? '<br><small style="color:#ef4444; font-weight:bold;">(Terlambat)</small>' : ''}
+            <br>
+            <small class="btn-toggle-foto-desktop" onclick="toggleFoto('${idBarisFoto}')" style="cursor:pointer; color:#64748b; text-decoration:underline;">
+              (Klik untuk lihat foto)
+            </small>
+          </td>
+          <td class="col-foto-mobile">
+            ${fotoAda 
+              ? `<img src="${urlFotoValid}" alt="Foto ${item.id}" class="img-card-mobile">` 
+              : `<div class="no-foto-mobile">Tanpa Foto</div>`}
+          </td>
+        `;
+
+        const trFoto = document.createElement("tr");
+        trFoto.id = idBarisFoto;
+        trFoto.className = "row-foto-desktop";
+        trFoto.style.display = "none";
+        trFoto.innerHTML = `
+          <td colspan="7" style="text-align: center; background-color: #f8fafc; padding: 15px;">
+            <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--dark);">
+              Foto Dokumentasi Peminjaman:
+            </div>
+            ${fotoAda 
+              ? `<img src="${urlFotoValid}" alt="Dokumentasi ${item.id}" style="max-width: 280px; height: auto; border-radius: 8px; border: 1px solid #cbd5e1;">` 
+              : `<p style="color: var(--danger); font-size: 13px; margin: 0;">⚠️ Foto tidak tersedia</p>`}
+          </td>
+        `;
+
+        body.appendChild(trMain);
+        body.appendChild(trFoto);
+      });
+
+      document.getElementById("infoHalaman").textContent = `Halaman ${halamanSekarang} dari ${totalHalaman}`;
+      document.getElementById("btnPrev").disabled = (halamanSekarang === 1);
+      document.getElementById("btnNext").disabled = (halamanSekarang === totalHalaman);
+    }
+
+    function toggleFoto(idRow) {
+      const el = document.getElementById(idRow);
+      if (el) {
+        el.style.display = (el.style.display === "none" || el.style.display === "") ? "table-row" : "none";
+      }
+    }
+
+    function halamanSebelumnya() { if (halamanSekarang > 1) { halamanSekarang--; tampilkanHalamanMonitor(); } }
+    function halamanBerikutnya() { if ((halamanSekarang * barisPerHalaman) < dataMonitorTerpinjam.length) { halamanSekarang++; tampilkanHalamanMonitor(); } }
+
+    /* ==========================================
+       4. AUTOCOMPLETE NAMA PENGEMBALI
+       ========================================== */
+    let rekomendasiNamaTerpilih = "";
+
+    function prosesInlineAutocomplete(nilaiInput) {
+      const hintEl = document.getElementById("nama_hint");
+      const teksCari = nilaiInput;
+      rekomendasiNamaTerpilih = "";
+      hintEl.textContent = "";
+
+      if (!teksCari.trim()) return;
+
+      const listNamaUnik = [...new Set(dataMonitorTerpinjam.map(item => item.peminjam).filter(Boolean))];
+      const kecocokan = listNamaUnik.find(nama => 
+        nama.toLowerCase().startsWith(teksCari.toLowerCase())
+      );
+
+      if (kecocokan) {
+        rekomendasiNamaTerpilih = kecocokan;
+        const bagianSama = kecocokan.substring(0, teksCari.length);
+        const sisaRekomendasi = kecocokan.substring(teksCari.length);
+        hintEl.innerHTML = `<span style="color: transparent;">${bagianSama}</span>${sisaRekomendasi}`;
+      }
+    }
+
+    function tanganiKeydownAutocomplete(e) {
+      const inputEl = document.getElementById("nama_kembali");
+      const hintEl = document.getElementById("nama_hint");
+
+      if ((e.key === "Tab" || e.key === "ArrowRight") && rekomendasiNamaTerpilih) {
+        e.preventDefault(); 
+        inputEl.value = rekomendasiNamaTerpilih;
+        hintEl.textContent = ""; 
+        rekomendasiNamaTerpilih = "";
+      }
+    }
+
+    /* ==========================================
+       5. AKSI CARI KUNCI & PENGEMBALIAN
+       ========================================== */
+    document.getElementById('btnCariKunci').addEventListener('click', () => {
+      const namaInput = document.getElementById('nama_kembali').value.trim().toLowerCase();
+      if (!namaInput) { alert("Masukkan nama Anda!"); return; }
+
+      const btnCari = document.getElementById('btnCariKunci');
+      btnCari.textContent = "Mencari...";
+
+      const kontainer = document.getElementById("kontainerKunciKembaliChecklist");
+      kontainer.innerHTML = "";
+
+      setTimeout(() => {
+        btnCari.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Cari Kunci Saya`;
+
+        const kunciDitemukan = dataMonitorTerpinjam.filter(item => 
+          item.peminjam && item.peminjam.toLowerCase().includes(namaInput)
+        );
+
+        if (kunciDitemukan.length === 0) {
+          kontainer.innerHTML = '<p style="font-size:13px; color:#ef4444; margin:0;">Sistem tidak menemukan kunci aktif yang sedang Anda pinjam. Pastikan nama sesuai!</p>';
+          return;
+        }
+
+        kunciDitemukan.forEach(k => {
+          const card = document.createElement("div");
+          card.className = "item-kunci-kembali";
+          card.style.cssText = "border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; background: #fff;";
+          card.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
+              <input type="checkbox" name="kunci_kembali" value="${k.id}" id="chk_kembali_${k.id}" checked style="width:auto; cursor:pointer;" onchange="toggleKameraRow('${k.id}')">
+              <label for="chk_kembali_${k.id}" style="margin:0; font-size:14px; cursor:pointer;">
+                <b>${k.id}</b> - ${k.nama}
+              </label>
+            </div>
+            <div id="box_cam_${k.id}" style="margin-left: 24px;">
+              <input type="hidden" name="foto_kembali_${k.id}" id="foto_kembali_${k.id}">
+              
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn-buka-cam" onclick="ambilFotoKunci('${k.id}', 'camera')" style="font-size:12px; padding:6px 10px; cursor:pointer; background:#5e9e82; color:white; border:none; border-radius:4px;">
+                  📷 Kamera
+                </button>
+                
+                <button type="button" class="btn-buka-cam" onclick="ambilFotoKunci('${k.id}', 'file')" style="font-size:12px; padding:6px 10px; cursor:pointer; background-color: #64748b; color:white; border:none; border-radius:4px;">
+                  📁 Galeri
+                </button>
+                
+                <span id="status_foto_${k.id}" style="font-size:12px; color:#ef4444;">(Wajib Foto)</span>
+              </div>
+              <div style="margin-top:8px;">
+                <img id="img_preview_${k.id}" style="max-width: 120px; max-height: 90px; border-radius: 6px; display: none; border: 1px solid #cbd5e1;">
+              </div>
+            </div>
+          `;
+          kontainer.appendChild(card);
+        });
+      }, 400);
+    });
+
+    function toggleKameraRow(id) {
+      const chk = document.getElementById(`chk_kembali_${id}`);
+      const boxCam = document.getElementById(`box_cam_${id}`);
+      if (boxCam) boxCam.style.display = chk.checked ? "block" : "none";
+    }
+
+    /* ==========================================
+       6. OLAH FOTO & CANVAS STAMPING
+       ========================================== */
+    function ambilFotoPinjam(sumber) {
+      const inputFotoHidden = document.getElementById('fotoP');
+      const statusSpan = document.getElementById('status_fotoP');
+      const previewBox = document.getElementById('previewBoxP');
+      const imgPreview = document.getElementById('imgPreviewP');
+
+      const inputDinamis = document.createElement('input');
+      inputDinamis.type = 'file';
+      inputDinamis.accept = 'image/*';
+
+      if (sumber === 'camera') {
+        inputDinamis.setAttribute('capture', 'environment');
+      }
+
+      inputDinamis.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (statusSpan) {
+            statusSpan.textContent = "⏳ Memproses foto...";
+            statusSpan.style.color = "#3b82f6";
+          }
+
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const img = new Image();
+            img.onload = function() {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 800;
+              const scaleFactor = MAX_WIDTH / img.width;
+              
+              if (scaleFactor < 1) {
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleFactor;
+              } else {
+                canvas.width = img.width;
+                canvas.height = img.height;
+              }
+
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              const sekarang = new Date();
+              const options = { 
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+              };
+              const teksWaktu = `📍 ${sekarang.toLocaleString('id-ID', options).replace(/\./g, ':')} WIB`;
+
+              const fontSize = Math.max(14, Math.round(canvas.width * 0.035));
+              ctx.font = `bold ${fontSize}px sans-serif`;
+
+              const padding = fontSize * 0.5;
+              const textWidth = ctx.measureText(teksWaktu).width;
+              const margin = fontSize;
+              const x = margin;
+              const y = canvas.height - margin;
+
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+              ctx.fillRect(x - (padding / 2), y - fontSize, textWidth + padding, fontSize + (padding * 0.8));
+
+              ctx.fillStyle = '#facc15';
+              ctx.fillText(teksWaktu, x, y - (padding * 0.2));
+
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+              if (inputFotoHidden) inputFotoHidden.value = dataUrl;
+              if (imgPreview) imgPreview.src = dataUrl;
+              if (previewBox) previewBox.style.display = "block";
+
+              if (statusSpan) {
+                statusSpan.textContent = "✓ Foto + Timestamp Ditangkap";
+                statusSpan.style.color = "#10b981";
+              }
+            };
+            img.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      inputDinamis.click();
+    }
+
+    function ambilFotoKunci(idKunci, sumber) {
+      const inputFotoHidden = document.getElementById(`foto_kembali_${idKunci}`);
+      const statusSpan = document.getElementById(`status_foto_${idKunci}`);
+      const imgPreview = document.getElementById(`img_preview_${idKunci}`);
+
+      const inputDinamis = document.createElement('input');
+      inputDinamis.type = 'file';
+      inputDinamis.accept = 'image/*';
+
+      if (sumber === 'camera') {
+        inputDinamis.setAttribute('capture', 'environment');
+      }
+
+      inputDinamis.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (statusSpan) {
+            statusSpan.textContent = "⏳ Memproses foto...";
+            statusSpan.style.color = "#3b82f6";
+          }
+
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const img = new Image();
+            img.onload = function() {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 800;
+              const scaleFactor = MAX_WIDTH / img.width;
+
+              if (scaleFactor < 1) {
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleFactor;
+              } else {
+                canvas.width = img.width;
+                canvas.height = img.height;
+              }
+
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              const d = new Date();
+              const tgl = String(d.getDate()).padStart(2, '0') + '/' + 
+                          String(d.getMonth() + 1).padStart(2, '0') + '/' + 
+                          d.getFullYear();
+              const jam = String(d.getHours()).padStart(2, '0') + ':' + 
+                          String(d.getMinutes()).padStart(2, '0') + ':' + 
+                          String(d.getSeconds()).padStart(2, '0');
+              const teksWaktu = `${tgl} ${jam} WIB`;
+
+              const fontSize = Math.max(16, Math.round(canvas.width * 0.038));
+              ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+              ctx.textBaseline = "bottom";
+              ctx.textAlign = "left";
+
+              const textWidth = ctx.measureText(teksWaktu).width;
+              const padding = 8;
+              const x = 15;
+              const y = canvas.height - 15;
+
+              ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+              ctx.fillRect(x - padding, y - fontSize - (padding * 2), textWidth + (padding * 2), fontSize + (padding * 2));
+
+              ctx.fillStyle = "#FFD700";
+              ctx.fillText(teksWaktu, x, y - padding);
+
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+              if (inputFotoHidden) inputFotoHidden.value = dataUrl;
+              if (imgPreview) {
+                imgPreview.src = dataUrl;
+                imgPreview.style.display = "block";
+              }
+
+              if (statusSpan) {
+                statusSpan.textContent = "✓ Foto Berhasil";
+                statusSpan.style.color = "#10b981";
+              }
+            };
+            img.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      inputDinamis.click();
+    }
+
+    /* ==========================================
+       7. SUBMIT FORM KE GOOGLE APPS SCRIPT
+       ========================================== */
+    function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
+      document.getElementById(idForm).addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+
+        if (konteksAksi === 'pinjam') {
+          const inputFoto = this.querySelector('input[name="foto"]')?.value;
+          if (!inputFoto) { alert("Wajib mengambil foto dokumentasi!"); return; }
+
+          const kunciTerpilih = Array.from(document.querySelectorAll('input[name="kunci"]:checked')).map(cb => cb.value);
+          if (kunciTerpilih.length === 0) {
+            alert("Pilih minimal satu kunci yang ingin dipinjam!");
+            return;
+          }
+          formData.set('kunci', kunciTerpilih.join(', '));
+        }
+
+        if (konteksAksi === 'kembali') {
+          const chks = Array.from(document.querySelectorAll('input[name="kunci_kembali"]:checked'));
+          if (chks.length === 0) {
+            alert("Pilih minimal satu kunci yang ingin dikembalikan!");
+            return;
+          }
+
+          const listDataKembali = [];
+          let adaFotoKosong = false;
+
+          chks.forEach(cb => {
+            const idKunci = cb.value;
+            const inputFotoEl = document.getElementById(`foto_kembali_${idKunci}`);
+            const fotoVal = inputFotoEl ? inputFotoEl.value : "";
+
+            if (!fotoVal) {
+              adaFotoKosong = true;
+            }
+            listDataKembali.push({ id: idKunci, foto: fotoVal });
+          });
+
+          if (adaFotoKosong) {
+            alert("Setiap kunci yang dicentang WAJIB diambil fotonya satu per satu!");
+            return;
+          }
+
+          formData.set('payload_kembali', JSON.stringify(listDataKembali));
+        }
+
+        const btn = document.getElementById(idBtn);
+        btn.disabled = true;
+        btn.textContent = "Memproses...";
+
+        const formatUlangTombol = (konteksAksi === 'pinjam')
+          ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
+          : `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
+
+        fetch(scriptUrl, { method: 'POST', body: formData })
+          .then(res => res.json())
+          .then(res => {
+            if(res.status === 'success') { 
+              document.getElementById(idForm).reset();
+              const pBox = document.getElementById('previewBoxP');
+              if(pBox) pBox.style.display = 'none';
+
+              muatKunciTersedia();
+              muatMonitorData();
+              
+              document.getElementById('navTabsContainer').style.display = 'none';
+              document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+              
+              const teksPesan = (konteksAksi === 'pinjam') 
+                ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
+                : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
+              
+              document.getElementById('pesanSukses').textContent = teksPesan;
+              document.getElementById('screenSukses').style.display = 'block';
+              
+              btn.disabled = false;
+              btn.innerHTML = formatUlangTombol;
+            }
+            else { 
+              alert("Gagal: " + res.message); 
+              btn.disabled = false; 
+              btn.innerHTML = formatUlangTombol; 
+            }
+          }).catch(() => { 
+            alert("Kendala Jaringan atau Server Timeout."); 
             btn.disabled = false; 
             btn.innerHTML = formatUlangTombol; 
-          }
-        }).catch(() => { 
-          alert("Kendala Jaringan atau Server Timeout."); 
-          btn.disabled = false; 
-          btn.innerHTML = formatUlangTombol; 
-        });
-    });
-  }
-
-  function resetKeHalamanForm() {
-    document.getElementById('screenSukses').style.display = 'none';
-    document.getElementById('navTabsContainer').style.display = 'flex';
-    gantiTab('pinjam'); 
-  }
-
-  function toggleShowFoto(idBaris) {
-    const barisFoto = document.getElementById(idBaris);
-    
-    document.querySelectorAll('[id^="foto-row-"]').forEach(el => {
-      if (el.id !== idBaris) {
-        el.style.display = "none";
-      }
-    });
-
-    if (barisFoto.style.display === "none" || barisFoto.style.display === "") {
-      barisFoto.style.display = "table-row";
-      barisFoto.style.opacity = "0";
-      setTimeout(() => {
-        barisFoto.style.transition = "opacity 0.4s ease";
-        barisFoto.style.opacity = "1";
-      }, 10);
-    } else {
-      barisFoto.style.display = "none";
-    }
-  }
-
-  /* ==========================================
-     8. INITIALISASI SISTEM & VIDEO BACKGROUND
-     ========================================== */
-  window.onload = () => {
-    muatKunciTersedia();
-    muatMonitorData();
-    aturKamera('P');
-    pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman', 'pinjam');
-    pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
-  };
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const video = document.getElementById('bgVideo');
-    if (video) {
-      video.play().catch(error => {
-        const putarVideo = () => {
-          video.play();
-          document.removeEventListener('click', putarVideo);
-          document.removeEventListener('touchstart', putarVideo);
-        };
-        document.addEventListener('click', putarVideo);
-        document.addEventListener('touchstart', putarVideo);
+          });
       });
     }
-  });
-    // EVENT LISTENER UNTUK PREVIEW FOTO
-document.addEventListener('DOMContentLoaded', function() {
-  const modal = document.getElementById('imageModal');
-  const modalImg = document.getElementById('imgModalTarget');
-  const closeBtn = document.querySelector('.modal-close');
 
-  // Deteksi klik pada foto (termasuk foto yang dimuat secara dinamis)
-  document.body.addEventListener('click', function(e) {
-    if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget') {
-      if (e.target.src && e.target.src !== '') {
-        modalImg.src = e.target.src;
-        modal.classList.add('show');
+    function resetKeHalamanForm() {
+      document.getElementById('screenSukses').style.display = 'none';
+      document.getElementById('navTabsContainer').style.display = 'flex';
+      gantiTab('pinjam'); 
+    }
+
+    /* ==========================================
+       8. INITIALISASI SISTEM
+       ========================================== */
+    window.onload = () => {
+      muatKunciTersedia();
+      muatMonitorData();
+      pasangSubmitForm('formPinjam', 'btnSubmitPinjam', 'Kirim Data Peminjaman', 'pinjam');
+      pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('imgModalTarget');
+      const closeBtn = document.querySelector('.modal-close');
+
+      document.body.addEventListener('click', function(e) {
+        if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget') {
+          if (e.target.src && e.target.src !== '') {
+            modalImg.src = e.target.src;
+            modal.classList.add('show');
+          }
+        }
+      });
+
+      function closeModal() {
+        if (modal) {
+          modal.classList.remove('show');
+        }
       }
-    }
-  });
 
-  // Fungsi menutup modal
-  function closeModal() {
-    if (modal) {
-      modal.classList.remove('show');
-    }
-  }
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal || e.target === closeBtn) {
+            closeModal();
+          }
+        });
+      }
 
-  // Klik tombol X atau klik area latar blur untuk menutup
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (modal) {
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal || e.target === closeBtn) {
-        closeModal();
+      const video = document.getElementById('bgVideo');
+      if (video) {
+        video.play().catch(error => {
+          const putarVideo = () => {
+            video.play();
+            document.removeEventListener('click', putarVideo);
+            document.removeEventListener('touchstart', putarVideo);
+          };
+          document.addEventListener('click', putarVideo);
+          document.addEventListener('touchstart', putarVideo);
+        });
       }
     });
-  }
-});
-</script>
-
-<video id="bgVideo" loop muted playsinline class="video-bg">
-  <source src="drone.mp4" type="video/mp4">
-</video>
-
-  <!-- MODAL PREVIEW FOTO -->
-<div id="imageModal" class="image-modal">
-  <span class="modal-close">&times;</span>
-  <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
-</div>
-  <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const pinPoints = document.querySelectorAll('.pin-point');
-  // Menghubungkan ke dropdown kunci Anda
-  const selectKunci = document.querySelector('select[name="kunci"], #pilihKunci, #ruangan');
-
-  pinPoints.forEach(pin => {
-    pin.addEventListener('click', (e) => {
-      pinPoints.forEach(p => p.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-
-      const namaKunci = e.currentTarget.getAttribute('data-kunci');
-
-      if (selectKunci) {
-        selectKunci.value = namaKunci;
-        selectKunci.focus();
-      }
-    });
-  });
-});
-    // Kode-kode JavaScript Anda yang lama...
-
-    // TARUH FUNGSI TOGGLE LAYOUT DI SINI
-    function toggleDenahLayout() {
-      const mapContainer = document.getElementById('mapCardContainer');
-      const btn = document.getElementById('btnToggleLayout');
-
-      if (mapContainer.style.display === 'none') {
-        mapContainer.style.display = 'block';
-        btn.innerHTML = '❌ Tutup Layout Mall';
-        btn.style.background = '#FEE2E2';
-        btn.style.borderColor = '#FCA5A5';
-        btn.style.color = '#991B1B';
-      } else {
-        mapContainer.style.display = 'none';
-        btn.innerHTML = '🗺️ Lihat Layout Mall';
-        btn.style.background = '#F1F5F9';
-        btn.style.borderColor = '#CBD5E1';
-        btn.style.color = '#0F172A';
-      }
-    }
-</script>
+  </script>
 </body>
 </html>
