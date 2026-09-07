@@ -10,6 +10,54 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
+.map-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.map-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #CBD5E1;
+}
+
+.map-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.pin-point {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-color: #2563EB;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-point:hover, .pin-point.active {
+  background-color: #16A34A;
+  transform: translate(-50%, -50%) scale(1.25);
+  z-index: 10;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3);
+}   
     /* Container Loading Dots */
 .dots-loader-wrapper {
   display: flex;
@@ -863,6 +911,28 @@ tbody tr:has(.dots-loader-wrapper) {
     </div>
 
     <div id="sectionPinjam" class="form-section active">
+      <div class="map-card">
+  <h3 style="margin-top: 0; text-align: center; color: #1E293B; font-size: 16px;">Denah Pintu & Ruangan Mall</h3>
+  <p style="text-align: center; font-size: 12px; color: #64748B; margin-bottom: 12px;">
+    Klik titik pada denah untuk memilih kunci secara otomatis
+  </p>
+  
+  <div class="map-container">
+    <img src="LG.jpg" alt="Layout Mall" class="map-image">
+
+    <button type="button" class="pin-point" style="top: 40%; left: 30%;" data-kunci="B3 Room" title="B3 Room">
+      <span>1</span>
+    </button>
+
+    <button type="button" class="pin-point" style="top: 55%; left: 50%;" data-kunci="R. BTS" title="R. BTS">
+      <span>2</span>
+    </button>
+
+    <button type="button" class="pin-point" style="top: 70%; left: 75%;" data-kunci="R. PANEL SURYA" title="R. PANEL SURYA">
+      <span>3</span>
+    </button>
+  </div>
+</div>
       <h2 style="color: #5e9e82 !important; font-weight: 700; text-align: center; margin-bottom: 20px;">
   Form Kunci 23 Semarang
 </h2>
@@ -1886,6 +1956,26 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
-  
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const pinPoints = document.querySelectorAll('.pin-point');
+  // Menghubungkan ke dropdown kunci Anda
+  const selectKunci = document.querySelector('select[name="kunci"], #pilihKunci, #ruangan');
+
+  pinPoints.forEach(pin => {
+    pin.addEventListener('click', (e) => {
+      pinPoints.forEach(p => p.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+
+      const namaKunci = e.currentTarget.getAttribute('data-kunci');
+
+      if (selectKunci) {
+        selectKunci.value = namaKunci;
+        selectKunci.focus();
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
