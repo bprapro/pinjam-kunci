@@ -2396,35 +2396,200 @@ function bukaZoomFoto(srcUrl) {
 }
 
 function tutupModalFoto() {
-  const modal = document.getElementById('imageModal');
-  if (modal) modal.style.display = "none";
-}
-</script>
+      const modal = document.getElementById('imageModal');
+      if (modal) modal.style.display = "none";
+    }
+  </script>
 
-<!-- SECTION DENAH INTERAKTIF -->
-<div id="sectionMap" class="form-section" style="display: none;">
-  <div class="map-controls-bar">
-    <div style="display: flex; gap: 6px; align-items: center;">
-      <span style="font-weight: bold; margin-right: 6px; color: #fff;">Lantai:</span>
-      <button type="button" class="btn-floor active" onclick="pilihLantaiMap('LG')">LG</button>
-      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L1')">L1</button>
-      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L2')">L2</button>
-      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L3')">L3</button>
-      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L4')">L4</button>
+  <!-- SECTION DENAH INTERAKTIF -->
+  <div id="sectionMap" class="form-section" style="display: none;">
+    <div class="map-controls-bar">
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <span style="font-weight: bold; margin-right: 6px; color: #fff;">Lantai:</span>
+        <button type="button" class="btn-floor active" onclick="pilihLantaiMap('LG')">LG</button>
+        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L1')">L1</button>
+        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L2')">L2</button>
+        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L3')">L3</button>
+        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L4')">L4</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" id="btnTambahPinMap" class="btn-edit-mode" style="background:#22c55e; color:#fff; display:none;" onclick="bukaModalPilihKunci()">➕ Tambah Pin Kunci</button>
+        <button type="button" id="btnToggleEditMap" class="btn-edit-mode" onclick="toggleEditModeMap()">✏️ Edit Posisi Pin</button>
+      </div>
     </div>
-    <div style="display: flex; gap: 8px;">
-      <button type="button" id="btnTambahPinMap" class="btn-edit-mode" style="background:#22c55e; color:#fff; display:none;" onclick="bukaModalPilihKunci()">➕ Tambah Pin Kunci</button>
-      <button type="button" id="btnToggleEditMap" class="btn-edit-mode" onclick="toggleEditModeMap()">✏️ Edit Posisi Pin</button>
+
+    <div class="map-viewport" id="mapViewport">
+      <div id="mapContainer">
+        <img id="mapImageBg" src="" alt="Denah Lantai" />
+        <div id="mapPinContainer"></div>
+      </div>
     </div>
   </div>
 
-  <div class="map-viewport" id="mapViewport">
-    <div id="mapContainer">
-      <img id="mapImageBg" src="" alt="Denah Lantai" />
-      <div id="mapPinContainer"></div>
-    </div>
-  </div>
-</div>
+  <!-- SCRIPT LOGIKA DENAH INTERAKTIF -->
+  <script>
+    const FLOOR_MAPS = {
+      'LG': './LG.jpg',
+      'L1': './L1.jpg',
+      'L2': './L2.jpg',
+      'L3': './L3.jpg',
+      'L4': './L4.jpg'
+    };
 
+    let currentFloorMap = 'LG';
+    let isMapEditMode = false;
+    let pinPositionsData = JSON.parse(localStorage.getItem('map_pin_positions') || '{}');
+
+    function pilihLantaiMap(floor) {
+      currentFloorMap = floor;
+      document.querySelectorAll('.btn-floor').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText === floor);
+      });
+      
+      const mapImg = document.getElementById('mapImageBg');
+      if (mapImg) mapImg.src = FLOOR_MAPS[floor] || '';
+      
+      renderPinsForFloor();
+    }
+
+    function renderPinsForFloor() {
+      const container = document.getElementById('mapPinContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      const dataKunci = window.semuaDataKunci || semuaDataKunci || []; 
+      const floorPins = pinPositionsData[currentFloorMap] || {};
+
+      Object.keys(floorPins).forEach(kunciId => {
+        const pos = floorPins[kunciId];
+        
+        const detailKunci = dataKunci.find(k => 
+          String(k.id) === String(kunciId) || 
+          String(k.nama).toLowerCase() === String(kunciId).toLowerCase()
+        ) || { nama: kunciId, status: 'Tersedia' };
+
+        const namaKunci = detailKunci.nama || kunciId;
+        const statusKunci = detailKunci.status || 'Tersedia';
+
+        const pinEl = document.createElement('div');
+        pinEl.className = 'map-pin';
+        pinEl.style.left = pos.x + '%';
+        pinEl.style.top = pos.y + '%';
+        
+        const isDipinjam = String(statusKunci).toLowerCase() === 'dipinjam';
+        const iconPin = isDipinjam ? '📍' : '📌';
+        
+        pinEl.innerHTML = `
+          <div style="font-size: 24px;">${iconPin}</div>
+          <div class="pin-tooltip">
+            <strong>${namaKunci}</strong><br/>
+            Status: <span style="color: ${isDipinjam ? '#ef4444' : '#22c55e'}; font-weight: bold;">${statusKunci}</span>
+          </div>
+        `;
+
+        if (isMapEditMode) {
+          enablePinDrag(pinEl, kunciId);
+        } else {
+          pinEl.onclick = () => alert(`Nama Kunci: ${namaKunci}\nLantai: ${currentFloorMap}\nStatus: ${statusKunci}`);
+        }
+
+        container.appendChild(pinEl);
+      });
+    }
+
+    function toggleEditModeMap() {
+      if (!isMapEditMode) {
+        const pin = prompt("Masukkan PIN Admin untuk Edit Denah:");
+        if (pin !== "3286") {
+          alert("PIN Salah!");
+          return;
+        }
+        isMapEditMode = true;
+        document.getElementById('btnToggleEditMap').classList.add('active');
+        document.getElementById('btnToggleEditMap').innerText = "💾 Selesai Edit";
+        document.getElementById('btnTambahPinMap').style.display = "inline-block";
+      } else {
+        isMapEditMode = false;
+        document.getElementById('btnToggleEditMap').classList.remove('active');
+        document.getElementById('btnToggleEditMap').innerText = "✏️ Edit Posisi Pin";
+        document.getElementById('btnTambahPinMap').style.display = "none";
+        localStorage.setItem('map_pin_positions', JSON.stringify(pinPositionsData));
+        alert("Posisi Pin Denah Berhasil Disimpan!");
+      }
+      renderPinsForFloor();
+    }
+
+    function enablePinDrag(elmnt, kunciId) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      elmnt.onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        e.stopPropagation();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+
+        const parent = document.getElementById('mapImageBg');
+        const rect = parent.getBoundingClientRect();
+        
+        let newX = ((elmnt.offsetLeft - pos1) / rect.width) * 100;
+        let newY = ((elmnt.offsetTop - pos2) / rect.height) * 100;
+
+        elmnt.style.left = newX + "%";
+        elmnt.style.top = newY + "%";
+
+        if (!pinPositionsData[currentFloorMap]) pinPositionsData[currentFloorMap] = {};
+        pinPositionsData[currentFloorMap][kunciId] = { x: newX, y: newY };
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
+    function bukaModalPilihKunci() {
+      const dataKunci = window.semuaDataKunci || semuaDataKunci || [];
+      
+      if (dataKunci.length === 0) {
+        alert("Data kunci dari Spreadsheet belum selesai dimuat.");
+        return;
+      }
+
+      const kunciLantaiIni = dataKunci.filter(k => 
+        String(k.lantai || '').toUpperCase() === currentFloorMap.toUpperCase()
+      );
+
+      if (kunciLantaiIni.length === 0) {
+        alert(`Tidak ada data kunci untuk lantai ${currentFloorMap} di Spreadsheet.`);
+        return;
+      }
+
+      let opsiText = `Pilih Kunci untuk ditaruh di Lantai ${currentFloorMap}:\n\n`;
+      kunciLantaiIni.forEach(k => {
+        opsiText += `• ID: ${k.id} - ${k.nama}\n`;
+      });
+
+      const kunciIdPilihan = prompt(opsiText + "\nKetik ID atau Nama Kunci yang ingin ditambahkan:");
+      
+      if (kunciIdPilihan) {
+        if (!pinPositionsData[currentFloorMap]) pinPositionsData[currentFloorMap] = {};
+        pinPositionsData[currentFloorMap][kunciIdPilihan] = { x: 50, y: 50 };
+        renderPinsForFloor();
+      }
+    }
+  </script>
 </body>
 </html>
