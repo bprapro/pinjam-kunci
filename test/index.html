@@ -1526,7 +1526,7 @@
     let isEditModeMap = false;
     let pinCoordinates = JSON.parse(localStorage.getItem('map_pin_coords') || '{}');
 
-    // KODE BARU (COPAG BAGIAN INI):
+    // Pemetaan gambar denah untuk tiap lantai
 const floorImages = {
   'LG': 'LG.jpg',
   'L1': 'L1.jpg',
@@ -1536,10 +1536,44 @@ const floorImages = {
 };
 
 function pilihLantaiMap(floor) {
+  // 1. Ubah class active pada tombol lantai
+  document.querySelectorAll('.btn-floor').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.textContent.trim() === floor) {
+      btn.classList.add('active');
+    }
+  });
+
+  // 2. Ganti gambar background denah
   const mapImageBg = document.getElementById('mapImageBg');
   if (mapImageBg) {
     mapImageBg.src = floorImages[floor] || 'LG.jpg';
   }
+
+  // 3. Render ulang pin nomor ruangan sesuai lantai yang dipilih
+  renderPinsForFloor(floor);
+}
+
+// Fungsi untuk menampilkan pin sesuai lantai
+function renderPinsForFloor(floor) {
+  const container = document.getElementById('mapPinContainer');
+  if (!container) return;
+
+  container.innerHTML = ''; // Bersihkan pin lama
+
+  // Filter data kunci/ruangan hanya untuk lantai yang dipilih
+  // (Sesuaikan `allKeysData` dengan nama variabel data kunci Anda)
+  const floorKeys = allKeysData.filter(kunci => kunci.floor === floor);
+
+  floorKeys.forEach(kunci => {
+    const pin = document.createElement('div');
+    pin.className = `map-pin ${kunci.status === 'dipinjam' ? 'dipinjam' : 'tersedia'}`;
+    pin.style.left = kunci.posX + '%';
+    pin.style.top = kunci.posY + '%';
+    pin.innerText = kunci.number || kunci.id; // Nomor/ID ruangan
+
+    container.appendChild(pin);
+  });
 }
 
     function toggleEditModeMap() {
