@@ -863,10 +863,12 @@
         </button>
       </div>
 
-      <div class="map-viewport" id="mapViewport">
-        <img id="mapImageBg" src="LG.jpg" class="map-image-bg" alt="Denah Lantai">
-        <div id="mapPinContainer"></div>
-      </div>
+      <div class="map-viewport" id="mapViewport" style="overflow: hidden; position: relative;">
+  <div id="panzoomContainer" style="position: relative; transform-origin: 0 0;">
+    <img id="mapImageBg" src="LG.jpg" class="map-image-bg" alt="Denah Lantai" style="width: 100%; display: block;" onerror="this.onerror=null; alert('Gambar denah gagal dimuat! Cek nama file LG.jpg');">
+    <div id="mapPinContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+  </div>
+</div>
 
       <div class="map-legend">
         <div class="legend-item">
