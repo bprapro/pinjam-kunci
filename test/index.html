@@ -2399,35 +2399,36 @@ function tutupModalFoto() {
       const modal = document.getElementById('imageModal');
       if (modal) modal.style.display = "none";
     }
-  </script>
+  <!-- TUTUP SCRIPT LAMA -->
+</script>
 
-  <!-- SECTION DENAH INTERAKTIF -->
-  <div id="sectionMap" class="form-section" style="display: none;">
-    <div class="map-controls-bar">
-      <div style="display: flex; gap: 6px; align-items: center;">
-        <span style="font-weight: bold; margin-right: 6px; color: #fff;">Lantai:</span>
-        <button type="button" class="btn-floor active" onclick="pilihLantaiMap('LG')">LG</button>
-        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L1')">L1</button>
-        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L2')">L2</button>
-        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L3')">L3</button>
-        <button type="button" class="btn-floor" onclick="pilihLantaiMap('L4')">L4</button>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button type="button" id="btnTambahPinMap" class="btn-edit-mode" style="background:#22c55e; color:#fff; display:none;" onclick="bukaModalPilihKunci()">➕ Tambah Pin Kunci</button>
-        <button type="button" id="btnToggleEditMap" class="btn-edit-mode" onclick="toggleEditModeMap()">✏️ Edit Posisi Pin</button>
-      </div>
+<!-- SECTION DENAH INTERAKTIF -->
+<div id="sectionMap" class="form-section" style="display: none;">
+  <div class="map-controls-bar">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <span style="font-weight: bold; margin-right: 6px; color: #fff;">Lantai:</span>
+      <button type="button" class="btn-floor active" onclick="pilihLantaiMap('LG')">LG</button>
+      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L1')">L1</button>
+      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L2')">L2</button>
+      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L3')">L3</button>
+      <button type="button" class="btn-floor" onclick="pilihLantaiMap('L4')">L4</button>
     </div>
-
-    <div class="map-viewport" id="mapViewport">
-      <div id="mapContainer">
-        <img id="mapImageBg" src="" alt="Denah Lantai" />
-        <div id="mapPinContainer"></div>
-      </div>
+    <div style="display: flex; gap: 8px;">
+      <button type="button" id="btnTambahPinMap" class="btn-edit-mode" style="background:#22c55e; color:#fff; display:none;" onclick="bukaModalPilihKunci()">➕ Tambah Pin Kunci</button>
+      <button type="button" id="btnToggleEditMap" class="btn-edit-mode" onclick="toggleEditModeMap()">✏️ Edit Posisi Pin</button>
     </div>
   </div>
 
-  <!-- SCRIPT LOGIKA DENAH INTERAKTIF -->
-  <script>
+  <div class="map-viewport" id="mapViewport">
+    <div id="mapContainer">
+      <img id="mapImageBg" src="" alt="Denah Lantai" />
+      <div id="mapPinContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Wajib Buka Tag Script Baru untuk Fungsi Denah di Bawahnya -->
+<script>
     const FLOOR_MAPS = {
       'LG': './LG.jpg',
       'L1': './L1.jpg',
