@@ -10,6 +10,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
+    /* Styling Pin Lingkaran Hijau/Merah */
+.map-pin {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+
+.map-pin:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  z-index: 10;
+}
+
+.map-pin.tersedia { background-color: #22c55e; }
+.map-pin.dipinjam { background-color: #ef4444; }
+
+/* Styling Popup Mengambang (Tooltip) */
+.pin-tooltip {
+  position: absolute;
+  display: none;
+  background: #0f172a;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transform: translate(-50%, -120%);
+}
     /* Container Loading Dots */
     .dots-loader-wrapper {
       display: flex !important;
@@ -1575,22 +1617,37 @@ function pilihLantaiMap(floor) {
   renderPinsForFloor(floor);
 }
 
+// Pastikan elemen tooltip ada di container
+function getOrCreateTooltip(container) {
+  let tooltip = document.getElementById('pinTooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'pinTooltip';
+    tooltip.className = 'pin-tooltip';
+    container.appendChild(tooltip);
+  }
+  return tooltip;
+}
+
 function renderPinsForFloor(floor) {
   const container = document.getElementById('mapPinContainer');
   if (!container) return;
   container.innerHTML = '';
 
+  const tooltip = getOrCreateTooltip(container);
+
   let keys = (typeof allKeysData !== 'undefined' && allKeysData.length > 0) 
-    ? allKeysData.filter(k => k.floor === floor)
+    ? allKeysData.filter(k => String(k.floor).toUpperCase() === String(floor).toUpperCase())
     : [];
 
-  // Generate otomatis 1-133 untuk LG jika data server belum ada
+  // Generate otomatis jika data kosong
   if (keys.length === 0) {
     const maxCount = totalKeysPerFloor[floor] || 30;
     for (let i = 1; i <= maxCount; i++) {
       keys.push({
         id: i,
         number: i,
+        name: `Ruangan ${i}`,
         floor: floor,
         status: 'tersedia',
         posX: 5 + ((i - 1) % 10) * 9,
@@ -1603,9 +1660,37 @@ function renderPinsForFloor(floor) {
     const pin = document.createElement('div');
     pin.className = `map-pin ${kunci.status === 'dipinjam' ? 'dipinjam' : 'tersedia'}`;
     pin.innerText = kunci.number || kunci.id;
-    pin.style.position = 'absolute';
     pin.style.left = `${kunci.posX}%`;
     pin.style.top = `${kunci.posY}%`;
+
+    const labelNama = kunci.name || kunci.nama || `Kunci ${kunci.number || kunci.id}`;
+    const labelStatus = kunci.status === 'dipinjam' ? '🔴 Dipinjam' : '🟢 Tersedia';
+
+    // Hover Kursor (Desktop)
+    pin.addEventListener('mouseenter', (e) => {
+      if (isEditMode) return;
+      tooltip.innerHTML = `<strong>${labelNama}</strong><br><small>${labelStatus}</small>`;
+      tooltip.style.display = 'block';
+      positionTooltip(e, pin, container, tooltip);
+    });
+
+    pin.addEventListener('mousemove', (e) => {
+      if (isEditMode) return;
+      positionTooltip(e, pin, container, tooltip);
+    });
+
+    pin.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+
+    // Tap/Klik (HP & Mobile)
+    pin.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isEditMode) return;
+      tooltip.innerHTML = `<strong>${labelNama}</strong><br><small>${labelStatus}</small>`;
+      tooltip.style.display = tooltip.style.display === 'block' ? 'none' : 'block';
+      positionTooltip(e, pin, container, tooltip);
+    });
 
     if (isEditMode) {
       pin.classList.add('draggable');
@@ -1614,6 +1699,23 @@ function renderPinsForFloor(floor) {
 
     container.appendChild(pin);
   });
+
+  // Sembunyikan tooltip saat klik area luar
+  document.addEventListener('click', () => {
+    if (tooltip) tooltip.style.display = 'none';
+  });
+}
+
+// Fungsi Mengatur Posisi Popup Mengambang
+function positionTooltip(event, pin, container, tooltip) {
+  const pinRect = pin.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  const left = pinRect.left - containerRect.left + (pinRect.width / 2);
+  const top = pinRect.top - containerRect.top;
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
 }
 
 function toggleEditModeMap() {
