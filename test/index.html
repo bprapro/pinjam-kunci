@@ -795,8 +795,14 @@
   cursor: grab;
   touch-action: none;
 }
-.map-viewport:active {
-  cursor: grabbing;
+.map-viewport {
+  position: relative;
+  width: 100%;
+  height: 500px; /* Atur tinggi area denah */
+  background-color: #f8fafc;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
 }
 #mapContainer {
   position: absolute;
@@ -807,7 +813,9 @@
 }
 #mapImageBg {
   display: block;
-  max-width: none;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Memaksa gambar pas di dalam bingkai tanpa terpotong/zoom */
   pointer-events: none;
   user-select: none;
 }
@@ -938,8 +946,7 @@
         <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
         Denah
       </button>
-      <button class="nav-tab" onclick="switchTab('sectionMap')">🗺️ Denah Interaktif</button>
-    </div>
+      </div>
 
     <!-- FORM PINJAM -->
     <div id="sectionPinjam" class="form-section active">
