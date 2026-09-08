@@ -84,21 +84,19 @@
     }
 
     .video-bg {
-      display: block !important;
-      visibility: visible !important;
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      z-index: -100 !important; 
-      object-fit: cover;
-      opacity: 0.25 !important; 
-      filter: grayscale(30%) contrast(110%);
-      pointer-events: none;
-    }
+  display: block !important;
+  visibility: visible !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1 !important; /* Memastikan video berada tepat di belakang konten */
+  object-fit: cover;
+  opacity: 0.6 !important; /* Dinaikkan dari 0.25 agar video tampak lebih jelas */
+  filter: contrast(105%);
+  pointer-events: none;
+}
 
     :root {
       --primary: #0052FF;
@@ -733,9 +731,10 @@
     </div>
   </div>
 
-  <video id="bgVideo" loop muted playsinline class="video-bg">
-    <source src="drone.mp4" type="video/mp4">
-  </video>
+ <video id="bgVideo" autoplay loop muted playsinline class="video-bg">
+  <source src="drone.mp4" type="video/mp4">
+  Browser Anda tidak mendukung tag video.
+</video>
 
   <!-- MODAL PREVIEW FOTO -->
   <div id="imageModal" class="image-modal">
