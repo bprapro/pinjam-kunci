@@ -1781,28 +1781,38 @@ function toggleEditModeMap() {
   renderPinsForFloor(currentFloor);
 }
 
-// Modal Pilih Kunci - Mengambil langsung opsi dari Dropdown/Select Kunci Utama
+// Modal Pilih Kunci - Mengambil Data Kunci Resmi Berdasarkan Lantai
 function bukaModalPilihKunci() {
-  // 1. Cari elemen dropdown/select Kunci yang ada di Form Utama Anda
-  // (Coba cari id 'selectKunci', 'kunci', 'id_kunci', atau elemen select pertama di form)
-  const mainSelect = document.getElementById('selectKunci') || 
-                     document.getElementById('kunci') || 
-                     document.getElementById('id_kunci') || 
-                     document.querySelector('select');
+  const sourceData = getSpreadsheetData();
 
-  if (!mainSelect || mainSelect.options.length <= 1) {
-    alert("Data pilihan kunci belum dimuat di form. Silakan tunggu sebentar atau refresh halaman.");
+  if (!sourceData || sourceData.length === 0) {
+    alert("Data kunci dari spreadsheet belum selesai dimuat. Silakan tunggu 2 detik lalu coba lagi.");
     return;
   }
 
-  // 2. Salin seluruh pilihan opsi (HTML) langsung dari dropdown utama
-  const optionsHtml = mainSelect.innerHTML;
+  // Filter kunci yang sesuai dengan Lantai Aktif (LG/L1/L2/L3/L4)
+  let keysInFloor = sourceData.filter(k => {
+    let f = k['Lantai'] || k.Lantai || k.lantai || k.floor || '';
+    return String(f).trim().toUpperCase() === String(currentFloor).trim().toUpperCase();
+  });
+
+  if (keysInFloor.length === 0) {
+    alert(`Tidak ditemukan daftar kunci untuk Lantai ${currentFloor}.`);
+    return;
+  }
+
+  // Buat Opsi Dropdown Kunci (ID + Nama Ruangan)
+  let optionsHtml = keysInFloor.map(k => {
+    let id = k['ID Kunci'] || k.id_kunci || k.id || k.no || '';
+    let nm = k['Nama Kunci'] || k.nama_kunci || k.ruangan || `Kunci ${id}`;
+    return `<option value="${id}">ID: ${id} - ${nm}</option>`;
+  }).join('');
 
   // Hapus modal lama jika ada
   let existingModal = document.getElementById('modalPilihKunci');
   if (existingModal) existingModal.remove();
 
-  // 3. Tampilkan Modal Pop-up menggunakan opsi yang sama persis
+  // Render Pop-up Modal
   const modal = document.createElement('div');
   modal.id = 'modalPilihKunci';
   modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:99999;';
@@ -1812,12 +1822,12 @@ function bukaModalPilihKunci() {
       <h3 style="margin-top:0; color:#0f172a; font-size:16px;">Tambah Pin Kunci ke Denah</h3>
       <p style="font-size:12px; color:#64748b;">Pilih kunci yang ingin ditampilkan di Lantai <b>${currentFloor}</b>:</p>
       
-      <select id="selectKunciPin" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #cbd5e1; font-size:13px;">
+      <select id="selectKunciPin" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #cbd5e1; font-size:13px; color:#333; background:#fff;">
         ${optionsHtml}
       </select>
       
       <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button onclick="document.getElementById('modalPilihKunci').remove()" style="padding:8px 14px; border:none; background:#e2e8f0; border-radius:6px; cursor:pointer;">Batal</button>
+        <button onclick="document.getElementById('modalPilihKunci').remove()" style="padding:8px 14px; border:none; background:#e2e8f0; border-radius:6px; cursor:pointer; color:#333;">Batal</button>
         <button onclick="prosesTambahPin()" style="padding:8px 14px; border:none; background:#16a34a; color:#fff; border-radius:6px; cursor:pointer; font-weight:bold;">Tampilkan Pin</button>
       </div>
     </div>
@@ -1825,7 +1835,7 @@ function bukaModalPilihKunci() {
   document.body.appendChild(modal);
 }
 
-// Fungsi eksekusi penambahan pin
+// Fungsi Eksekusi & Merender Langsung Pin ke Denah
 function prosesTambahPin() {
   const select = document.getElementById('selectKunciPin');
   if (!select || !select.value) {
@@ -1834,20 +1844,22 @@ function prosesTambahPin() {
   }
 
   const idKunci = select.value;
+  const teksKunci = select.options[select.selectedIndex].text;
   const posKey = `${currentFloor}_${idKunci}`;
 
+  // 1. Simpan posisi awal di tengah denah (50%, 50%)
   if (typeof storedPinPositions === 'undefined') storedPinPositions = {};
-  
-  // Taruh titik pin di posisi tengah denah (50%, 50%) agar bisa digeser
   storedPinPositions[posKey] = { x: 50, y: 50 };
   localStorage.setItem('map_pin_positions', JSON.stringify(storedPinPositions));
 
-  if (typeof renderPinsForFloor === 'function') {
-    renderPinsForFloor(currentFloor);
-  }
-  
-  document.getElementById('modalPilihKunci').remove();
-  alert(`Pin Kunci ID ${idKunci} berhasil dimunculkan! Silakan geser ke posisi ruangan yang sesuai.`);
+  // 2. Re-render seluruh pin di lantai aktif agar pin baru langsung muncul & bisa digeser
+  renderPinsForFloor(currentFloor);
+
+  // 3. Tutup Modal & Berikan Notifikasi
+  const modal = document.getElementById('modalPilihKunci');
+  if (modal) modal.remove();
+
+  alert(`Pin [${teksKunci}] berhasil dimunculkan di tengah denah Lantai ${currentFloor}! Silakan geser pin tersebut ke posisi ruangan yang tepat.`);
 }
 
 // Drag Pin
