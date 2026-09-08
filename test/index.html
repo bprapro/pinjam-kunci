@@ -10,6 +10,50 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
+    /* Styling Viewport Zoom & Drag Map */
+.map-viewport {
+  position: relative;
+  width: 100%;
+  max-height: 600px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: grab;
+}
+.map-viewport:active {
+  cursor: grabbing;
+}
+
+#panzoomContainer {
+  position: relative;
+  width: 100%;
+  transform-origin: 0 0;
+}
+
+.map-image-bg {
+  width: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* Modal Pilih Kunci Admin */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.admin-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
     /* Styling Pin Lingkaran Hijau/Merah */
 .map-pin {
   position: absolute;
@@ -1566,11 +1610,12 @@
     /* ==========================================
        7. LOGIKA INTERACTIVE FLOOR MAP & PIN EDITOR
        ========================================== */
-    let currentFloor = 'LG';
+let currentFloor = 'LG';
 let isEditMode = false;
 let panzoomInstance = null;
 const ADMIN_PIN = '3286';
 
+// Map Gambar Denah
 const floorImages = {
   'LG': 'LG.jpg',
   'L1': 'L1.jpg',
@@ -1579,56 +1624,49 @@ const floorImages = {
   'L4': 'L4.jpg'
 };
 
-const totalKeysPerFloor = { 'LG': 133, 'L1': 50, 'L2': 50, 'L3': 50, 'L4': 50 };
+// Data pin lokal tempat menyimpan koordinat sementara
+let activeMapPins = [];
 
-// Inisialisasi
 document.addEventListener('DOMContentLoaded', () => {
   initPanzoom();
   pilihLantaiMap('LG');
 });
 
+// Inisialisasi Zoom & Pan
 function initPanzoom() {
   const elem = document.getElementById('panzoomContainer');
   if (elem && typeof Panzoom !== 'undefined') {
     panzoomInstance = Panzoom(elem, {
-      maxScale: 4,
+      maxScale: 5,
       minScale: 1,
-      contain: 'outside'
+      contain: 'outside',
+      cursor: 'move'
     });
-    elem.parentElement.addEventListener('wheel', panzoomInstance.zoomWithWheel);
+    const parent = elem.parentElement;
+    parent.addEventListener('wheel', panzoomInstance.zoomWithWheel);
   }
 }
 
+// Ganti Lantai Denah
 function pilihLantaiMap(floor) {
   currentFloor = floor;
 
-  // Highlight tombol aktif
+  // Highlight tombol lantai
   document.querySelectorAll('.btn-floor').forEach(btn => {
     btn.classList.toggle('active', btn.textContent.trim() === floor);
   });
 
-  // Ganti Gambar Denah
+  // Ganti Gambar Background
   const mapImage = document.getElementById('mapImageBg');
   if (mapImage) {
     mapImage.src = floorImages[floor] || 'LG.jpg';
   }
 
-  // Render Pin
+  // Render Ulang Pin
   renderPinsForFloor(floor);
 }
 
-// Pastikan elemen tooltip ada di container
-function getOrCreateTooltip(container) {
-  let tooltip = document.getElementById('pinTooltip');
-  if (!tooltip) {
-    tooltip = document.createElement('div');
-    tooltip.id = 'pinTooltip';
-    tooltip.className = 'pin-tooltip';
-    container.appendChild(tooltip);
-  }
-  return tooltip;
-}
-
+// Render Pin di Denah
 function renderPinsForFloor(floor) {
   const container = document.getElementById('mapPinContainer');
   if (!container) return;
@@ -1636,80 +1674,56 @@ function renderPinsForFloor(floor) {
 
   const tooltip = getOrCreateTooltip(container);
 
-  // 1. Ambil data dari variabel global Spreadsheet (misal: window.allKeysData atau dataKunciGlobal)
-  // Pastikan mengambil array data utama
+  // Ambil data kunci dari Spreadsheet / Variabel Global
   let sourceData = (typeof allKeysData !== 'undefined' && Array.isArray(allKeysData)) 
     ? allKeysData 
-    : ((typeof dataKunciGlobal !== 'undefined') ? dataKunciGlobal : []);
+    : ((typeof dataKunciGlobal !== 'undefined') ? dataKunciGlobal : activeMapPins);
 
-  // Filter berdasarkan lantai yang dipilih
+  // Filter kunci berdasarkan lantai
   let keys = sourceData.filter(k => {
     let f = k.floor || k.Lantai || k.lantai || '';
     return String(f).trim().toUpperCase() === String(floor).trim().toUpperCase();
   });
 
-  // 2. Jika data dari spreadsheet benar-benar kosong, baru tampilkan info peringatan (bukan angka acak)
-  if (keys.length === 0) {
-    console.warn(`Data kunci spreadsheet untuk lantai ${floor} tidak ditemukan/kosong.`);
-  }
-
   keys.forEach((kunci, index) => {
+    // Hanya tampilkan jika koordinat posX & posY sudah ditentukan
+    if (kunci.posX === undefined && kunci.posX === null && !isEditMode) return;
+
     const pin = document.createElement('div');
-    
-    // Ambil properti status dari Spreadsheet
     const statusKunci = (kunci.status || kunci.Status || 'tersedia').toString().toLowerCase();
-    const isDipinjam = statusKunci.includes('pinjam') || statusKunci.includes('dipinjam');
+    const isDipinjam = statusKunci.includes('pinjam');
 
     pin.className = `map-pin ${isDipinjam ? 'dipinjam' : 'tersedia'}`;
-    
-    // Ambil Nomor Kunci dari Spreadsheet
-    const noKunci = kunci.no || kunci.number || kunci.nomor || kunci['No Kunci'] || kunci['Nomor Kunci'] || (index + 1);
+    const noKunci = kunci.no || kunci.number || kunci.nomor || kunci['No Kunci'] || (index + 1);
     pin.innerText = noKunci;
 
-    // Posisi X & Y (Jika belum ada koordinat di spreadsheet, gunakan posisi default)
-    const posX = kunci.posX || kunci.x || (5 + (index % 10) * 9);
-    const posY = kunci.posY || kunci.y || (10 + Math.floor(index / 10) * 6);
+    // Posisi default jika belum diset
+    const posX = kunci.posX !== undefined ? kunci.posX : (10 + (index % 10) * 8);
+    const posY = kunci.posY !== undefined ? kunci.posY : (15 + Math.floor(index / 10) * 8);
 
     pin.style.left = `${posX}%`;
     pin.style.top = `${posY}%`;
 
-    // Informasikan Nama Ruangan & Peminjam dari Spreadsheet ke Tooltip
-    const namaRuangan = kunci.ruangan || kunci.Ruangan || kunci['Nama Ruangan'] || kunci.nama || `Kunci ${noKunci}`;
-    const peminjam = kunci.peminjam || kunci.Peminjam || kunci['Nama Peminjam'] || '-';
+    const namaRuangan = kunci.ruangan || kunci.Ruangan || kunci['Nama Ruangan'] || `Kunci ${noKunci}`;
+    const peminjam = kunci.peminjam || kunci.Peminjam || '-';
     const statusTeks = isDipinjam ? `🔴 Dipinjam (${peminjam})` : '🟢 Tersedia';
 
-    // Event Hover (Desktop)
-    pin.addEventListener('mouseenter', (e) => {
+    // Hover / Touch Tooltip
+    const showInfo = (e) => {
       if (isEditMode) return;
       tooltip.innerHTML = `
-        <div style="font-weight:600; font-size:13px; margin-bottom:2px;">${namaRuangan}</div>
-        <div style="font-size:11px; opacity:0.9;">No. Kunci: <strong>${noKunci}</strong></div>
-        <div style="font-size:11px; margin-top:2px;">Status: ${statusTeks}</div>
+        <div style="font-weight:bold; font-size:13px;">${namaRuangan}</div>
+        <div>No. Kunci: <strong>${noKunci}</strong></div>
+        <div style="font-size:11px; margin-top:2px;">${statusTeks}</div>
       `;
       tooltip.style.display = 'block';
       positionTooltip(e, pin, container, tooltip);
-    });
+    };
 
-    pin.addEventListener('mousemove', (e) => {
-      if (!isEditMode) positionTooltip(e, pin, container, tooltip);
-    });
-
-    pin.addEventListener('mouseleave', () => {
-      tooltip.style.display = 'none';
-    });
-
-    // Event Click / Tap (Mobile)
-    pin.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (isEditMode) return;
-      tooltip.innerHTML = `
-        <div style="font-weight:600; font-size:13px; margin-bottom:2px;">${namaRuangan}</div>
-        <div style="font-size:11px; opacity:0.9;">No. Kunci: <strong>${noKunci}</strong></div>
-        <div style="font-size:11px; margin-top:2px;">Status: ${statusTeks}</div>
-      `;
-      tooltip.style.display = (tooltip.style.display === 'block') ? 'none' : 'block';
-      positionTooltip(e, pin, container, tooltip);
-    });
+    pin.addEventListener('mouseenter', showInfo);
+    pin.addEventListener('mousemove', (e) => { if (!isEditMode) positionTooltip(e, pin, container, tooltip); });
+    pin.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+    pin.addEventListener('click', (e) => { e.stopPropagation(); showInfo(e); });
 
     if (isEditMode) {
       pin.classList.add('draggable');
@@ -1720,27 +1734,17 @@ function renderPinsForFloor(floor) {
   });
 }
 
-// Fungsi Mengatur Posisi Popup Mengambang
-function positionTooltip(event, pin, container, tooltip) {
-  const pinRect = pin.getBoundingClientRect();
-  const containerRect = container.getBoundingClientRect();
-
-  const left = pinRect.left - containerRect.left + (pinRect.width / 2);
-  const top = pinRect.top - containerRect.top;
-
-  tooltip.style.left = `${left}px`;
-  tooltip.style.top = `${top}px`;
-}
-
+// Mode Edit (Proteksi PIN 3286)
 function toggleEditModeMap() {
   if (!isEditMode) {
     const inputPin = prompt("Masukkan PIN Admin untuk Edit Posisi Pin:");
     if (inputPin !== ADMIN_PIN) {
-      alert("PIN Salah!");
+      alert("PIN Salah! Akses ditolak.");
       return;
     }
     isEditMode = true;
-    alert("Mode Edit Aktif: Geser titik pin.");
+    alert("Mode Edit Aktif! Geser pin ke posisi ruangan. Klik 'Tambah Pin' untuk memasukkan kunci baru dari Spreadsheet.");
+    bukaModalPilihKunci();
   } else {
     isEditMode = false;
     alert("Mode Edit Nonaktif.");
@@ -1748,11 +1752,72 @@ function toggleEditModeMap() {
   renderPinsForFloor(currentFloor);
 }
 
+// Modal Tambah Kunci dari Database Spreadsheet ke Layout
+function bukaModalPilihKunci() {
+  let sourceData = (typeof allKeysData !== 'undefined' && Array.isArray(allKeysData)) ? allKeysData : [];
+  
+  if (sourceData.length === 0) {
+    alert("Data kunci dari Spreadsheet belum selesai dimuat.");
+    return;
+  }
+
+  let existingModal = document.getElementById('modalPilihKunci');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modalPilihKunci';
+  modal.className = 'admin-modal-overlay';
+  
+  let optionsHtml = sourceData.map((k, idx) => {
+    let no = k.no || k.number || k.nomor || k['No Kunci'] || (idx + 1);
+    let nm = k.ruangan || k.Ruangan || k['Nama Ruangan'] || `Kunci ${no}`;
+    let fl = k.floor || k.Lantai || 'LG';
+    return `<option value="${idx}">[${fl}] No. ${no} - ${nm}</option>`;
+  }).join('');
+
+  modal.innerHTML = `
+    <div class="admin-modal-content">
+      <h3 style="margin-top:0;">Pilih Kunci untuk Ditambahkan</h3>
+      <p style="font-size:12px; color:#666;">Pilih kunci dari Spreadsheet untuk ditampilkan pin-nya di Lantai ${currentFloor}:</p>
+      <select id="selectKunciAdmin" style="width:100%; padding:8px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;">
+        ${optionsHtml}
+      </select>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button onclick="document.getElementById('modalPilihKunci').remove()" style="padding:8px 12px; border:none; background:#ccc; border-radius:6px; cursor:pointer;">Batal</button>
+        <button onclick="prosesTambahPinKunci()" style="padding:8px 12px; border:none; background:#22c55e; color:#fff; border-radius:6px; cursor:pointer; font-weight:bold;">Tampilkan Pin</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function prosesTambahPinKunci() {
+  const select = document.getElementById('selectKunciAdmin');
+  if (!select) return;
+
+  let sourceData = (typeof allKeysData !== 'undefined') ? allKeysData : [];
+  let selectedObj = sourceData[select.value];
+
+  if (selectedObj) {
+    selectedObj.floor = currentFloor; // Set ke lantai yang sedang dibuka
+    selectedObj.posX = 50; // Taruh di tengah denah (50%)
+    selectedObj.posY = 50;
+    
+    activeMapPins.push(selectedObj);
+    renderPinsForFloor(currentFloor);
+    alert(`Pin untuk No. ${selectedObj.no || selectedObj.number || ''} berhasil ditaruh di tengah denah. Silakan geser ke posisi ruangan yang sesuai.`);
+  }
+
+  document.getElementById('modalPilihKunci').remove();
+}
+
+// Drag & Drop Pin saat Edit Mode
 function enablePinDrag(pinElement, kunci) {
   let isDragging = false;
+
   pinElement.onmousedown = (e) => {
     isDragging = true;
-    if (panzoomInstance) panzoomInstance.pause();
+    if (panzoomInstance) panzoomInstance.pause(); // Matikan zoom saat geser pin
 
     const parentRect = pinElement.parentElement.getBoundingClientRect();
 
@@ -1767,8 +1832,8 @@ function enablePinDrag(pinElement, kunci) {
       pinElement.style.left = `${x}%`;
       pinElement.style.top = `${y}%`;
 
-      kunci.posX = x.toFixed(2);
-      kunci.posY = y.toFixed(2);
+      kunci.posX = parseFloat(x.toFixed(2));
+      kunci.posY = parseFloat(y.toFixed(2));
     };
 
     document.onmousemove = onMouseMove;
@@ -1781,6 +1846,31 @@ function enablePinDrag(pinElement, kunci) {
     };
   };
 }
+
+// Tooltip Helper
+function getOrCreateTooltip(container) {
+  let tooltip = document.getElementById('pinTooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'pinTooltip';
+    tooltip.className = 'pin-tooltip';
+    container.appendChild(tooltip);
+  }
+  return tooltip;
+}
+
+function positionTooltip(event, pin, container, tooltip) {
+  const pinRect = pin.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  const left = pinRect.left - containerRect.left + (pinRect.width / 2);
+  const top = pinRect.top - containerRect.top;
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+}
+
+// Alias fungsi jika dipanggil dari tempat lain
+const renderMapPins = renderPinsForFloor;
 
     /* ==========================================
        8. SUBMIT FORM KE GOOGLE APPS SCRIPT
