@@ -1960,16 +1960,15 @@ function toggleEditModeMap() {
 }
 
 function bukaModalPilihKunci() {
-  const dataKunci = window.semuaDataKunci || semuaDataKunci || [];
+  const dataKunci = window.semuaDataKunci || window.allKunciData || [];
   
   if (dataKunci.length === 0) {
     alert("Data kunci dari Spreadsheet belum selesai dimuat.");
     return;
   }
 
-  // Filter kunci berdasarkan lantai yang aktif
   const kunciLantaiIni = dataKunci.filter(k => 
-    String(k.lantai || '').toUpperCase() === currentFloorMap.toUpperCase()
+    String(k.lantai || k.Lantai || '').toUpperCase() === currentFloorMap.toUpperCase()
   );
 
   if (kunciLantaiIni.length === 0) {
@@ -1977,19 +1976,21 @@ function bukaModalPilihKunci() {
     return;
   }
 
-  let opsiText = `Pilih Kunci untuk ditaruh di Lantai ${currentFloorMap}:\n\n`;
-  kunciLantaiIni.forEach(k => {
-    opsiText += `• ID: ${k.id} - ${k.nama}\n`;
-  });
-
-  const kunciIdPilihan = prompt(opsiText + "\nKetik ID atau Nama Kunci yang ingin ditambahkan:");
+  // Cukup masukkan ID angka kunci (Misal: 1, 2, atau 3)
+  const kunciIdPilihan = prompt(
+    `PILIH KUNCI LANTAI ${currentFloorMap}:\n\n` + 
+    kunciLantaiIni.map(k => `• ID: ${k.id || k['ID Kunci']} - ${k.nama || k['Nama Kunci']}`).join('\n') +
+    `\n\nKetik angka ID Kunci yang ingin ditambahkan:`
+  );
   
   if (kunciIdPilihan) {
+    const keySelected = kunciIdPilihan.trim();
     if (!pinPositionsData[currentFloorMap]) pinPositionsData[currentFloorMap] = {};
     
-    // Posisi pin baru ditaruh di tengah gambar (50%, 50%)
-    pinPositionsData[currentFloorMap][kunciIdPilihan] = { x: 50, y: 50 };
+    // Taruh pin di tengah denah (50%, 50%) agar bisa digeser
+    pinPositionsData[currentFloorMap][keySelected] = { x: 50, y: 50 };
     renderPinsForFloor();
+    alert(`Pin Kunci ID ${keySelected} berhasil ditambahkan ke lantai ${currentFloorMap}! Silakan geser posisi pin tersebut.`);
   }
 }
 
