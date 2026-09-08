@@ -1636,59 +1636,78 @@ function renderPinsForFloor(floor) {
 
   const tooltip = getOrCreateTooltip(container);
 
-  let keys = (typeof allKeysData !== 'undefined' && allKeysData.length > 0) 
-    ? allKeysData.filter(k => String(k.floor).toUpperCase() === String(floor).toUpperCase())
-    : [];
+  // 1. Ambil data dari variabel global Spreadsheet (misal: window.allKeysData atau dataKunciGlobal)
+  // Pastikan mengambil array data utama
+  let sourceData = (typeof allKeysData !== 'undefined' && Array.isArray(allKeysData)) 
+    ? allKeysData 
+    : ((typeof dataKunciGlobal !== 'undefined') ? dataKunciGlobal : []);
 
-  // Generate otomatis jika data kosong
+  // Filter berdasarkan lantai yang dipilih
+  let keys = sourceData.filter(k => {
+    let f = k.floor || k.Lantai || k.lantai || '';
+    return String(f).trim().toUpperCase() === String(floor).trim().toUpperCase();
+  });
+
+  // 2. Jika data dari spreadsheet benar-benar kosong, baru tampilkan info peringatan (bukan angka acak)
   if (keys.length === 0) {
-    const maxCount = totalKeysPerFloor[floor] || 30;
-    for (let i = 1; i <= maxCount; i++) {
-      keys.push({
-        id: i,
-        number: i,
-        name: `Ruangan ${i}`,
-        floor: floor,
-        status: 'tersedia',
-        posX: 5 + ((i - 1) % 10) * 9,
-        posY: 10 + Math.floor((i - 1) / 10) * 6
-      });
-    }
+    console.warn(`Data kunci spreadsheet untuk lantai ${floor} tidak ditemukan/kosong.`);
   }
 
-  keys.forEach(kunci => {
+  keys.forEach((kunci, index) => {
     const pin = document.createElement('div');
-    pin.className = `map-pin ${kunci.status === 'dipinjam' ? 'dipinjam' : 'tersedia'}`;
-    pin.innerText = kunci.number || kunci.id;
-    pin.style.left = `${kunci.posX}%`;
-    pin.style.top = `${kunci.posY}%`;
+    
+    // Ambil properti status dari Spreadsheet
+    const statusKunci = (kunci.status || kunci.Status || 'tersedia').toString().toLowerCase();
+    const isDipinjam = statusKunci.includes('pinjam') || statusKunci.includes('dipinjam');
 
-    const labelNama = kunci.name || kunci.nama || `Kunci ${kunci.number || kunci.id}`;
-    const labelStatus = kunci.status === 'dipinjam' ? '🔴 Dipinjam' : '🟢 Tersedia';
+    pin.className = `map-pin ${isDipinjam ? 'dipinjam' : 'tersedia'}`;
+    
+    // Ambil Nomor Kunci dari Spreadsheet
+    const noKunci = kunci.no || kunci.number || kunci.nomor || kunci['No Kunci'] || kunci['Nomor Kunci'] || (index + 1);
+    pin.innerText = noKunci;
 
-    // Hover Kursor (Desktop)
+    // Posisi X & Y (Jika belum ada koordinat di spreadsheet, gunakan posisi default)
+    const posX = kunci.posX || kunci.x || (5 + (index % 10) * 9);
+    const posY = kunci.posY || kunci.y || (10 + Math.floor(index / 10) * 6);
+
+    pin.style.left = `${posX}%`;
+    pin.style.top = `${posY}%`;
+
+    // Informasikan Nama Ruangan & Peminjam dari Spreadsheet ke Tooltip
+    const namaRuangan = kunci.ruangan || kunci.Ruangan || kunci['Nama Ruangan'] || kunci.nama || `Kunci ${noKunci}`;
+    const peminjam = kunci.peminjam || kunci.Peminjam || kunci['Nama Peminjam'] || '-';
+    const statusTeks = isDipinjam ? `🔴 Dipinjam (${peminjam})` : '🟢 Tersedia';
+
+    // Event Hover (Desktop)
     pin.addEventListener('mouseenter', (e) => {
       if (isEditMode) return;
-      tooltip.innerHTML = `<strong>${labelNama}</strong><br><small>${labelStatus}</small>`;
+      tooltip.innerHTML = `
+        <div style="font-weight:600; font-size:13px; margin-bottom:2px;">${namaRuangan}</div>
+        <div style="font-size:11px; opacity:0.9;">No. Kunci: <strong>${noKunci}</strong></div>
+        <div style="font-size:11px; margin-top:2px;">Status: ${statusTeks}</div>
+      `;
       tooltip.style.display = 'block';
       positionTooltip(e, pin, container, tooltip);
     });
 
     pin.addEventListener('mousemove', (e) => {
-      if (isEditMode) return;
-      positionTooltip(e, pin, container, tooltip);
+      if (!isEditMode) positionTooltip(e, pin, container, tooltip);
     });
 
     pin.addEventListener('mouseleave', () => {
       tooltip.style.display = 'none';
     });
 
-    // Tap/Klik (HP & Mobile)
+    // Event Click / Tap (Mobile)
     pin.addEventListener('click', (e) => {
       e.stopPropagation();
       if (isEditMode) return;
-      tooltip.innerHTML = `<strong>${labelNama}</strong><br><small>${labelStatus}</small>`;
-      tooltip.style.display = tooltip.style.display === 'block' ? 'none' : 'block';
+      tooltip.innerHTML = `
+        <div style="font-weight:600; font-size:13px; margin-bottom:2px;">${namaRuangan}</div>
+        <div style="font-size:11px; opacity:0.9;">No. Kunci: <strong>${noKunci}</strong></div>
+        <div style="font-size:11px; margin-top:2px;">Status: ${statusTeks}</div>
+      `;
+      tooltip.style.display = (tooltip.style.display === 'block') ? 'none' : 'block';
       positionTooltip(e, pin, container, tooltip);
     });
 
@@ -1698,11 +1717,6 @@ function renderPinsForFloor(floor) {
     }
 
     container.appendChild(pin);
-  });
-
-  // Sembunyikan tooltip saat klik area luar
-  document.addEventListener('click', () => {
-    if (tooltip) tooltip.style.display = 'none';
   });
 }
 
