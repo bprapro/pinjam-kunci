@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pinjam Kunci</title>
+  <title>Pinjam Kunci & Floor Mapping</title>
   <link rel="icon" type="image/png" sizes="32x32" href="23smg.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,19 +84,19 @@
     }
 
     .video-bg {
-  display: block !important;
-  visibility: visible !important;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1 !important; /* Memastikan video berada tepat di belakang konten */
-  object-fit: cover;
-  opacity: 0.6 !important; /* Dinaikkan dari 0.25 agar video tampak lebih jelas */
-  filter: contrast(105%);
-  pointer-events: none;
-}
+      display: block !important;
+      visibility: visible !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1 !important;
+      object-fit: cover;
+      opacity: 0.6 !important;
+      filter: contrast(105%);
+      pointer-events: none;
+    }
 
     :root {
       --primary: #0052FF;
@@ -293,12 +293,13 @@
       margin-bottom: 30px; 
       border: none;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+      gap: 4px;
     }
 
     .tab-btn { 
       flex: 1; 
       padding: 10px; 
-      font-size: 14px; 
+      font-size: 13px; 
       font-weight: 600; 
       border: none; 
       border-radius: 8px; 
@@ -309,7 +310,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
     .tab-btn svg { width: 18px; height: 18px; fill: var(--text-muted); transition: fill 0.25s; }
 
@@ -318,6 +319,9 @@
 
     .tab-btn.active-kembali { background-color: #be123c; color: white; box-shadow: 0 4px 12px rgba(223,44,62,0.2); }
     .tab-btn.active-kembali svg { fill: white; }
+
+    .tab-btn.active-map { background-color: #0284c7; color: white; box-shadow: 0 4px 12px rgba(2,132,199,0.2); }
+    .tab-btn.active-map svg { fill: white; }
 
     button {
       transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
@@ -540,6 +544,159 @@
     tbody tr td img:active, .img-card-mobile:active {
       transform: scale(0.94) !important;
     }
+
+    /* ==========================================
+       9. STYLES FITUR FLOOR MAP INTERAKTIF
+       ========================================== */
+    .map-controls-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .map-floor-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-floor {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-floor.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+    }
+
+    .btn-edit-mode {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #e2e8f0;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-edit-mode.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+    }
+
+    .map-viewport {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0f172a;
+      user-select: none;
+    }
+
+    .map-image-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+
+    .key-pin {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      transition: transform 0.15s ease, background 0.2s ease;
+      z-index: 10;
+    }
+
+    .key-pin:hover {
+      transform: translate(-50%, -50%) scale(1.3);
+      z-index: 20;
+    }
+
+    .key-pin.available {
+      background: #22c55e;
+      border: 2px solid #ffffff;
+    }
+
+    .key-pin.borrowed {
+      background: #ef4444;
+      border: 2px solid #ffffff;
+    }
+
+    .key-pin.dragging {
+      opacity: 0.8;
+      transform: translate(-50%, -50%) scale(1.4);
+      z-index: 100;
+    }
+
+    .pin-tooltip {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: nowrap;
+      pointer-events: none;
+      display: none;
+    }
+
+    .key-pin:hover .pin-tooltip {
+      display: block;
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      margin-top: 8px;
+      justify-content: center;
+      color: #64748b;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
@@ -548,11 +705,15 @@
     <div id="navTabsContainer" class="nav-tabs">
       <button type="button" id="tabPinjam" class="tab-btn active-pinjam" onclick="gantiTab('pinjam')">
         <svg viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
-        Pinjam Kunci
+        Pinjam
       </button>
       <button type="button" id="tabKembali" class="tab-btn" onclick="gantiTab('kembali')">
         <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
-        Kembalikan Kunci
+        Kembali
+      </button>
+      <button type="button" id="tabMap" class="tab-btn" onclick="gantiTab('map')">
+        <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+        Denah
       </button>
     </div>
 
@@ -683,6 +844,43 @@
       </form>
     </div>
 
+    <!-- TAB FLOOR MAP / DENAH -->
+    <div id="sectionMap" class="form-section">
+      <h2 style="color: #0284c7 !weight: 700; text-align: center; margin-bottom: 15px;">
+        Denah Lokasi Ruangan & Kunci
+      </h2>
+      
+      <div class="map-controls-bar">
+        <div class="map-floor-btns">
+          <button class="btn-floor active" onclick="pilihLantaiMap('LG')">LG</button>
+          <button class="btn-floor" onclick="pilihLantaiMap('L1')">L1</button>
+          <button class="btn-floor" onclick="pilihLantaiMap('L2')">L2</button>
+          <button class="btn-floor" onclick="pilihLantaiMap('L3')">L3</button>
+          <button class="btn-floor" onclick="pilihLantaiMap('L4')">L4</button>
+        </div>
+        <button id="btnToggleEditMap" class="btn-edit-mode" onclick="toggleEditModeMap()">
+          ✏️ Edit Posisi Pin
+        </button>
+      </div>
+
+      <div class="map-viewport" id="mapViewport">
+        <img id="mapImageBg" src="floor_lg.jpg" class="map-image-bg" alt="Denah Lantai" onerror="this.src='https://via.placeholder.com/800x420/0f172a/ffffff?text=Denah+Lantai+23+Semarang';">
+        <div id="mapPinContainer"></div>
+      </div>
+
+      <div class="map-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #22c55e;"></div> Kunci Tersedia
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #ef4444;"></div> Sedang Dipinjam
+        </div>
+      </div>
+      <p id="mapEditHint" style="display: none; font-size: 11px; text-align: center; color: #ef4444; margin-top: 6px;">
+        * Mode Edit Aktif: Geser titik pin untuk menyesuaikan letak ruangan di denah.
+      </p>
+    </div>
+
     <!-- TAMPILAN SUKSES -->
     <div id="screenSukses" class="success-screen">
       <h3>✨ Terima Kasih!</h3>
@@ -731,10 +929,10 @@
     </div>
   </div>
 
- <video id="bgVideo" autoplay loop muted playsinline class="video-bg">
-  <source src="drone.mp4" type="video/mp4">
-  Browser Anda tidak mendukung tag video.
-</video>
+  <video id="bgVideo" autoplay loop muted playsinline class="video-bg">
+    <source src="drone.mp4" type="video/mp4">
+    Browser Anda tidak mendukung tag video.
+  </video>
 
   <!-- MODAL PREVIEW FOTO -->
   <div id="imageModal" class="image-modal">
@@ -761,36 +959,44 @@
       tabAktifSekarang = tipe;
 
       document.querySelectorAll('.tab-btn').forEach(b => { 
-        b.classList.remove('active-pinjam', 'active-kembali'); 
+        b.classList.remove('active-pinjam', 'active-kembali', 'active-map'); 
       });
 
       if (tipe === 'pinjam') {
         document.getElementById('tabPinjam').classList.add('active-pinjam');
-      } else {
+      } else if (tipe === 'kembali') {
         document.getElementById('tabKembali').classList.add('active-kembali');
+      } else if (tipe === 'map') {
+        document.getElementById('tabMap').classList.add('active-map');
       }
 
       const formPinjam = document.getElementById('sectionPinjam');
       const formKembali = document.getElementById('sectionKembali');
-      const formAktifLama = tipe === 'pinjam' ? formKembali : formPinjam;
-      const formAktifBaru = tipe === 'pinjam' ? formPinjam : formKembali;
+      const formMap = document.getElementById('sectionMap');
 
-      formAktifLama.classList.remove('active');
+      [formPinjam, formKembali, formMap].forEach(s => s.classList.remove('active'));
 
       setTimeout(() => {
-        formAktifLama.style.display = 'none';
+        formPinjam.style.display = 'none';
+        formKembali.style.display = 'none';
+        formMap.style.display = 'none';
         
+        let targetForm = formPinjam;
         if (tipe === 'kembali') {
+          targetForm = formKembali;
           const kontainer = document.getElementById('kontainerKunciKembaliChecklist');
           if (kontainer) {
             kontainer.innerHTML = '<p style="color: #64748b; font-size: 13px; margin: 0;">Klik tombol \'Cari Kunci Saya\' di atas terlebih dahulu.</p>';
           }
+        } else if (tipe === 'map') {
+          targetForm = formMap;
+          renderMapPins();
         }
 
-        formAktifBaru.style.display = 'block';
+        targetForm.style.display = 'block';
         
         setTimeout(() => {
-          formAktifBaru.classList.add('active');
+          targetForm.classList.add('active');
         }, 20);
 
       }, 350);
@@ -833,6 +1039,7 @@
           listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
           
           saringKunci();
+          renderMapPins();
         }).catch(err => {
           if (kontainer) {
             kontainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">❌ Gagal memuat data. Periksa koneksi.</p>';
@@ -1313,7 +1520,128 @@
     }
 
     /* ==========================================
-       7. SUBMIT FORM KE GOOGLE APPS SCRIPT
+       7. LOGIKA INTERACTIVE FLOOR MAP & PIN EDITOR
+       ========================================== */
+    let lantaiAktifMap = 'LG';
+    let isEditModeMap = false;
+    let pinCoordinates = JSON.parse(localStorage.getItem('map_pin_coords') || '{}');
+
+    function pilihLantaiMap(lantai) {
+      lantaiAktifMap = lantai;
+      document.querySelectorAll('.btn-floor').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === lantai);
+      });
+      const imgBg = document.getElementById('mapImageBg');
+      if (imgBg) {
+        imgBg.src = `floor_${lantai.toLowerCase()}.jpg`;
+      }
+      renderMapPins();
+    }
+
+    function toggleEditModeMap() {
+      isEditModeMap = !isEditModeMap;
+      const btn = document.getElementById('btnToggleEditMap');
+      const hint = document.getElementById('mapEditHint');
+      
+      if (isEditModeMap) {
+        btn.classList.add('active');
+        btn.textContent = '💾 Simpan Posisi Pin';
+        hint.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '✏️ Edit Posisi Pin';
+        hint.style.display = 'none';
+        localStorage.setItem('map_pin_coords', JSON.stringify(pinCoordinates));
+        alert('Posisi koordinat kunci berhasil disimpan!');
+      }
+      renderMapPins();
+    }
+
+    function renderMapPins() {
+      const container = document.getElementById('mapPinContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const kunciLantaiIni = semuaDataKunci.filter(k => 
+        (k.lantai || '').toUpperCase() === lantaiAktifMap.toUpperCase()
+      );
+
+      kunciLantaiIni.forEach((kunci, idx) => {
+        const pin = document.createElement('div');
+        const isTerpinjam = kunci.status && kunci.status.toLowerCase() !== 'tersedia';
+        
+        pin.className = `key-pin ${isTerpinjam ? 'borrowed' : 'available'}`;
+        pin.textContent = kunci.id;
+
+        const defaultX = 15 + ((idx * 12) % 70);
+        const defaultY = 20 + Math.floor(idx / 6) * 15;
+        const posX = pinCoordinates[kunci.id]?.x ?? defaultX;
+        const posY = pinCoordinates[kunci.id]?.y ?? defaultY;
+
+        pin.style.left = `${posX}%`;
+        pin.style.top = `${posY}%`;
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'pin-tooltip';
+        tooltip.innerHTML = `<b>${kunci.id}</b> - ${kunci.nama}<br>Status: ${kunci.status}`;
+        pin.appendChild(tooltip);
+
+        if (isEditModeMap) {
+          pasangDragPin(pin, kunci.id);
+        }
+
+        container.appendChild(pin);
+      });
+    }
+
+    function pasangDragPin(pinElement, keyId) {
+      let isDragging = false;
+      const viewport = document.getElementById('mapViewport');
+
+      const onMouseDown = (e) => {
+        if (!isEditModeMap) return;
+        isDragging = true;
+        pinElement.classList.add('dragging');
+        e.preventDefault();
+      };
+
+      const onMouseMove = (e) => {
+        if (!isDragging || !isEditModeMap) return;
+        const rect = viewport.getBoundingClientRect();
+        let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        let xPercent = ((clientX - rect.left) / rect.width) * 100;
+        let yPercent = ((clientY - rect.top) / rect.height) * 100;
+
+        xPercent = Math.max(2, Math.min(98, xPercent));
+        yPercent = Math.max(2, Math.min(98, yPercent));
+
+        pinElement.style.left = `${xPercent}%`;
+        pinElement.style.top = `${yPercent}%`;
+
+        pinCoordinates[keyId] = { x: xPercent.toFixed(2), y: yPercent.toFixed(2) };
+      };
+
+      const onMouseUp = () => {
+        if (isDragging) {
+          isDragging = false;
+          pinElement.classList.remove('dragging');
+        }
+      };
+
+      pinElement.addEventListener('mousedown', onMouseDown);
+      pinElement.addEventListener('touchstart', onMouseDown);
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('touchmove', onMouseMove);
+
+      window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('touchend', onMouseUp);
+    }
+
+    /* ==========================================
+       8. SUBMIT FORM KE GOOGLE APPS SCRIPT
        ========================================== */
     function pasangSubmitForm(idForm, idBtn, textReset, konteksAksi) {
       document.getElementById(idForm).addEventListener('submit', function(e) {
@@ -1414,7 +1742,7 @@
     }
 
     /* ==========================================
-       8. INITIALISASI SISTEM
+       9. INITIALISASI SISTEM
        ========================================== */
     window.onload = () => {
       muatKunciTersedia();
@@ -1429,7 +1757,7 @@
       const closeBtn = document.querySelector('.modal-close');
 
       document.body.addEventListener('click', function(e) {
-        if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget') {
+        if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget' && e.target.id !== 'mapImageBg') {
           if (e.target.src && e.target.src !== '') {
             modalImg.src = e.target.src;
             modal.classList.add('show');
