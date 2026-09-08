@@ -1143,44 +1143,63 @@
     }
 
     function saringKunci() {
-      const lantai = document.getElementById("filterLantai").value.toLowerCase();
-      const zona = document.getElementById("filterZona").value.toLowerCase();
-      const cari = document.getElementById("kotakCari").value.toLowerCase();
-      const kontainer = document.getElementById("kontainerKunciChecklist");
+  const lantai = (document.getElementById("filterLantai")?.value || "").toLowerCase();
+  const zona = (document.getElementById("filterZona")?.value || "").toLowerCase();
+  const cari = (document.getElementById("kotakCari")?.value || "").toLowerCase();
+  const kontainer = document.getElementById("kontainerKunciChecklist");
 
-      if (!kontainer) return;
+  if (!kontainer) return;
 
-      const hasilSaring = semuaDataKunci.filter(k => {
-        return (!lantai || (k.lantai && k.lantai.toLowerCase() === lantai)) &&
-               (!zona || (k.zona && k.zona.toLowerCase() === zona)) &&
-               (`${k.id} ${k.nama}`.toLowerCase().includes(cari));
-      });
+  if (!semuaDataKunci || semuaDataKunci.length === 0) {
+    kontainer.innerHTML = '<p style="font-size:13px; color:#64748b; margin:0;">Memuat data kunci...</p>';
+    return;
+  }
 
-      if (hasilSaring.length === 0) {
-        kontainer.innerHTML = '<p style="font-size:13px; color:var(--danger); margin:0;">Tidak ada kunci yang cocok.</p>';
-        return;
-      }
+  const hasilSaring = semuaDataKunci.filter(k => {
+    // Ambil properti dengan fallback jika nama kolom dari backend berbeda
+    const kId = String(k.id || k['ID Kunci'] || k.id_kunci || '');
+    const kNama = String(k.nama || k['Nama Kunci'] || k.nama_kunci || '');
+    const kLantai = String(k.lantai || k.Lantai || k['Lantai'] || '');
+    const kZona = String(k.zona || k.Zona || k['Zona'] || '');
 
-      let html = '';
-      hasilSaring.forEach(k => {
-        const isDipinjam = k.status && k.status.toLowerCase() !== 'tersedia';
+    const matchLantai = !lantai || kLantai.toLowerCase() === lantai;
+    const matchZona = !zona || kZona.toLowerCase() === zona;
+    const matchCari = !cari || `${kId} ${kNama}`.toLowerCase().includes(cari);
 
-        html += `
-          <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDipinjam ? 'opacity: 0.55; cursor: not-allowed;' : ''}">
-            <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" 
-                   ${isDipinjam ? 'disabled' : ''} 
-                   style="width: auto; ${isDipinjam ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
-            
-            <label for="chk_${k.id}" style="margin: 0; font-weight: normal; ${isDipinjam ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
-              <b>${k.id}</b> - ${k.nama} <small style="color:var(--text-muted);">[Lantai ${k.lantai} - ${k.zona}]</small>
-              ${isDipinjam ? '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>' : ''}
-            </label>
-          </div>
-        `;
-      });
+    return matchLantai && matchZona && matchCari;
+  });
 
-      kontainer.innerHTML = html;
-    }
+  if (hasilSaring.length === 0) {
+    kontainer.innerHTML = '<p style="font-size:13px; color:var(--danger); margin:0;">Tidak ada kunci yang cocok.</p>';
+    return;
+  }
+
+  let html = '';
+  hasilSaring.forEach(k => {
+    const kId = k.id || k['ID Kunci'] || k.id_kunci || '-';
+    const kNama = k.nama || k['Nama Kunci'] || k.nama_kunci || '-';
+    const kLantai = k.lantai || k.Lantai || k['Lantai'] || '-';
+    const kZona = k.zona || k.Zona || k['Zona'] || '-';
+    const status = (k.status || k.Status || 'Tersedia').toString();
+
+    const isDipinjam = status.toLowerCase() !== 'tersedia';
+
+    html += `
+      <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDipinjam ? 'opacity: 0.55; cursor: not-allowed;' : ''}">
+        <input type="checkbox" name="kunci" value="${kId}" id="chk_${kId}" 
+               ${isDipinjam ? 'disabled' : ''} 
+               style="width: auto; ${isDipinjam ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+        
+        <label for="chk_${kId}" style="margin: 0; font-weight: normal; ${isDipinjam ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
+          <b>${kId}</b> - ${kNama} <small style="color:var(--text-muted);">[Lantai ${kLantai} - ${kZona}]</small>
+          ${isDipinjam ? '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>' : ''}
+        </label>
+      </div>
+    `;
+  });
+
+  kontainer.innerHTML = html;
+}
 
     /* ==========================================
        3. TABEL MONITORING & PAGINASI
