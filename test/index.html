@@ -1688,18 +1688,13 @@ function pilihLantaiMap(floor) {
   renderPinsForFloor(floor);
 }
 
-// Fungsi Ambil Data dari Spreadsheet (Mendukung Properti Spreadsheet Anda)
+// Arahkan langsung ke variabel semuaDataKunci
 function getSpreadsheetData() {
-  if (typeof allKeysData !== 'undefined' && Array.isArray(allKeysData) && allKeysData.length > 0) {
-    return allKeysData;
-  }
-  if (typeof dataKunciGlobal !== 'undefined' && Array.isArray(dataKunciGlobal) && dataKunciGlobal.length > 0) {
-    return dataKunciGlobal;
+  if (typeof semuaDataKunci !== 'undefined' && Array.isArray(semuaDataKunci) && semuaDataKunci.length > 0) {
+    return semuaDataKunci;
   }
   return [];
 }
-
-// Render Pin Berdasarkan Data Spreadsheet
 function renderPinsForFloor(floor) {
   const container = document.getElementById('mapPinContainer');
   if (!container) return;
@@ -1708,25 +1703,25 @@ function renderPinsForFloor(floor) {
   const tooltip = getOrCreateTooltip(container);
   const sourceData = getSpreadsheetData();
 
-  // Filter kunci berdasarkan Lantai
+  // Filter kunci berdasarkan Lantai (cocokkan format huruf kecil dari backend)
   let keys = sourceData.filter(k => {
-    let f = k['Lantai'] || k.Lantai || k.lantai || k.floor || '';
+    let f = k.lantai || k.Lantai || k['Lantai'] || k.floor || '';
     return String(f).trim().toUpperCase() === String(floor).trim().toUpperCase();
   });
 
   keys.forEach((kunci, index) => {
-    const idKunci = kunci['ID Kunci'] || kunci.id_kunci || kunci.id || kunci.no || (index + 1);
-    const namaKunci = kunci['Nama Kunci'] || kunci.nama_kunci || kunci.ruangan || `Kunci ${idKunci}`;
-    const statusKunci = (kunci['Status'] || kunci.status || 'Tersedia').toString();
-    const isDipinjam = statusKunci.toLowerCase().includes('pinjam');
+    // Ambil nilai properti secara fleksibel
+    const idKunci = kunci.id || kunci['ID Kunci'] || kunci.id_kunci || (index + 1);
+    const namaKunci = kunci.nama || kunci['Nama Kunci'] || kunci.nama_kunci || `Kunci ${idKunci}`;
+    const statusKunci = (kunci.status || kunci['Status'] || 'Tersedia').toString();
+    const isDipinjam = statusKunci.toLowerCase() !== 'tersedia';
 
-    // Cek apakah posisi X & Y sudah pernah diatur
+    // Ambil koordinat tersimpan
     const posKey = `${floor}_${idKunci}`;
     const savedPos = storedPinPositions[posKey];
 
-    // Jika belum di-edit posisinya dan tidak dalam Mode Edit, sembunyikan atau beri posisi default
-    let posX = savedPos ? savedPos.x : (kunci.posX || (5 + (index % 10) * 9));
-    let posY = savedPos ? savedPos.y : (kunci.posY || (10 + Math.floor(index / 10) * 7));
+    let posX = savedPos ? savedPos.x : (kunci.posX || (10 + (index % 8) * 11));
+    let posY = savedPos ? savedPos.y : (kunci.posY || (15 + Math.floor(index / 8) * 10));
 
     const pin = document.createElement('div');
     pin.className = `map-pin ${isDipinjam ? 'dipinjam' : 'tersedia'}`;
@@ -1734,7 +1729,7 @@ function renderPinsForFloor(floor) {
     pin.style.left = `${posX}%`;
     pin.style.top = `${posY}%`;
 
-    // Popup Tooltip Info Kunci
+    // Tooltip Hover
     const showInfo = (e) => {
       if (isEditMode) return;
       tooltip.innerHTML = `
