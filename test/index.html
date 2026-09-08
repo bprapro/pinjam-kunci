@@ -864,7 +864,7 @@
       </div>
 
       <div class="map-viewport" id="mapViewport">
-        <img id="mapImageBg" src="floor_lg.jpg" class="map-image-bg" alt="Denah Lantai" onerror="this.src='https://via.placeholder.com/800x420/0f172a/ffffff?text=Denah+Lantai+23+Semarang';">
+        <img id="mapImageBg" src="LG.jpg" class="map-image-bg" alt="Denah Lantai">
         <div id="mapPinContainer"></div>
       </div>
 
@@ -1526,17 +1526,21 @@
     let isEditModeMap = false;
     let pinCoordinates = JSON.parse(localStorage.getItem('map_pin_coords') || '{}');
 
-    function pilihLantaiMap(lantai) {
-      lantaiAktifMap = lantai;
-      document.querySelectorAll('.btn-floor').forEach(btn => {
-        btn.classList.toggle('active', btn.textContent === lantai);
-      });
-      const imgBg = document.getElementById('mapImageBg');
-      if (imgBg) {
-        imgBg.src = `floor_${lantai.toLowerCase()}.jpg`;
-      }
-      renderMapPins();
-    }
+    // KODE BARU (COPAG BAGIAN INI):
+const floorImages = {
+  'LG': 'LG.jpg',
+  'L1': 'L1.jpg',
+  'L2': 'L2.jpg',
+  'L3': 'L3.jpg',
+  'L4': 'L4.jpg'
+};
+
+function pilihLantaiMap(floor) {
+  const mapImageBg = document.getElementById('mapImageBg');
+  if (mapImageBg) {
+    mapImageBg.src = floorImages[floor] || 'LG.jpg';
+  }
+}
 
     function toggleEditModeMap() {
       isEditModeMap = !isEditModeMap;
