@@ -1877,14 +1877,11 @@ function pilihLantaiMap(floor) {
   document.querySelectorAll('.btn-floor').forEach(btn => {
     btn.classList.toggle('active', btn.innerText === floor);
   });
-  
+
   const mapImg = document.getElementById('mapImageBg');
   if (mapImg) mapImg.src = FLOOR_MAPS[floor] || '';
-  
-  renderPinsForFloor();
-}
 
-  renderPinsForFloor(floor);
+  renderPinsForFloor();
 }
 
 // Arahkan langsung ke variabel semuaDataKunci
