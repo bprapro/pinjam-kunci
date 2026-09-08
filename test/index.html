@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- CDN Library Zoom & Drag Denah -->
+<script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
   
   <style>
     /* Container Loading Dots */
@@ -1519,14 +1521,14 @@
       inputDinamis.click();
     }
 
-    /* ==========================================
-       7. LOGIKA INTERACTIVE FLOOR MAP & PIN EDITOR
-       ========================================== */
-    let lantaiAktifMap = 'LG';
-    let isEditModeMap = false;
-    let pinCoordinates = JSON.parse(localStorage.getItem('map_pin_coords') || '{}');
+    let currentFloor = 'LG';
+let isEditMode = false;
+let panzoomInstance = null;
 
-    // Pemetaan gambar denah untuk tiap lantai
+// PIN Admin
+const ADMIN_PIN = '3286';
+
+// Map Gambar Denah
 const floorImages = {
   'LG': 'LG.jpg',
   'L1': 'L1.jpg',
@@ -1535,148 +1537,151 @@ const floorImages = {
   'L4': 'L4.jpg'
 };
 
+// Jumlah default kunci jika data database belum berkoordinat
+const totalKeysPerFloor = {
+  'LG': 133,
+  'L1': 50,
+  'L2': 50,
+  'L3': 50,
+  'L4': 50
+};
+
+// Inisialisasi Zoom saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  initPanzoom();
+  pilihLantaiMap('LG');
+});
+
+function initPanzoom() {
+  const elem = document.getElementById('mapViewport');
+  if (elem && typeof Panzoom !== 'undefined') {
+    panzoomInstance = Panzoom(elem, {
+      maxScale: 4,
+      minScale: 1,
+      contain: 'outside'
+    });
+    elem.parentElement.addEventListener('wheel', panzoomInstance.zoomWithWheel);
+  }
+}
+
+// 1 & 2. Ganti Lantai dan Render Pin (Mencegah Hilang Saat Pindah Lantai)
 function pilihLantaiMap(floor) {
-  // 1. Ubah class active pada tombol lantai
+  currentFloor = floor;
+
+  // Update Tampilan Tombol Active
   document.querySelectorAll('.btn-floor').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.textContent.trim() === floor) {
-      btn.classList.add('active');
-    }
+    btn.classList.toggle('active', btn.textContent.trim() === floor);
   });
 
-  // 2. Ganti gambar background denah
-  const mapImageBg = document.getElementById('mapImageBg');
-  if (mapImageBg) {
-    mapImageBg.src = floorImages[floor] || 'LG.jpg';
+  // Update Gambar Background Denah
+  const mapImage = document.getElementById('mapImageBg');
+  if (mapImage) {
+    mapImage.src = floorImages[floor] || 'LG.jpg';
   }
 
-  // 3. Render ulang pin nomor ruangan sesuai lantai yang dipilih
+  // Render Ulang Pin
   renderPinsForFloor(floor);
 }
 
-// Fungsi untuk menampilkan pin sesuai lantai
 function renderPinsForFloor(floor) {
   const container = document.getElementById('mapPinContainer');
   if (!container) return;
+  container.innerHTML = '';
 
-  container.innerHTML = ''; // Bersihkan pin lama
+  // Filter kunci berdasarkan lantai dari data global (misal: allKeysData)
+  // Jika data global belum ada, buat pin otomatis 1 s/d totalKeysPerFloor
+  let keys = (typeof allKeysData !== 'undefined') 
+    ? allKeysData.filter(k => k.floor === floor)
+    : [];
 
-  // Filter data kunci/ruangan hanya untuk lantai yang dipilih
-  // (Sesuaikan `allKeysData` dengan nama variabel data kunci Anda)
-  const floorKeys = allKeysData.filter(kunci => kunci.floor === floor);
+  // Auto-generate 1-133 untuk LG jika data dari server kosong/belum di-set
+  if (keys.length === 0) {
+    const maxCount = totalKeysPerFloor[floor] || 30;
+    for (let i = 1; i <= maxCount; i++) {
+      keys.push({
+        id: i,
+        number: i,
+        floor: floor,
+        status: 'tersedia',
+        posX: 5 + ((i - 1) % 10) * 9, // Grid posisi default
+        posY: 10 + Math.floor((i - 1) / 10) * 6
+      });
+    }
+  }
 
-  floorKeys.forEach(kunci => {
+  // Buat Elemen Pin
+  keys.forEach(kunci => {
     const pin = document.createElement('div');
     pin.className = `map-pin ${kunci.status === 'dipinjam' ? 'dipinjam' : 'tersedia'}`;
-    pin.style.left = kunci.posX + '%';
-    pin.style.top = kunci.posY + '%';
-    pin.innerText = kunci.number || kunci.id; // Nomor/ID ruangan
+    pin.innerText = kunci.number || kunci.id;
+    pin.style.left = `${kunci.posX}%`;
+    pin.style.top = `${kunci.posY}%`;
+
+    // Jika mode edit aktif, beri kemampuan drag pin
+    if (isEditMode) {
+      pin.classList.add('draggable');
+      enablePinDrag(pin, kunci);
+    }
 
     container.appendChild(pin);
   });
 }
 
-    function toggleEditModeMap() {
-      isEditModeMap = !isEditModeMap;
-      const btn = document.getElementById('btnToggleEditMap');
-      const hint = document.getElementById('mapEditHint');
-      
-      if (isEditModeMap) {
-        btn.classList.add('active');
-        btn.textContent = '💾 Simpan Posisi Pin';
-        hint.style.display = 'block';
-      } else {
-        btn.classList.remove('active');
-        btn.textContent = '✏️ Edit Posisi Pin';
-        hint.style.display = 'none';
-        localStorage.setItem('map_pin_coords', JSON.stringify(pinCoordinates));
-        alert('Posisi koordinat kunci berhasil disimpan!');
-      }
-      renderMapPins();
+// 4. Proteksi Mode Edit dengan PIN '3286'
+function toggleEditModeMap() {
+  if (!isEditMode) {
+    const inputPin = prompt("Masukkan PIN Admin untuk Mengubah Posisi Pin:");
+    if (inputPin !== ADMIN_PIN) {
+      alert("PIN Salah! Akses ditolak.");
+      return;
     }
+    isEditMode = true;
+    alert("Mode Edit Aktif: Silakan geser titik pin.");
+  } else {
+    isEditMode = false;
+    alert("Mode Edit Dinonaktifkan.");
+  }
 
-    function renderMapPins() {
-      const container = document.getElementById('mapPinContainer');
-      if (!container) return;
-      container.innerHTML = '';
+  // Refresh tampilan pin sesuai status edit mode
+  renderPinsForFloor(currentFloor);
+}
 
-      const kunciLantaiIni = semuaDataKunci.filter(k => 
-        (k.lantai || '').toUpperCase() === lantaiAktifMap.toUpperCase()
-      );
+// Fungsi Drag Pin saat Edit Mode
+function enablePinDrag(pinElement, kunci) {
+  let isDragging = false;
 
-      kunciLantaiIni.forEach((kunci, idx) => {
-        const pin = document.createElement('div');
-        const isTerpinjam = kunci.status && kunci.status.toLowerCase() !== 'tersedia';
-        
-        pin.className = `key-pin ${isTerpinjam ? 'borrowed' : 'available'}`;
-        pin.textContent = kunci.id;
+  pinElement.onmousedown = (e) => {
+    isDragging = true;
+    if (panzoomInstance) panzoomInstance.pause(); // Matikan zoom saat geser pin
 
-        const defaultX = 15 + ((idx * 12) % 70);
-        const defaultY = 20 + Math.floor(idx / 6) * 15;
-        const posX = pinCoordinates[kunci.id]?.x ?? defaultX;
-        const posY = pinCoordinates[kunci.id]?.y ?? defaultY;
+    const parentRect = pinElement.parentElement.getBoundingClientRect();
 
-        pin.style.left = `${posX}%`;
-        pin.style.top = `${posY}%`;
+    const onMouseMove = (moveEvent) => {
+      if (!isDragging) return;
+      let x = ((moveEvent.clientX - parentRect.left) / parentRect.width) * 100;
+      let y = ((moveEvent.clientY - parentRect.top) / parentRect.height) * 100;
 
-        const tooltip = document.createElement('div');
-        tooltip.className = 'pin-tooltip';
-        tooltip.innerHTML = `<b>${kunci.id}</b> - ${kunci.nama}<br>Status: ${kunci.status}`;
-        pin.appendChild(tooltip);
+      // Batasi agar tidak keluar denah (0-100%)
+      x = Math.max(0, Math.min(100, x));
+      y = Math.max(0, Math.min(100, y));
 
-        if (isEditModeMap) {
-          pasangDragPin(pin, kunci.id);
-        }
+      pinElement.style.left = `${x}%`;
+      pinElement.style.top = `${y}%`;
 
-        container.appendChild(pin);
-      });
-    }
+      kunci.posX = x.toFixed(2);
+      kunci.posY = y.toFixed(2);
+    };
 
-    function pasangDragPin(pinElement, keyId) {
-      let isDragging = false;
-      const viewport = document.getElementById('mapViewport');
+    document.onmousemove = onMouseMove;
 
-      const onMouseDown = (e) => {
-        if (!isEditModeMap) return;
-        isDragging = true;
-        pinElement.classList.add('dragging');
-        e.preventDefault();
-      };
-
-      const onMouseMove = (e) => {
-        if (!isDragging || !isEditModeMap) return;
-        const rect = viewport.getBoundingClientRect();
-        let clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        let clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-        let xPercent = ((clientX - rect.left) / rect.width) * 100;
-        let yPercent = ((clientY - rect.top) / rect.height) * 100;
-
-        xPercent = Math.max(2, Math.min(98, xPercent));
-        yPercent = Math.max(2, Math.min(98, yPercent));
-
-        pinElement.style.left = `${xPercent}%`;
-        pinElement.style.top = `${yPercent}%`;
-
-        pinCoordinates[keyId] = { x: xPercent.toFixed(2), y: yPercent.toFixed(2) };
-      };
-
-      const onMouseUp = () => {
-        if (isDragging) {
-          isDragging = false;
-          pinElement.classList.remove('dragging');
-        }
-      };
-
-      pinElement.addEventListener('mousedown', onMouseDown);
-      pinElement.addEventListener('touchstart', onMouseDown);
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('touchmove', onMouseMove);
-
-      window.addEventListener('mouseup', onMouseUp);
-      window.addEventListener('touchend', onMouseUp);
-    }
+    document.onmouseup = () => {
+      isDragging = false;
+      document.onmousemove = null;
+      document.onmouseup = null;
+      if (panzoomInstance) panzoomInstance.resume();
+    };
+  };
+}
 
     /* ==========================================
        8. SUBMIT FORM KE GOOGLE APPS SCRIPT
