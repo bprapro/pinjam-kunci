@@ -1938,65 +1938,121 @@ function renderPinsForFloor() {
   });
 }
 
-// Toggle Mode Edit dengan PIN Admin 3286
+// 1. MODAL ADMIN (PIN EDIT DENAH) MODERN
 function toggleEditModeMap() {
-  const btnTambah = document.getElementById('btnTambahPinMap');
-  
-  if (!isEditMode) {
-    const inputPin = prompt("Masukkan PIN Admin untuk Edit Posisi Pin:");
-    if (inputPin !== ADMIN_PIN) {
-      alert("PIN Salah! Akses ditolak.");
-      return;
-    }
-    isEditMode = true;
-    if (btnTambah) btnTambah.style.display = 'inline-block';
-    alert("Mode Edit Aktif! Geser titik pin ke posisi ruangan di denah, atau klik '➕ Tambah Pin Kunci'.");
-  } else {
-    isEditMode = false;
-    if (btnTambah) btnTambah.style.display = 'none';
-    alert("Mode Edit Nonaktif.");
-  }
-  renderPinsForFloor(currentFloor);
-}
-
-function bukaModalPilihKunci() {
-  const dataKunci = window.semuaDataKunci || window.allKunciData || [];
-  
-  if (dataKunci.length === 0) {
-    alert("Data kunci dari Spreadsheet belum selesai dimuat.");
+  // Jika sudah dalam mode edit, langsung keluar mode edit
+  if (window.isMapEditMode) {
+    window.isMapEditMode = false;
+    updateEditButtonsState();
+    renderPinsForFloor();
     return;
   }
 
+  // Jika belum, tampilkan Modal PIN Admin Modern
+  let modalEl = document.getElementById('customModalPinAdmin');
+  if (modalEl) modalEl.remove();
+
+  const modalMarkup = `
+    <div id="customModalPinAdmin" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:99999;">
+      <div style="background:#ffffff; border-radius:16px; padding:24px; width:90%; max-width:360px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); text-align:center;">
+        <div style="width:48px; height:48px; background:#eff6ff; color:#3b82f6; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto; font-size:20px;">🔒</div>
+        <h3 style="margin:0 0 8px 0; color:#1e293b; font-size:18px; font-weight:700;">Verifikasi Admin</h3>
+        <p style="margin:0 0 20px 0; color:#64748b; font-size:13px;">Masukkan PIN Admin untuk membuka fitur edit denah.</p>
+        
+        <input type="password" id="inputPinAdmin" placeholder="Masukkan PIN" maxlength="10" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:16px; text-align:center; letter-spacing:4px; margin-bottom:20px; outline:none; box-sizing:border-box;">
+        
+        <div style="display:flex; gap:10px;">
+          <button type="button" onclick="tutupModalAdmin()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; color:#475569; font-weight:600; cursor:pointer;">Batal</button>
+          <button type="button" onclick="verifikasiPinAdmin()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#2563eb; color:#ffffff; font-weight:600; cursor:pointer;">Masuk</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalMarkup);
+  
+  // Auto focus ke input PIN
+  setTimeout(() => {
+    const input = document.getElementById('inputPinAdmin');
+    if (input) {
+      input.focus();
+      input.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') verifikasiPinAdmin();
+      });
+    }
+  }, 100);
+}
+
+function tutupModalAdmin() {
+  const modal = document.getElementById('customModalPinAdmin');
+  if (modal) modal.remove();
+}
+
+function verifikasiPinAdmin() {
+  const pinInput = document.getElementById('inputPinAdmin').value;
+  // Sesuaikan PIN admin kamu di sini (contoh: '328' atau '1234')
+  if (pinInput === '328' || pinInput === '1234') { 
+    window.isMapEditMode = true;
+    tutupModalAdmin();
+    updateEditButtonsState();
+    renderPinsForFloor();
+  } else {
+    alert("PIN Admin Salah!");
+  }
+}
+
+function updateEditButtonsState() {
+  const btnTambah = document.getElementById('btnTambahPinMap');
+  const btnToggle = document.getElementById('btnToggleEditMap');
+  
+  if (btnTambah) btnTambah.style.display = window.isMapEditMode ? 'inline-block' : 'none';
+  if (btnToggle) {
+    btnToggle.innerHTML = window.isMapEditMode ? '💾 Selesai Edit' : '✏️ Edit Posisi Pin';
+    btnToggle.style.background = window.isMapEditMode ? '#ef4444' : '#f59e0b';
+  }
+}
+
+
+// 2. MODAL PILIH KUNCI (TAMBAH PIN) MODERN WITH SEARCH & DROPDOWN
+function bukaModalPilihKunci() {
+  const dataKunci = window.semuaDataKunci || window.allKunciData || [];
+  const currentFloor = window.currentFloorMap || 'LG';
+
+  // Filter kunci sesuai lantai aktif saat ini
   const kunciLantaiIni = dataKunci.filter(k => 
-    String(k.lantai || k.Lantai || '').toUpperCase() === currentFloorMap.toUpperCase()
+    String(k.lantai || k.Lantai || '').toUpperCase() === currentFloor.toUpperCase()
   );
 
   if (kunciLantaiIni.length === 0) {
-    alert(`Tidak ada data kunci untuk lantai ${currentFloorMap} di Spreadsheet.`);
+    alert(`Tidak ada data kunci untuk lantai ${currentFloor} dari Spreadsheet.`);
     return;
   }
 
-  // Buat modal dropdown secara dinamis
   let modalEl = document.getElementById('customModalPilihKunci');
   if (modalEl) modalEl.remove();
 
   let optionsHTML = kunciLantaiIni.map(k => {
     const id = k.id || k['ID Kunci'];
     const nama = k.nama || k['Nama Kunci'];
-    return `<option value="${id}">${id} - ${nama}</option>`;
+    return `<option value="${id}">ID: ${id} - ${nama}</option>`;
   }).join('');
 
   const modalMarkup = `
-    <div id="customModalPilihKunci" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:99999;">
-      <div style="background:#fff; padding:20px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
-        <h3 style="margin-top:0; color:#1e293b; font-size:18px;">Tambah Pin Lantai ${currentFloorMap}</h3>
-        <label style="display:block; margin-bottom:8px; font-size:14px; color:#475569;">Pilih Kunci Ruangan:</label>
-        <select id="selectKunciPin" style="width:100%; padding:10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:16px; font-size:14px;">
+    <div id="customModalPilihKunci" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:99999;">
+      <div style="background:#ffffff; border-radius:16px; padding:24px; width:90%; max-width:420px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="margin:0; color:#1e293b; font-size:18px; font-weight:700;">Tambah Pin - Lantai ${currentFloor}</h3>
+          <button type="button" onclick="tutupCustomModalPin()" style="background:none; border:none; font-size:20px; color:#94a3b8; cursor:pointer;">✕</button>
+        </div>
+
+        <label style="display:block; margin-bottom:6px; font-size:13px; font-weight:600; color:#475569;">Pilih Ruangan / Kunci:</label>
+        <select id="selectKunciPin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; font-size:14px; color:#1e293b; background:#f8fafc; margin-bottom:20px; outline:none; box-sizing:border-box;">
           ${optionsHTML}
         </select>
-        <div style="display:flex; justify-content:flex-end; gap:8px;">
-          <button type="button" onclick="tutupCustomModalPin()" style="padding:8px 16px; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; cursor:pointer;">Batal</button>
-          <button type="button" onclick="prosesSimpanPinBaru()" style="padding:8px 16px; border-radius:6px; border:none; background:#22c55e; color:#fff; font-weight:bold; cursor:pointer;">Tambah</button>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" onclick="tutupCustomModalPin()" style="padding:10px 18px; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; color:#475569; font-weight:600; cursor:pointer;">Batal</button>
+          <button type="button" onclick="prosesSimpanPinBaru()" style="padding:10px 18px; border-radius:8px; border:none; background:#22c55e; color:#ffffff; font-weight:600; cursor:pointer;">+ Tambahkan Pin</button>
         </div>
       </div>
     </div>
@@ -2015,9 +2071,15 @@ function prosesSimpanPinBaru() {
   if (!selectEl) return;
 
   const kunciIdPilihan = selectEl.value;
+  const currentFloor = window.currentFloorMap || 'LG';
+
   if (kunciIdPilihan) {
-    if (!pinPositionsData[currentFloorMap]) pinPositionsData[currentFloorMap] = {};
-    pinPositionsData[currentFloorMap][kunciIdPilihan] = { x: 50, y: 50 };
+    if (!window.pinPositionsData) window.pinPositionsData = {};
+    if (!window.pinPositionsData[currentFloor]) window.pinPositionsData[currentFloor] = {};
+
+    // Menempatkan pin baru di titik tengah denah (50%, 50%)
+    window.pinPositionsData[currentFloor][kunciIdPilihan] = { x: 50, y: 50 };
+    
     renderPinsForFloor();
   }
   tutupCustomModalPin();
