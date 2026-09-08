@@ -1293,28 +1293,36 @@
       }
 
       fetch(`${scriptUrl}?aksi=ambil_status_lengkap`)
-        .then(res => res.json())
-        .then(data => {
-          semuaDataKunci = data;
-          
-          const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
-          const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
-          
-          const selectLantai = document.getElementById("filterLantai");
-          selectLantai.innerHTML = '<option value="">All Floor</option>';
-          listLantai.forEach(l => { selectLantai.innerHTML += `<option value="${l}">${l}</option>`; });
-          
-          const selectZona = document.getElementById("filterZona");
-          selectZona.innerHTML = '<option value="">All Zone</option>';
-          listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
-          
-          saringKunci();
-          renderMapPins();
-        }).catch(err => {
-          if (kontainer) {
-            kontainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">❌ Gagal memuat data. Periksa koneksi.</p>';
-          }
-        });
+  .then(res => res.json())
+  .then(data => {
+    semuaDataKunci = data; // Data tersimpan di semuaDataKunci
+    
+    const listLantai = [...new Set(data.map(k => k.lantai).filter(Boolean))].sort();
+    const listZona = [...new Set(data.map(k => k.zona).filter(Boolean))].sort();
+    
+    const selectLantai = document.getElementById("filterLantai");
+    if (selectLantai) {
+      selectLantai.innerHTML = '<option value="">All Floor</option>';
+      listLantai.forEach(l => { selectLantai.innerHTML += `<option value="${l}">${l}</option>`; });
+    }
+    
+    const selectZona = document.getElementById("filterZona");
+    if (selectZona) {
+      selectZona.innerHTML = '<option value="">All Zone</option>';
+      listZona.forEach(z => { selectZona.innerHTML += `<option value="${z}">Zona ${z}</option>`; });
+    }
+    
+    saringKunci();
+    
+    // PEMANGGILAN RENDERING DENAH
+    if (typeof renderPinsForFloor === 'function') {
+      renderPinsForFloor();
+    }
+  }).catch(err => {
+    if (kontainer) {
+      kontainer.innerHTML = '<p style="color: var(--danger); font-size: 13px; margin: 0;">❌ Gagal memuat data. Periksa koneksi.</p>';
+    }
+  });
     }
 
     function saringKunci() {
@@ -1889,63 +1897,50 @@ function getSpreadsheetData() {
   }
   return [];
 }
-function renderPinsForFloor(floor) {
+function renderPinsForFloor() {
   const container = document.getElementById('mapPinContainer');
   if (!container) return;
   container.innerHTML = '';
+  
+  // Menggunakan variabel semuaDataKunci dari fetch kamu
+  const dataKunci = window.semuaDataKunci || semuaDataKunci || []; 
+  const floorPins = pinPositionsData[currentFloorMap] || {};
 
-  const tooltip = getOrCreateTooltip(container);
-  const sourceData = getSpreadsheetData();
+  Object.keys(floorPins).forEach(kunciId => {
+    const pos = floorPins[kunciId];
+    
+    // Cari detail kunci berdasarkan id atau nama dari spreadsheet
+    const detailKunci = dataKunci.find(k => 
+      String(k.id) === String(kunciId) || 
+      String(k.nama).toLowerCase() === String(kunciId).toLowerCase()
+    ) || { nama: kunciId, status: 'Tersedia' };
 
-  // Filter kunci berdasarkan Lantai (cocokkan format huruf kecil dari backend)
-  let keys = sourceData.filter(k => {
-    let f = k.lantai || k.Lantai || k['Lantai'] || k.floor || '';
-    return String(f).trim().toUpperCase() === String(floor).trim().toUpperCase();
-  });
+    const namaKunci = detailKunci.nama || kunciId;
+    const statusKunci = detailKunci.status || 'Tersedia';
 
-  keys.forEach((kunci, index) => {
-    // Ambil nilai properti secara fleksibel
-    const idKunci = kunci.id || kunci['ID Kunci'] || kunci.id_kunci || (index + 1);
-    const namaKunci = kunci.nama || kunci['Nama Kunci'] || kunci.nama_kunci || `Kunci ${idKunci}`;
-    const statusKunci = (kunci.status || kunci['Status'] || 'Tersedia').toString();
-    const isDipinjam = statusKunci.toLowerCase() !== 'tersedia';
+    const pinEl = document.createElement('div');
+    pinEl.className = 'map-pin';
+    pinEl.style.left = pos.x + '%';
+    pinEl.style.top = pos.y + '%';
+    
+    const isDipinjam = String(statusKunci).toLowerCase() === 'dipinjam';
+    const iconPin = isDipinjam ? '📍' : '📌';
+    
+    pinEl.innerHTML = `
+      <div style="font-size: 24px;">${iconPin}</div>
+      <div class="pin-tooltip">
+        <strong>${namaKunci}</strong><br/>
+        Status: <span style="color: ${isDipinjam ? '#ef4444' : '#22c55e'}; font-weight: bold;">${statusKunci}</span>
+      </div>
+    `;
 
-    // Ambil koordinat tersimpan
-    const posKey = `${floor}_${idKunci}`;
-    const savedPos = storedPinPositions[posKey];
-
-    let posX = savedPos ? savedPos.x : (kunci.posX || (10 + (index % 8) * 11));
-    let posY = savedPos ? savedPos.y : (kunci.posY || (15 + Math.floor(index / 8) * 10));
-
-    const pin = document.createElement('div');
-    pin.className = `map-pin ${isDipinjam ? 'dipinjam' : 'tersedia'}`;
-    pin.innerText = idKunci;
-    pin.style.left = `${posX}%`;
-    pin.style.top = `${posY}%`;
-
-    // Tooltip Hover
-    const showInfo = (e) => {
-      if (isEditMode) return;
-      tooltip.innerHTML = `
-        <div style="font-weight:bold; font-size:13px; color:#fff;">${namaKunci}</div>
-        <div style="font-size:11px; color:#cbd5e1;">ID Kunci: <strong>${idKunci}</strong></div>
-        <div style="font-size:11px; margin-top:2px;">Status: ${isDipinjam ? '🔴 Dipinjam' : '🟢 Tersedia'}</div>
-      `;
-      tooltip.style.display = 'block';
-      positionTooltip(e, pin, container, tooltip);
-    };
-
-    pin.addEventListener('mouseenter', showInfo);
-    pin.addEventListener('mousemove', (e) => { if (!isEditMode) positionTooltip(e, pin, container, tooltip); });
-    pin.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
-    pin.addEventListener('click', (e) => { e.stopPropagation(); showInfo(e); });
-
-    if (isEditMode) {
-      pin.classList.add('draggable');
-      enablePinDrag(pin, posKey);
+    if (isMapEditMode) {
+      enablePinDrag(pinEl, kunciId);
+    } else {
+      pinEl.onclick = () => alert(`Nama Kunci: ${namaKunci}\nLantai: ${currentFloorMap}\nStatus: ${statusKunci}`);
     }
 
-    container.appendChild(pin);
+    container.appendChild(pinEl);
   });
 }
 
@@ -1970,58 +1965,38 @@ function toggleEditModeMap() {
   renderPinsForFloor(currentFloor);
 }
 
-// Modal Pilih Kunci - Mengambil Data Kunci Resmi Berdasarkan Lantai
 function bukaModalPilihKunci() {
-  const sourceData = getSpreadsheetData();
-
-  if (!sourceData || sourceData.length === 0) {
-    alert("Data kunci dari spreadsheet belum selesai dimuat. Silakan tunggu 2 detik lalu coba lagi.");
+  const dataKunci = window.semuaDataKunci || semuaDataKunci || [];
+  
+  if (dataKunci.length === 0) {
+    alert("Data kunci dari Spreadsheet belum selesai dimuat.");
     return;
   }
 
-  // Filter kunci yang sesuai dengan Lantai Aktif (LG/L1/L2/L3/L4)
-  let keysInFloor = sourceData.filter(k => {
-    let f = k['Lantai'] || k.Lantai || k.lantai || k.floor || '';
-    return String(f).trim().toUpperCase() === String(currentFloor).trim().toUpperCase();
+  // Filter kunci berdasarkan lantai yang aktif
+  const kunciLantaiIni = dataKunci.filter(k => 
+    String(k.lantai || '').toUpperCase() === currentFloorMap.toUpperCase()
+  );
+
+  if (kunciLantaiIni.length === 0) {
+    alert(`Tidak ada data kunci untuk lantai ${currentFloorMap} di Spreadsheet.`);
+    return;
+  }
+
+  let opsiText = `Pilih Kunci untuk ditaruh di Lantai ${currentFloorMap}:\n\n`;
+  kunciLantaiIni.forEach(k => {
+    opsiText += `• ID: ${k.id} - ${k.nama}\n`;
   });
 
-  if (keysInFloor.length === 0) {
-    alert(`Tidak ditemukan daftar kunci untuk Lantai ${currentFloor}.`);
-    return;
+  const kunciIdPilihan = prompt(opsiText + "\nKetik ID atau Nama Kunci yang ingin ditambahkan:");
+  
+  if (kunciIdPilihan) {
+    if (!pinPositionsData[currentFloorMap]) pinPositionsData[currentFloorMap] = {};
+    
+    // Posisi pin baru ditaruh di tengah gambar (50%, 50%)
+    pinPositionsData[currentFloorMap][kunciIdPilihan] = { x: 50, y: 50 };
+    renderPinsForFloor();
   }
-
-  // Buat Opsi Dropdown Kunci (ID + Nama Ruangan)
-  let optionsHtml = keysInFloor.map(k => {
-    let id = k['ID Kunci'] || k.id_kunci || k.id || k.no || '';
-    let nm = k['Nama Kunci'] || k.nama_kunci || k.ruangan || `Kunci ${id}`;
-    return `<option value="${id}">ID: ${id} - ${nm}</option>`;
-  }).join('');
-
-  // Hapus modal lama jika ada
-  let existingModal = document.getElementById('modalPilihKunci');
-  if (existingModal) existingModal.remove();
-
-  // Render Pop-up Modal
-  const modal = document.createElement('div');
-  modal.id = 'modalPilihKunci';
-  modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:99999;';
-
-  modal.innerHTML = `
-    <div style="background:#fff; padding:20px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.3); font-family:sans-serif;">
-      <h3 style="margin-top:0; color:#0f172a; font-size:16px;">Tambah Pin Kunci ke Denah</h3>
-      <p style="font-size:12px; color:#64748b;">Pilih kunci yang ingin ditampilkan di Lantai <b>${currentFloor}</b>:</p>
-      
-      <select id="selectKunciPin" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #cbd5e1; font-size:13px; color:#333; background:#fff;">
-        ${optionsHtml}
-      </select>
-      
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button onclick="document.getElementById('modalPilihKunci').remove()" style="padding:8px 14px; border:none; background:#e2e8f0; border-radius:6px; cursor:pointer; color:#333;">Batal</button>
-        <button onclick="prosesTambahPin()" style="padding:8px 14px; border:none; background:#16a34a; color:#fff; border-radius:6px; cursor:pointer; font-weight:bold;">Tampilkan Pin</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
 }
 
 // Fungsi Eksekusi & Merender Langsung Pin ke Denah
@@ -2170,42 +2145,58 @@ const renderMapPins = renderPinsForFloor;
           ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Kirim Data Peminjaman`
           : `<svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg> Proses Pengembalian Kunci`;
 
-        fetch(scriptUrl, { method: 'POST', body: formData })
-          .then(res => res.json())
-          .then(res => {
-            if(res.status === 'success') { 
-              document.getElementById(idForm).reset();
-              const pBox = document.getElementById('previewBoxP');
-              if(pBox) pBox.style.display = 'none';
+        // FUNGSI RENDERING PIN PADA DENAH (TERHUBUNG KE SPREADSHEET)
+function renderPinsForFloor() {
+  const container = document.getElementById('mapPinContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  // Ambil data kunci dari variabel aplikasi (menyesuaikan nama variabel yang ada)
+  const dataKunci = window.dataKunciMaster || window.dataKunci || window.allKunciData || []; 
+  const floorPins = pinPositionsData[currentFloorMap] || {};
 
-              muatKunciTersedia();
-              muatMonitorData();
-              
-              document.getElementById('navTabsContainer').style.display = 'none';
-              document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-              
-              const teksPesan = (konteksAksi === 'pinjam') 
-                ? "Terima Kasih! Data Peminjaman Kunci Anda telah berhasil disimpan ke dalam sistem."
-                : "Terima Kasih! Kunci telah dikembalikan dan status rak monitor telah diperbarui.";
-              
-              document.getElementById('pesanSukses').textContent = teksPesan;
-              document.getElementById('screenSukses').style.display = 'block';
-              
-              btn.disabled = false;
-              btn.innerHTML = formatUlangTombol;
-            }
-            else { 
-              alert("Gagal: " + res.message); 
-              btn.disabled = false; 
-              btn.innerHTML = formatUlangTombol; 
-            }
-          }).catch(() => { 
-            alert("Kendala Jaringan atau Server Timeout."); 
-            btn.disabled = false; 
-            btn.innerHTML = formatUlangTombol; 
-          });
-      });
+  Object.keys(floorPins).forEach(kunciId => {
+    const pos = floorPins[kunciId];
+    
+    // Cari detail kunci berdasarkan ID Kunci atau Nama Kunci dari Sheet
+    const detailKunci = dataKunci.find(k => 
+      String(k.id || k.id_kunci || k['ID Kunci']) === String(kunciId) ||
+      String(k.nama || k.nama_kunci || k['Nama Kunci']) === String(kunciId)
+    ) || { 
+      'Nama Kunci': kunciId, 
+      'Status': 'Tersedia' 
+    };
+
+    // Pembacaan field dari Spreadsheet (Nama Kunci & Status)
+    const namaKunci = detailKunci['Nama Kunci'] || detailKunci.nama_kunci || detailKunci.nama || kunciId;
+    const statusKunci = detailKunci['Status'] || detailKunci.status || 'Tersedia';
+
+    const pinEl = document.createElement('div');
+    pinEl.className = 'map-pin';
+    pinEl.style.left = pos.x + '%';
+    pinEl.style.top = pos.y + '%';
+    
+    // Warna/Icon berdasarkan status dari sheet
+    const isDipinjam = String(statusKunci).toLowerCase() === 'dipinjam';
+    const iconPin = isDipinjam ? '📍' : '📌';
+    
+    pinEl.innerHTML = `
+      <div style="font-size: 24px;">${iconPin}</div>
+      <div class="pin-tooltip">
+        <strong>${namaKunci}</strong><br/>
+        Status: <span style="color: ${isDipinjam ? '#ef4444' : '#22c55e'}; font-weight: bold;">${statusKunci}</span>
+      </div>
+    `;
+
+    if (isMapEditMode) {
+      enablePinDrag(pinEl, kunciId);
+    } else {
+      pinEl.onclick = () => alert(`Nama Kunci: ${namaKunci}\nLantai: ${currentFloorMap}\nStatus: ${statusKunci}`);
     }
+
+    container.appendChild(pinEl);
+  });
+}
 
     function resetKeHalamanForm() {
       document.getElementById('screenSukses').style.display = 'none';
