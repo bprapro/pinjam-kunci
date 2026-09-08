@@ -1873,19 +1873,16 @@ function handleZoomWheel(event) {
 
 // Ganti Lantai Denah
 function pilihLantaiMap(floor) {
-  currentFloor = floor;
-
+  window.currentFloorMap = floor;
   document.querySelectorAll('.btn-floor').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.trim() === floor);
+    btn.classList.toggle('active', btn.innerText === floor);
   });
-
-  const mapImage = document.getElementById('mapImageBg');
-  if (mapImage) {
-    mapImage.src = floorImages[floor] || 'LG.jpg';
-    mapImage.onload = () => {
-      if (panzoomInstance) panzoomInstance.reset();
-    };
-  }
+  
+  const mapImg = document.getElementById('mapImageBg');
+  if (mapImg) mapImg.src = FLOOR_MAPS[floor] || '';
+  
+  renderPinsForFloor();
+}
 
   renderPinsForFloor(floor);
 }
@@ -2084,9 +2081,6 @@ function positionTooltip(event, pin, container, tooltip) {
   tooltip.style.top = `${top}px`;
 }
 
-// Alias
-const renderMapPins = renderPinsForFloor;
-
     /* ==========================================
        8. SUBMIT FORM KE GOOGLE APPS SCRIPT
        ========================================== */
@@ -2229,13 +2223,18 @@ const renderMapPins = renderPinsForFloor;
 
   <!-- SCRIPT DENAH INTERAKTIF -->
   <script>
-    const FLOOR_MAPS = {
-      'LG': './LG.jpg',
-      'L1': './L1.jpg',
-      'L2': './L2.jpg',
-      'L3': './L3.jpg',
-      'L4': './L4.jpg'
-    };
+    // Deklarasikan variabel denah di paling atas agar bisa dibaca semua fungsi
+window.pinPositionsData = JSON.parse(localStorage.getItem('map_pin_positions') || '{}');
+window.currentFloorMap = 'LG';
+window.isMapEditMode = false;
+
+const FLOOR_MAPS = {
+  'LG': './LG.jpg',
+  'L1': './L1.jpg',
+  'L2': './L2.jpg',
+  'L3': './L3.jpg',
+  'L4': './L4.jpg'
+};
 
     let currentFloorMap = 'LG';
     let isMapEditMode = false;
@@ -2254,51 +2253,54 @@ const renderMapPins = renderPinsForFloor;
     }
 
     function renderPinsForFloor() {
-      const container = document.getElementById('mapPinContainer');
-      if (!container) return;
-      container.innerHTML = '';
-      
-      const dataKunci = window.semuaDataKunci || semuaDataKunci || window.allKunciData || []; 
-      const floorPins = pinPositionsData[currentFloorMap] || {};
+  const container = document.getElementById('mapPinContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  const dataKunci = window.semuaDataKunci || window.allKunciData || []; 
+  const pinData = window.pinPositionsData || {};
+  const currentFloor = window.currentFloorMap || 'LG';
+  const floorPins = pinData[currentFloor] || {};
 
-      Object.keys(floorPins).forEach(kunciId => {
-        const pos = floorPins[kunciId];
-        
-        const detailKunci = dataKunci.find(k => 
-          String(k.id || k['ID Kunci']) === String(kunciId) || 
-          String(k.nama || k['Nama Kunci']).toLowerCase() === String(kunciId).toLowerCase()
-        ) || { nama: kunciId, status: 'Tersedia' };
+  Object.keys(floorPins).forEach(kunciId => {
+    const pos = floorPins[kunciId];
+    
+    const detailKunci = dataKunci.find(k => 
+      String(k.id || k['ID Kunci']) === String(kunciId) || 
+      String(k.nama || k['Nama Kunci']).toLowerCase() === String(kunciId).toLowerCase()
+    ) || { nama: kunciId, status: 'Tersedia' };
 
-        const namaKunci = detailKunci.nama || detailKunci['Nama Kunci'] || kunciId;
-        const statusKunci = detailKunci.status || detailKunci['Status'] || 'Tersedia';
+    const namaKunci = detailKunci.nama || detailKunci['Nama Kunci'] || kunciId;
+    const statusKunci = detailKunci.status || detailKunci['Status'] || 'Tersedia';
 
-        const pinEl = document.createElement('div');
-        pinEl.className = 'map-pin';
-        pinEl.style.left = pos.x + '%';
-        pinEl.style.top = pos.y + '%';
-        
-        const isDipinjam = String(statusKunci).toLowerCase() === 'dipinjam';
-        const iconPin = isDipinjam ? '📍' : '📌';
-        
-        pinEl.innerHTML = `
-          <div style="font-size: 24px;">${iconPin}</div>
-          <div class="pin-tooltip">
-            <strong>${namaKunci}</strong><br/>
-            Status: <span style="color: ${isDipinjam ? '#ef4444' : '#22c55e'}; font-weight: bold;">${statusKunci}</span>
-          </div>
-        `;
+    const pinEl = document.createElement('div');
+    pinEl.className = 'map-pin';
+    pinEl.style.left = pos.x + '%';
+    pinEl.style.top = pos.y + '%';
+    
+    const isDipinjam = String(statusKunci).toLowerCase() === 'dipinjam';
+    const iconPin = isDipinjam ? '📍' : '📌';
+    
+    pinEl.innerHTML = `
+      <div style="font-size: 24px;">${iconPin}</div>
+      <div class="pin-tooltip">
+        <strong>${namaKunci}</strong><br/>
+        Status: <span style="color: ${isDipinjam ? '#ef4444' : '#22c55e'}; font-weight: bold;">${statusKunci}</span>
+      </div>
+    `;
 
-        if (isMapEditMode) {
-          enablePinDrag(pinEl, kunciId);
-        } else {
-          pinEl.onclick = () => alert(`Nama Kunci: ${namaKunci}\nLantai: ${currentFloorMap}\nStatus: ${statusKunci}`);
-        }
-
-        container.appendChild(pinEl);
-      });
+    if (window.isMapEditMode) {
+      enablePinDrag(pinEl, kunciId);
+    } else {
+      pinEl.onclick = () => alert(`Nama Kunci: ${namaKunci}\nLantai: ${currentFloor}\nStatus: ${statusKunci}`);
     }
 
-    const renderMapPins = renderPinsForFloor;
+    container.appendChild(pinEl);
+  });
+}
+
+// Cukup assign alias seperti ini tanpa kata kunci 'const' atau 'let' jika sudah pernah ada
+renderMapPins = renderPinsForFloor;
 
     function toggleEditModeMap() {
       if (!isMapEditMode) {
