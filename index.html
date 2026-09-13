@@ -1908,6 +1908,27 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
-  
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const kunciDipilih = urlParams.get('kunci');
+
+    if (kunciDipilih) {
+      setTimeout(function() {
+        const daftarKunciArray = decodeURIComponent(kunciDipilih).split(',');
+        
+        daftarKunciArray.forEach(function(keyId) {
+          const cleanKey = keyId.trim();
+          const chk = document.getElementById('chk-' + cleanKey) || 
+                      document.querySelector(`input[type="checkbox"][value="${cleanKey}"]`);
+          if (chk) {
+            chk.checked = true;
+            chk.dispatchEvent(new Event('change'));
+          }
+        });
+      }, 500);
+    }
+  });
+</script>
 </body>
 </html>
