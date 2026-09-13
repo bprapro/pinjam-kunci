@@ -477,21 +477,35 @@
 
         if (isAdminMode) {
           marker.on('dragend', function(e) {
-            const newLatLng = e.target.getLatLng();
-            const newY = Math.round(newLatLng.lat);
-            const newX = Math.round(newLatLng.lng);
-            const formattedCoords = '[' + newY + ', ' + newX + ']';
+  const newLatLng = e.target.getLatLng();
+  const newY = Math.round(newLatLng.lat);
+  const newX = Math.round(newLatLng.lng);
+  const formattedCoords = newY + ',' + newX;
 
-            koordinatKunciMap[keyId] = [newY, newX];
-            
-            const copyText = "'" + keyId + "': " + formattedCoords + ",";
-            if (navigator.clipboard) {
-              navigator.clipboard.writeText(copyText);
-            }
-            
-            console.log("Koordinat Baru (" + keyId + "):", copyText);
-            alert("Koordinat Baru (" + kunci.nama + "):\n" + copyText + "\n\n(Telah otomatis disalin ke Clipboard!)");
-          });
+  koordinatKunciMap[keyId] = [newY, newX];
+
+  // Kirim koordinat baru ke Google Spreadsheet
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      aksi: 'simpan_koordinat',
+      id: keyId,
+      koordinat: formattedCoords
+    })
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.status === 'success') {
+      alert("Koordinat " + kunci.nama + " berhasil disimpan permanen ke Google Sheets!");
+    } else {
+      alert("Gagal menyimpan ke database.");
+    }
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    alert("Terjadi kesalahan saat menyimpan ke database.");
+  });
+});
         }
 
         marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Tahan & Geser Pin Ini]</i>' : ''), {
