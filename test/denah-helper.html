@@ -218,14 +218,14 @@
     .custom-marker { position: relative; }
 
     .marker-dot {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       background: #ffffff;
       border: 3px solid var(--primary-color);
       border-radius: 50%;
       box-shadow: 0 0 12px rgba(0,0,0,0.35);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: transform 0.2s ease;
     }
 
     .custom-marker:hover .marker-dot, .marker-dot.selected {
@@ -235,16 +235,16 @@
 
     .marker-dot.borrowed { border-color: #ef4444; }
 
-    /* Visual Indicator pas Pin bisa digeser */
+    /* Indikator visual ketika mode admin aktif */
     .marker-dot.admin-draggable {
       border-color: #f59e0b !important;
-      background: #fef3c7 !important;
+      background: #fbbf24 !important;
       cursor: move !important;
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.8) !important;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.9) !important;
     }
 
     .leaflet-tooltip-voyager {
-      background: rgba(255, 255, 255, 0.9) !important;
+      background: rgba(255, 255, 255, 0.95) !important;
       backdrop-filter: blur(12px) !important;
       border: 1px solid rgba(255, 255, 255, 0.7) !important;
       border-radius: 20px !important;
@@ -266,7 +266,7 @@
       <div class="form-group">
         <label>Pilih Kunci / Ruangan:</label>
         <div class="filter-row">
-          <select id="filterLantai" onchange="saringKunci()">
+          <select id="filterLantai" onchange="gantiLantai()">
             <option value="">All Floor</option>
           </select>
           <select id="filterZona" onchange="saringKunci()">
@@ -300,7 +300,7 @@
 
 <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
-  const PASSWORD_ADMIN = "admin123"; // Ganti password admin di sini
+  const PASSWORD_ADMIN = "admin123";
 
   const map = L.map('map', {
     crs: L.CRS.Simple,
@@ -310,6 +310,7 @@
   });
 
   let currentOverlay = null;
+  let currentFloorLoaded = null;
   let activeImageBounds = [[0, 0], [1000, 1400]];
   let markersGroup = L.layerGroup().addTo(map);
 
@@ -342,7 +343,7 @@
         const btn = document.getElementById('btnAdminToggle');
         btn.classList.add('active');
         btn.innerHTML = '🔒 Mode Admin (Aktif)';
-        alert("Mode Admin Aktif! Sekarang Anda dapat menggeser pin di peta. Koordinat baru akan otomatis disalin.");
+        alert("Mode Admin Aktif!\n\nSekarang Anda dapat menahan & geser (drag) titik pin di peta.\nKoordinat baru akan otomatis disalin ke Clipboard.");
         saringKunci();
       } else if (pass !== null) {
         alert("Kata sandi salah!");
@@ -367,7 +368,7 @@
       } else {
         globalDataKunci = [];
       }
-      saringKunci();
+      gantiLantai();
     } catch (error) {
       console.error("Gagal mengambil data:", error);
       document.getElementById('kontainerKunciChecklist').innerHTML = '<p style="color: red; font-size: 13px;">Gagal memuat data.</p>';
@@ -392,12 +393,21 @@
     });
   }
 
+  function gantiLantai() {
+    const selectedFloor = document.getElementById('filterLantai').value || 'LG';
+    if (currentFloorLoaded !== selectedFloor) {
+      renderMapOverlay(selectedFloor);
+      currentFloorLoaded = selectedFloor;
+    }
+    saringKunci();
+  }
+
   function saringKunci() {
     const selectedFloor = document.getElementById('filterLantai').value;
     const selectedZone = document.getElementById('filterZona').value;
     const searchQuery = document.getElementById('kotakCari').value.toLowerCase().trim();
 
-    renderMapOverlay(selectedFloor || 'LG');
+    markersGroup.clearLayers();
 
     const container = document.getElementById('kontainerKunciChecklist');
     container.innerHTML = '';
@@ -448,7 +458,7 @@
 
       const currentFloorMap = selectedFloor || 'LG';
       if (String(kunci.lantai || '').toUpperCase() === currentFloorMap.toUpperCase()) {
-        let coords = koordinatKunciMap[kunci.id] || koordinatKunciMap[kunci.nama];
+        let coords = koordinatKunciMap[keyId] || koordinatKunciMap[kunci.id] || koordinatKunciMap[kunci.nama];
         if (!coords) {
           coords = [500 + (index * 20), 400 + (index * 30)];
         }
@@ -456,8 +466,8 @@
         const customIcon = L.divIcon({
           className: 'custom-marker',
           html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + ' ' + (isAdminMode ? 'admin-draggable' : '') + '"></div>',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
         });
 
         const marker = L.marker(coords, { 
@@ -465,23 +475,26 @@
           draggable: isAdminMode
         });
 
-        // Event Drag Selesai untuk Admin
-        marker.on('dragend', function(e) {
-          const newLatLng = e.target.getLatLng();
-          const newY = Math.round(newLatLng.lat);
-          const newX = Math.round(newLatLng.lng);
-          const formattedCoords = '[' + newY + ', ' + newX + ']';
+        if (isAdminMode) {
+          marker.on('dragend', function(e) {
+            const newLatLng = e.target.getLatLng();
+            const newY = Math.round(newLatLng.lat);
+            const newX = Math.round(newLatLng.lng);
+            const formattedCoords = '[' + newY + ', ' + newX + ']';
 
-          koordinatKunciMap[keyId] = [newY, newX];
-          
-          if (navigator.clipboard) {
-            navigator.clipboard.writeText("'" + keyId + "': " + formattedCoords);
-          }
-          
-          alert("Koordinat Baru " + kunci.nama + ":\n" + formattedCoords + "\n\n(Koordinat telah disalin ke Clipboard!)");
-        });
+            koordinatKunciMap[keyId] = [newY, newX];
+            
+            const copyText = "'" + keyId + "': " + formattedCoords + ",";
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(copyText);
+            }
+            
+            console.log("Koordinat Baru (" + keyId + "):", copyText);
+            alert("Koordinat Baru (" + kunci.nama + "):\n" + copyText + "\n\n(Telah otomatis disalin ke Clipboard!)");
+          });
+        }
 
-        marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:orange">[Geser untuk pindahkan]</i>' : ''), {
+        marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Tahan & Geser Pin Ini]</i>' : ''), {
           direction: 'top',
           className: 'leaflet-tooltip-voyager'
         });
