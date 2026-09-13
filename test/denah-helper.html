@@ -369,9 +369,9 @@
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
   const PASSWORD_ADMIN = "admin123";
 
-  // 1. INSISIALISASI PETA DENGAN L.CRS.Simple (WAJIB UNTUK DENAH GAMBAR)
+  // 1. INISIALISASI PETA DENGAN L.CRS.Simple
   const map = L.map('map', {
-    crs: L.CRS.Simple, // Mengunci sistem koordinat piksel gambar agar pin TIDAK GESER saat zoom
+    crs: L.CRS.Simple,
     minZoom: -2,
     maxZoom: 2
   });
@@ -438,7 +438,7 @@
       console.error("Gagal mengambil data:", error);
       const container = document.getElementById('kontainerKunciChecklist');
       if (container) {
-        container.innerHTML = '&lt;p style=&quot;color: red; font-size: 13px;&quot;&gt;Gagal memuat data.&lt;/p&gt;';
+        container.innerHTML = '<p style="color: red; font-size: 13px;">Gagal memuat data.</p>';
       }
     }
   }
@@ -461,13 +461,13 @@
     if (selLantai.options.length === 0) {
       selLantai.innerHTML = '';
       lantaiList.forEach(function(l) {
-        selLantai.innerHTML += '&lt;option value=&quot;' + l + '&quot;&gt;Lantai ' + l + '&lt;/option&gt;';
+        selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
       });
     }
 
-    selZona.innerHTML = '&lt;option value=&quot;&quot;&gt;All Zone&lt;/option&gt;';
+    selZona.innerHTML = '<option value="">All Zone</option>';
     zonaList.forEach(function(z) {
-      selZona.innerHTML += '&lt;option value=&quot;' + z + '&quot;&gt;Zone ' + z + '&lt;/option&gt;';
+      selZona.innerHTML += '<option value="' + z + '">Zone ' + z + '</option>';
     });
   }
 
@@ -489,7 +489,6 @@
     const img = new Image();
     img.src = imagePath;
     img.onload = function() {
-      // Mengatur Bounds dinamis sesuai tinggi dan lebar asli dari gambar denah
       activeImageBounds = [[0, 0], [this.naturalHeight || 1500, this.naturalWidth || 2000]];
       currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
       map.fitBounds(activeImageBounds);
@@ -528,7 +527,7 @@
     });
 
     if (filteredKeys.length === 0) {
-      container.innerHTML = '&lt;p style=&quot;color: var(--text-muted, #64748b); font-size: 13px; margin: 0;&quot;&gt;Kunci tidak ditemukan di lantai ini&lt;/p&gt;';
+      container.innerHTML = '<p style="color: var(--text-muted, #64748b); font-size: 13px; margin: 0;">Kunci tidak ditemukan di lantai ini</p>';
       return;
     }
 
@@ -545,15 +544,15 @@
 
       let adminInsertBtn = '';
       if (isAdminMode) {
-        adminInsertBtn = '&lt;button class=&quot;btn-manual-set&quot; onclick=&quot;inputManualPin(\&apos;' + keyId + '\&apos;, \&apos;' + kunci.nama + '\&apos;)&quot;&gt;📌 Insert Pin&lt;/button&gt;';
+        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Insert Pin</button>';
       }
 
       itemEl.innerHTML = 
-        '&lt;input type=&quot;checkbox&quot; id=&quot;chk-' + keyId + '&quot; value=&quot;' + keyId + '&quot; ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '&gt;' +
-        '&lt;label for=&quot;chk-' + keyId + '&quot; style=&quot;cursor: pointer; width: 100%; display: flex; align-items: center;&quot;&gt;' +
-          '&lt;span class=&quot;key-label&quot;&gt;' + labelTeks + '&lt;/span&gt;' +
-          '&lt;span class=&quot;key-tag&quot;&gt;' + tagTeks + '&lt;/span&gt;' +
-        '&lt;/label&gt;' +
+        '<input type="checkbox" id="chk-' + keyId + '" value="' + keyId + '" ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '>' +
+        '<label for="chk-' + keyId + '" style="cursor: pointer; width: 100%; display: flex; align-items: center;">' +
+          '<span class="key-label">' + labelTeks + '</span>' +
+          '<span class="key-tag">' + tagTeks + '</span>' +
+        '</label>' +
         adminInsertBtn;
 
       const checkbox = itemEl.querySelector('input[type="checkbox"]');
@@ -567,15 +566,13 @@
 
       container.appendChild(itemEl);
 
-      // --- PEMBACAAN KOORDINAT YANG DIPERBAIKI ---
       if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
         let coordStr = String(kunci.koordinat).trim();
         let rawCoords = [];
 
         if (coordStr.includes(',')) {
           rawCoords = coordStr.split(',').map(function(n) { return parseFloat(n.trim()); });
-        } else if (coordStr.length &gt;= 6) {
-          // Antisipasi jika terformat sebagai angka tunggal (misal 18901020 -&gt; Y:1890, X:1020)
+        } else if (coordStr.length >= 6) {
           const mid = Math.floor(coordStr.length / 2);
           rawCoords = [
             parseFloat(coordStr.substring(0, mid)),
@@ -588,9 +585,9 @@
 
           const customIcon = L.divIcon({
             className: 'custom-marker',
-            html: '&lt;div class=&quot;marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '&quot;&gt;&lt;/div&gt;',
-            iconSize: [18, 18],   // Ukuran fisik marker 18x18 piksel
-            iconAnchor: [9, 9]    // Titik jangkar terkunci tepat di tengah (setengah dari 18)
+            html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
           });
 
           const marker = L.marker(coords, { 
@@ -607,7 +604,7 @@
             });
           }
 
-          marker.bindTooltip('&lt;b&gt;' + kunci.nama + '&lt;/b&gt;&lt;br&gt;Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '&lt;br&gt;&lt;i style=&quot;color:#d97706&quot;&gt;[Geser Pin Ini]&lt;/i&gt;' : ''), {
+          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Geser Pin Ini]</i>' : ''), {
             direction: 'top',
             className: 'leaflet-tooltip-voyager'
           });
@@ -648,7 +645,6 @@
       if (res.status === 'success') {
         alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
         
-        // Update data di memori lokal secara langsung agar pin langsung muncul
         const item = globalDataKunci.find(function(k) { 
           return String(k.id || k.nama) === String(keyId); 
         });
@@ -656,7 +652,6 @@
           item.koordinat = strKoordinat;
         }
         
-        // Render ulang daftar & pin peta
         saringKunci();
       } else {
         alert("❌ Gagal menyimpan: " + (res.message || "Error server"));
@@ -679,7 +674,6 @@
 
   let activePopupLatLng = null;
 
-  // Dipanggil saat denah peta diklik pada Mode Admin
   function bukaPopupPasangPin(latlng) {
     activePopupLatLng = latlng;
     const roundY = Math.round(latlng.lat);
@@ -687,39 +681,36 @@
     const selLantai = document.getElementById('filterLantai');
     const selectedFloor = selLantai ? (selLantai.value || 'LG') : 'LG';
 
-    // Filter kunci berdasarkan lantai yang sedang aktif
     const availableForPin = globalDataKunci.filter(function(k) {
       return String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase();
     });
 
     let popupContent = 
-      '&lt;div style=&quot;padding: 5px; width: 260px; font-family: sans-serif;&quot;&gt;' +
-        '&lt;div style=&quot;font-weight: bold; font-size: 14px; margin-bottom: 2px;&quot;&gt;📍 Pasang Pin di Koordinat:&lt;/div&gt;' +
-        '&lt;div style=&quot;font-size: 12px; color: #64748b; margin-bottom: 8px;&quot;&gt;Y: ' + roundY + ', X: ' + roundX + ' (Lantai ' + selectedFloor + ')&lt;/div&gt;' +
+      '<div style="padding: 5px; width: 260px; font-family: sans-serif;">' +
+        '<div style="font-weight: bold; font-size: 14px; margin-bottom: 2px;">📍 Pasang Pin di Koordinat:</div>' +
+        '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Y: ' + roundY + ', X: ' + roundX + ' (Lantai ' + selectedFloor + ')</div>' +
         
-        '&lt;!-- Input Pencarian --&gt;' +
-        '&lt;input type=&quot;text&quot; id=&quot;searchPopupKey&quot; placeholder=&quot;🔍 Cari ID atau Nama Kunci...&quot; ' +
-        '  style=&quot;width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 6px; box-sizing: border-box;&quot; ' +
-        '  onkeyup=&quot;filterDropdownPopup()&quot;&gt;' +
+        '<input type="text" id="searchPopupKey" placeholder="🔍 Cari ID atau Nama Kunci..." ' +
+        '  style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 6px; box-sizing: border-box;" ' +
+        '  onkeyup="filterDropdownPopup()">' +
 
-        '&lt;!-- Dropdown Kunci --&gt;' +
-        '&lt;select id=&quot;selectKeyForPin&quot; size=&quot;5&quot; style=&quot;width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;&quot; onchange=&quot;fokusKePinKunci(this.value)&quot;&gt;';
+        '<select id="selectKeyForPin" size="5" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;" onchange="fokusKePinKunci(this.value)">';
 
     availableForPin.forEach(function(k) {
       const keyId = k.id || k.nama;
       const hasPin = (k.koordinat && String(k.koordinat).trim() !== '');
       const pinStatusTag = hasPin ? ' 📍 (Sudah ada pin)' : '';
       
-      popupContent += '&lt;option value=&quot;' + keyId + '&quot;&gt;' + keyId + ' - ' + k.nama + pinStatusTag + '&lt;/option&gt;';
+      popupContent += '<option value="' + keyId + '">' + keyId + ' - ' + k.nama + pinStatusTag + '</option>';
     });
 
     popupContent += 
-        '&lt;/select&gt;' +
-        '&lt;button onclick=&quot;eksekusiSimpanPin(' + roundY + ',' + roundX + ')&quot; ' +
-        '  style=&quot;width: 100%; background: #0084c7; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;&quot;&gt;' +
+        '</select>' +
+        '<button onclick="eksekusiSimpanPin(' + roundY + ',' + roundX + ')" ' +
+        '  style="width: 100%; background: #0084c7; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">' +
         '  Simpan Pin Kunci' +
-        '&lt;/button&gt;' +
-      '&lt;/div&gt;';
+        '</button>' +
+      '</div>';
 
     L.popup()
       .setLatLng(latlng)
@@ -727,7 +718,6 @@
       .openOn(map);
   }
 
-  // 1. Fitur Pencarian di dalam Modal Popup
   function filterDropdownPopup() {
     const inputEl = document.getElementById('searchPopupKey');
     const selectEl = document.getElementById('selectKeyForPin');
@@ -736,7 +726,7 @@
     const input = inputEl.value.toLowerCase();
     const options = selectEl.options;
 
-    for (let i = 0; i &lt; options.length; i++) {
+    for (let i = 0; i < options.length; i++) {
       const text = options[i].text.toLowerCase();
       if (text.includes(input)) {
         options[i].style.display = '';
@@ -746,7 +736,6 @@
     }
   }
 
-  // 2. Arahkan peta secara otomatis ke lokasi pin jika item yang dipilih sudah punya koordinat
   function fokusKePinKunci(keyId) {
     const item = globalDataKunci.find(function(k) {
       return String(k.id || k.nama) === String(keyId);
@@ -760,7 +749,6 @@
     }
   }
 
-  // 3. Simpan Koordinat Kunci dari Modal Popup
   function eksekusiSimpanPin(y, x) {
     const select = document.getElementById('selectKeyForPin');
     if (!select) return;
@@ -776,14 +764,12 @@
     map.closePopup();
   }
 
-  // Event Listener Klik pada Peta untuk Admin Mode
   map.on('click', function(e) {
     if (isAdminMode) {
       bukaPopupPasangPin(e.latlng);
     }
   });
 
-  // Jalankan Fetch Data Awal
   fetchSpreadsheetData();
 </script>
 </body>
