@@ -581,11 +581,23 @@
 
       container.appendChild(itemEl);
 
-      // Render Pin di Peta
-      if (kunci.koordinat) {
-        const rawCoords = String(kunci.koordinat).split(',').map(function(n) { return parseFloat(n.trim()); });
+      // --- PEMBACAAN KOORDINAT YANG DIPERBAIKI ---
+      if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
+        let coordStr = String(kunci.koordinat).trim();
+        let rawCoords = [];
+
+        if (coordStr.includes(',')) {
+          rawCoords = coordStr.split(',').map(function(n) { return parseFloat(n.trim()); });
+        } else if (coordStr.length >= 6) {
+          // Antisipasi jika terformat sebagai angka tunggal (misal 18901020 -> Y:1890, X:1020)
+          const mid = Math.floor(coordStr.length / 2);
+          rawCoords = [
+            parseFloat(coordStr.substring(0, mid)),
+            parseFloat(coordStr.substring(mid))
+          ];
+        }
+
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
-          
           const coords = [rawCoords[0], rawCoords[1]];
 
           const customIcon = L.divIcon({
