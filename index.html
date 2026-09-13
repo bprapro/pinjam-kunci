@@ -1911,32 +1911,43 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
   window.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
+    const kunciMulti = urlParams.get('kunci_multi');
     const kataCari = urlParams.get('cari');
 
-    if (kataCari) {
-      const inputCari = document.getElementById('kotakCari');
+    // Jika datang membawa banyak kunci dari denah
+    if (kunciMulti) {
+      const daftarNama = decodeURIComponent(kunciMulti).split('|');
 
       let kounter = 0;
-      const intervalCari = setInterval(function() {
+      const intervalCheck = setInterval(function() {
         kounter++;
+        const checkboxes = document.querySelectorAll('#kontainerKunciChecklist input[type="checkbox"]');
 
-        if (inputCari) {
-          // Isikan nama ruangan ke kotak pencarian
-          inputCari.value = decodeURIComponent(kataCari);
-
-          // Jalankan fungsi filter
-          if (typeof saringKunci === 'function') {
-            saringKunci();
-          }
-
-          inputCari.dispatchEvent(new Event('keyup', { bubbles: true }));
-          inputCari.dispatchEvent(new Event('input', { bubbles: true }));
-
-          clearInterval(intervalCari);
+        if (checkboxes.length > 0) {
+          checkboxes.forEach(chk => {
+            // Cek apakah label atau teks elemen terdekat cocok dengan nama ruangan
+            const parentText = chk.parentElement ? chk.parentElement.textContent : '';
+            daftarNama.forEach(nama => {
+              if (parentText.toLowerCase().includes(nama.toLowerCase())) {
+                chk.checked = true;
+                chk.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+          });
+          clearInterval(intervalCheck);
         }
 
-        if (kounter > 10) clearInterval(intervalCari);
+        if (kounter > 15) clearInterval(intervalCheck);
       }, 300);
+    } 
+    // Jika hanya membawa 1 kunci pencarian biasa
+    else if (kataCari) {
+      const inputCari = document.getElementById('kotakCari');
+      if (inputCari) {
+        inputCari.value = decodeURIComponent(kataCari);
+        if (typeof saringKunci === 'function') saringKunci();
+        inputCari.dispatchEvent(new Event('keyup', { bubbles: true }));
+      }
     }
   });
 </script>
