@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pilih Lokasi Kunci - Denah Mall</title>
   
-  <!-- Font Modern (Plus Jakarta Sans) -->
+  <!-- Font Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -21,61 +21,112 @@
       padding: 0;
     }
 
+    /* Background Fullscreen Hutan/Alam sesuai sampel gambar */
     body {
-      background-color: #55e0e7;
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+      background-size: cover;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 30px 20px;
     }
 
-    .app-container {
+    /* Overlay gelap tipis agar container lebih menyala */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.25);
+      z-index: 0;
+    }
+
+    /* Container Utama (Card Melayang Putih Bersih) */
+    .app-card {
+      position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 1250px;
+      max-width: 1050px;
+      background: #ffffff;
+      border-radius: 40px;
+      padding: 24px;
       display: flex;
-      gap: 30px;
+      gap: 25px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
       align-items: stretch;
     }
 
     /* --- KOLOM KIRI (SIDEBAR FORM) --- */
     .sidebar {
-      flex: 1;
+      flex: 1.1;
+      padding: 30px 20px 20px 30px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 15px;
-      padding: 10px;
-      min-width: 300px;
+      justify-content: space-between;
     }
 
-    .form-group {
+    .brand-logo {
+      font-size: 16px;
+      font-weight: 800;
+      color: #375b4f;
+      letter-spacing: -0.5px;
+      margin-bottom: 25px;
+    }
+
+    .title-header {
+      font-size: 32px;
+      font-weight: 800;
+      color: #111827;
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      margin-bottom: 30px;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Label Input Tipis & Elegan */
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b7280;
+      margin-bottom: 4px;
+      display: block;
+      margin-left: 12px;
+    }
+
+    /* Select Box Bentuk Pill Sesuai Gambar */
+    .select-wrapper {
       position: relative;
     }
 
-    .select-pill, .btn-cari {
+    .select-pill {
       width: 100%;
-      padding: 16px 24px;
+      padding: 15px 22px;
       border-radius: 50px;
       border: none;
       outline: none;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
-      color: #2d3748;
-      background: #ffffff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      color: #111827;
+      background: #f3f4f6;
       appearance: none;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .select-pill:focus {
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+    .select-pill:hover {
+      background: #e5e7eb;
     }
 
-    .select-wrapper {
-      position: relative;
+    .select-pill:focus {
+      background: #ffffff;
+      box-shadow: 0 0 0 2px #375b4f;
     }
+
     .select-wrapper::after {
       content: '▾';
       position: absolute;
@@ -83,210 +134,259 @@
       top: 50%;
       transform: translateY(-50%);
       pointer-events: none;
-      color: #718096;
-      font-size: 16px;
-    }
-
-    .btn-cari {
-      background: #b0b0b0;
-      color: #ffffff;
-      text-align: center;
-      margin-top: 5px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .btn-cari:hover {
-      background: #999999;
-    }
-
-    .back-link {
-      color: #1a202c;
-      text-decoration: none;
+      color: #9ca3af;
       font-size: 14px;
-      margin-top: 10px;
-      display: inline-block;
-      font-weight: 500;
     }
 
-    .back-link strong {
+    /* Tombol Utama Hijau Forest (#375b4f) */
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      border-radius: 50px;
+      border: none;
+      background: #375b4f;
+      color: #ffffff;
+      font-size: 15px;
       font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 10px 20px rgba(55, 91, 79, 0.25);
+    }
+
+    .btn-submit:hover {
+      background: #2b473e;
+      transform: translateY(-1px);
+    }
+
+    .footer-link {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .footer-link a {
+      color: #111827;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
     }
 
     /* --- KOLOM KANAN (DENAH LAYOUT) --- */
     .map-wrapper {
-      flex: 2.2;
-      background: #ffffff;
-      border-radius: 35px;
-      padding: 25px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      flex: 1.4;
+      border-radius: 32px;
+      overflow: hidden;
       position: relative;
-      display: flex;
-      flex-direction: column;
+      min-height: 520px;
+      background: #e5e7eb;
     }
 
     #map {
       width: 100%;
-      height: 520px;
-      background: #f8fafc;
-      border-radius: 20px;
+      height: 100%;
+      min-height: 520px;
+      background: #2d3748;
       z-index: 1;
     }
 
+    /* Custom Zoom Controls Ala Minimalis */
     .custom-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 8px 18px;
       display: flex;
-      justify-content: space-between;
+      gap: 15px;
       align-items: center;
-      padding-top: 15px;
-      font-size: 20px;
-      font-weight: 600;
-      color: #2d3748;
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
 
-    .zoom-btn-group span {
-      cursor: pointer;
-      user-select: none;
-      padding: 0 8px;
-    }
-
-    .btn-fit {
-      font-size: 18px;
-      font-weight: 600;
+    .custom-controls span {
       cursor: pointer;
       user-select: none;
     }
 
-    /* --- MARKER & TOOLTIP STYLES --- */
+    .custom-controls span:hover {
+      color: #375b4f;
+    }
+
+    /* --- MARKER PIN & FLOATING TOOLTIP ALA VOIGER (GAMBAR) --- */
+    /* Marker Ring Glowing Dot */
     .custom-marker {
-      width: 16px;
-      height: 16px;
+      position: relative;
+    }
+
+    .marker-dot {
+      width: 14px;
+      height: 14px;
       background: #ffffff;
-      border: 4px solid #2d3748;
+      border: 3px solid #375b4f;
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      box-shadow: 0 0 12px rgba(0,0,0,0.4);
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: all 0.2s ease;
     }
-    .custom-marker:hover {
+
+    .custom-marker:hover .marker-dot {
       transform: scale(1.3);
-      border-color: #2563eb;
+      background: #375b4f;
     }
-    .custom-marker.borrowed {
+
+    .marker-dot.borrowed {
       border-color: #ef4444;
     }
 
-    .leaflet-tooltip-custom {
-      background: rgba(255, 255, 255, 0.9) !important;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+    /* Glassmorphism Floating Card Tooltip persis Gambar */
+    .leaflet-tooltip-voyager {
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
       border: 1px solid rgba(255, 255, 255, 0.6) !important;
       border-radius: 20px !important;
-      padding: 10px 18px !important;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-      color: #1e293b !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12) !important;
+      color: #111827 !important;
       font-size: 13px !important;
       font-weight: 600 !important;
     }
     
-    .leaflet-tooltip-custom::before {
+    .leaflet-tooltip-voyager::before {
       display: none;
     }
 
-    .tooltip-tag {
+    .tooltip-card {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .tooltip-icon {
-      width: 24px;
-      height: 24px;
-      background: #e2e8f0;
+      width: 28px;
+      height: 28px;
+      background: rgba(55, 91, 79, 0.1);
+      color: #375b4f;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 12px;
     }
 
     .status-badge {
       font-size: 10px;
       padding: 2px 8px;
-      border-radius: 10px;
-      margin-top: 2px;
+      border-radius: 12px;
+      font-weight: 700;
+      margin-top: 3px;
       display: inline-block;
     }
-    .status-available { background: #dcfce7; color: #166534; }
-    .status-borrowed { background: #fee2e2; color: #991b1b; }
+    .status-available { background: #dcfce7; color: #15803d; }
+    .status-borrowed { background: #fee2e2; color: #b91c1c; }
 
+    /* Overlay Loading */
     .loading-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      border-radius: 35px;
+      color: #375b4f;
     }
 
-    @media (max-width: 900px) {
-      .app-container { flex-direction: column; }
-      #map { height: 400px; }
+    /* Responsive untuk Layar Kecil */
+    @media (max-width: 850px) {
+      .app-card {
+        flex-direction: column;
+        border-radius: 30px;
+      }
+      .sidebar { padding: 10px; }
+      .map-wrapper { min-height: 380px; border-radius: 24px; }
+      #map { min-height: 380px; }
     }
   </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-card">
   
-  <!-- KOLOM KIRI (SIDEBAR INPUT) -->
+  <!-- KOLOM KIRI (FORM INPUT) -->
   <div class="sidebar">
-    <div class="form-group select-wrapper">
-      <select id="select-lantai" class="select-pill" onchange="renderCurrentLantai()">
-        <option value="LG" selected>Lantai : LG</option>
-        <option value="L1">Lantai : L1</option>
-        <option value="L2">Lantai : L2</option>
-        <option value="L3">Lantai : L3</option>
-        <option value="L4">Lantai : L4</option>
-      </select>
-    </div>
-
-    <div class="form-group select-wrapper">
-      <select id="select-zona" class="select-pill">
-        <option value="A">Zona : A</option>
-        <option value="B">Zona : B</option>
-        <option value="C">Zona : C</option>
-      </select>
-    </div>
-
-    <div class="form-group select-wrapper">
-      <select id="select-kunci" class="select-pill">
-        <option value="">Nomor Kunci : Pilih di Peta</option>
-      </select>
-    </div>
-
-    <button class="btn-cari" onclick="submitPilihanKunci()">Cari</button>
-
     <div>
-      <a href="index.html" class="back-link">Kembali ke <strong>form peminjaman kunci</strong></a>
+      <div class="brand-logo">keymanager</div>
+      <h1 class="title-header">Pilih lokasi<br>kunci Anda</h1>
+
+      <div class="form-container">
+        <div>
+          <label class="form-label">Lantai Mall</label>
+          <div class="select-wrapper">
+            <select id="select-lantai" class="select-pill" onchange="renderCurrentLantai()">
+              <option value="LG" selected>Lantai LG</option>
+              <option value="L1">Lantai L1</option>
+              <option value="L2">Lantai L2</option>
+              <option value="L3">Lantai L3</option>
+              <option value="L4">Lantai L4</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label">Zona Area</label>
+          <div class="select-wrapper">
+            <select id="select-zona" class="select-pill">
+              <option value="A">Zona A</option>
+              <option value="B">Zona B</option>
+              <option value="C">Zona C</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label">Nomor Kunci / Ruangan</label>
+          <div class="select-wrapper">
+            <select id="select-kunci" class="select-pill">
+              <option value="">Pilih via Peta / Dropdown</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-submit" onclick="submitPilihanKunci()">Pilih Kunci Ini</button>
+      </div>
+    </div>
+
+    <div class="footer-link">
+      Kembali ke <a href="index.html">Form Peminjaman</a>
     </div>
   </div>
 
-  <!-- KOLOM KANAN (DENAH MALL) -->
+  <!-- KOLOM KANAN (MAP LAYOUT VOYAGER STYLE) -->
   <div class="map-wrapper">
     <div id="loading-indicator" class="loading-overlay" style="display: none;">Memuat Data Kunci...</div>
     <div id="map"></div>
     
-    <!-- Controls Zoom & Fit -->
+    <!-- Controls Zoom & Fit Floating -->
     <div class="custom-controls">
-      <div class="zoom-btn-group">
-        <span onclick="map.zoomIn()">+</span>
-        <span>|</span>
-        <span onclick="map.zoomOut()">-</span>
-      </div>
-      <div class="btn-fit" onclick="resetViewMap()">Fit</div>
+      <span onclick="map.zoomIn()">+</span>
+      <span style="opacity: 0.3;">|</span>
+      <span onclick="map.zoomOut()">-</span>
+      <span style="opacity: 0.3;">|</span>
+      <span onclick="resetViewMap()">Reset</span>
     </div>
   </div>
 
@@ -297,11 +397,11 @@
 
 <script>
   // =========================================================
-  // 1. ISIKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+  // 1. ISIKAN URL APPS SCRIPT ANDA DI SINI
   // =========================================================
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx...AKAN_DISEUAIKAN.../exec";
 
-  // Inisialisasi Map Leaflet
+  // Inisialisasi Map Leaflet (CRS Simple untuk denah image)
   const map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -1,
@@ -313,7 +413,7 @@
   let currentOverlay = null;
   let markersGroup = L.layerGroup().addTo(map);
 
-  // Mapping Gambar per Lantai
+  // Mapping File Gambar Denah Lantai
   const gambarDenahLantai = {
     'LG': 'LG.jpg',
     'L1': 'L1.jpg',
@@ -322,7 +422,7 @@
     'L4': 'L4.jpg'
   };
 
-  // Titik Koordinat Default Marker (Bisa disesuaikan per ID Kunci)
+  // Titik Koordinat Posisi Pin Marker di Peta
   const koordinatKunciMap = {
     '3 - PINTU KACA': [480, 430],
     '4 - SELMA': [520, 780],
@@ -333,7 +433,7 @@
 
   let globalDataKunci = [];
 
-  // 2. AMBIL DATA REALTIME DARI APPS SCRIPT
+  // 2. AMBIL DATA REALTIME DARI GOOGLE APPS SCRIPT
   async function fetchSpreadsheetData() {
     toggleLoading(true);
     try {
@@ -349,7 +449,7 @@
     }
   }
 
-  // 3. RENDER PETA & MARKER DARI DATA SPREADSHEET
+  // 3. RENDER MAP & MARKER PARALLEL UI VOYAGER
   function renderCurrentLantai() {
     const selectedFloor = document.getElementById('select-lantai').value;
     const imagePath = gambarDenahLantai[selectedFloor] || 'LG.jpg';
@@ -361,43 +461,44 @@
     currentOverlay = L.imageOverlay(imagePath, bounds).addTo(map);
     resetViewMap();
 
-    // Reset Dropdown Kunci
+    // Reset Select Option Kunci
     const selectKunci = document.getElementById('select-kunci');
-    selectKunci.innerHTML = '<option value="">Nomor Kunci : Pilih di Peta</option>';
+    selectKunci.innerHTML = '<option value="">Pilih via Peta / Dropdown</option>';
 
-    // Filter Kunci Berdasarkan Lantai Terpilih
+    // Filter Kunci Berdasarkan Lantai yang Dipilih
     const keysOnFloor = globalDataKunci.filter(k => String(k.lantai).trim().toUpperCase() === selectedFloor.toUpperCase());
 
     keysOnFloor.forEach(kunci => {
-      // Tambahkan Option ke Dropdown
+      // Masukkan ke dropdown
       const opt = document.createElement('option');
       opt.value = kunci.id || kunci.nama;
-      opt.textContent = `Nomor Kunci : \({kunci.id} (\){kunci.nama})`;
+      opt.textContent = `\({kunci.id} -\){kunci.nama}`;
       selectKunci.appendChild(opt);
 
-      // Cari Koordinat (jika ada, default center jika tidak ditemukan)
+      // Cari koordinat atau default di tengah denah
       const coords = koordinatKunciMap[kunci.id] || koordinatKunciMap[kunci.nama] || [500, 700];
       const isAvailable = (kunci.status.toLowerCase() === 'tersedia');
 
-      // Style Icon Marker
+      // Custom Ring Marker Dot
       const customIcon = L.divIcon({
-        className: `custom-marker ${isAvailable ? '' : 'borrowed'}`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8]
+        className: 'custom-marker',
+        html: `<div class="marker-dot ${isAvailable ? '' : 'borrowed'}"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
       });
 
       const marker = L.marker(coords, { icon: customIcon });
 
-      // PopUp Detail saat Hover
+      // PopUp Floating Card ala Voyager App
       const tooltipContent = `
-        <div class="tooltip-tag">
+        <div class="tooltip-card">
           <div class="tooltip-icon">🔑</div>
           <div>
-            <div>${kunci.nama}</div>
-            <div style="font-size: 11px; color: #64748b;">ID: ${kunci.id}</div>
-            \({!isAvailable ? `<div style="font-size: 10px; color: #ef4444;">Peminjam:\){kunci.peminjam}</div>` : ''}
+            <div style="font-weight: 700;">${kunci.nama}</div>
+            <div style="font-size: 11px; color: #6b7280;">Kode: ${kunci.id}</div>
+            \({!isAvailable ? `<div style="font-size: 10px; color: #ef4444; margin-top: 2px;">Peminjam:\){kunci.peminjam}</div>` : ''}
             <span class="status-badge ${isAvailable ? 'status-available' : 'status-borrowed'}">
-              ${isAvailable ? '● Tersedia' : '● Dipinjam'}
+              ${isAvailable ? 'Tersedia' : 'Dipinjam'}
             </span>
           </div>
         </div>
@@ -407,10 +508,10 @@
         permanent: false,
         direction: 'top',
         offset: [0, -10],
-        className: 'leaflet-tooltip-custom'
+        className: 'leaflet-tooltip-voyager'
       });
 
-      // Event Click Marker
+      // Event Klik Marker
       marker.on('click', () => {
         if (!isAvailable) {
           alert(`Kunci \({kunci.nama} (\){kunci.id}) sedang dipinjam oleh ${kunci.peminjam}!`);
@@ -446,7 +547,7 @@
     window.location.href = `index.html?lantai=\({lantai}&zona=\){zona}&kunci=${encodeURIComponent(kunci)}`;
   }
 
-  // Panggil Fetch Data Pertama Kali Saat Halaman Dimuat
+  // Load Data Pertama Kali
   fetchSpreadsheetData();
 </script>
 
