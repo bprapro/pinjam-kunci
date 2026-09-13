@@ -323,6 +323,31 @@
       cursor: pointer;
       transition: transform 0.2s ease;
     }
+    /* Mencegah marker bergeser saat di-zoom */
+  .custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .marker-dot {
+    width: 16px;
+    height: 16px;
+    background-color: #ef4444; /* Warna merah pin */
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+    
+    /* PENTING: Mengunci titik tengah icon persis pada koordinat */
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+  }
+
+  /* Indikator pin yang terpilih/tercentang */
+  .marker-dot.selected {
+    background-color: #22c55e; /* Warna hijau */
+    transform: translate(-50%, -50%) scale(1.3);
+  }
   </style>
 </head>
 <body>
@@ -600,17 +625,18 @@
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           const coords = [rawCoords[0], rawCoords[1]];
 
-          const customIcon = L.divIcon({
-            className: 'custom-marker',
-            html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + ' ' + (isAdminMode ? 'admin-draggable' : '') + '"></div>',
-            iconSize: [18, 18],
-            iconAnchor: [9, 9]
-          });
+         // Di dalam loop rendering marker pada fungsi saringKunci():
+  const customIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div class="marker-dot ' + (isChecked ? 'selected' : '') + '"></div>',
+    iconSize: [0, 0],     // Ukuran container diset 0 agar tidak mengganggu kalkulasi posisi
+    iconAnchor: [0, 0]    // Titik jangkar terkunci tepat di tengah koordinat
+  });
 
-          const marker = L.marker(coords, { 
-            icon: customIcon,
-            draggable: isAdminMode
-          });
+  const marker = L.marker(coords, { 
+    icon: customIcon,
+    draggable: isAdminMode
+  });
 
           if (isAdminMode) {
             marker.on('dragend', function(e) {
