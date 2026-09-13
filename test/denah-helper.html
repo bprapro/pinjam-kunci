@@ -385,7 +385,7 @@
   // 2. PEMBUATAN ICON PIN YANG PRESISI
   const customIcon = L.divIcon({
     className: 'custom-marker',
-    html: '&lt;div class=&quot;marker-dot &apos; + (isAvailable ? &apos;&apos; : &apos;borrowed&apos;) + &apos; &apos; + (isChecked ? &apos;selected&apos; : &apos;&apos;) + &apos;&quot;&gt;&lt;/div&gt;',
+    html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
     iconSize: [18, 18],   // Ukuran elemen icon (18px x 18px)
     iconAnchor: [9, 9]    // PENTING: Titik kunci tepat di tengah (setengah dari 18)
   });
@@ -455,16 +455,16 @@
       const idKey = k.id || k.nama;
       const label = (k.id ? k.id + ' - ' : '') + k.nama;
       const sudahAdaPin = k.koordinat ? ' 📍' : '';
-      optionHtml += '&lt;option value=&quot;' + idKey + '&quot;&gt;' + label + sudahAdaPin + '&lt;/option&gt;';
+      optionHtml += '<option value="' + idKey + '">' + label + sudahAdaPin + '</option>';
     });
 
     const popupContent = 
-      '&lt;div class=&quot;popup-admin-container&quot;&gt;' +
-        '&lt;strong style=&quot;font-size: 13px; color: #0f172a;&quot;&gt;📍 Pasang Pin di Koordinat:&lt;/strong&gt;&lt;br&gt;' +
-        '&lt;small style=&quot;color:#64748b;&quot;&gt;Y: ' + clickY + ', X: ' + clickX + ' (Lantai ' + selectedFloor + ')&lt;/small&gt;&lt;br&gt;' +
-        '&lt;select id=&quot;adminSelectKeyPopup&quot;&gt;' + optionHtml + '&lt;/select&gt;' +
-        '&lt;button onclick=&quot;eksekusiSimpanPinPopup(' + clickY + ',' + clickX + ')&quot;&gt;Simpan Pin Kunci&lt;/button&gt;' +
-      '&lt;/div&gt;';
+      '<div class="popup-admin-container">' +
+        '<strong style="font-size: 13px; color: #0f172a;">📍 Pasang Pin di Koordinat:</strong><br>' +
+        '<small style="color:#64748b;">Y: ' + clickY + ', X: ' + clickX + ' (Lantai ' + selectedFloor + ')</small><br>' +
+        '<select id="adminSelectKeyPopup">' + optionHtml + '</select>' +
+        '<button onclick="eksekusiSimpanPinPopup(' + clickY + ',' + clickX + ')">Simpan Pin Kunci</button>' +
+      '</div>';
 
     L.popup()
       .setLatLng(e.latlng)
@@ -496,7 +496,7 @@
       gantiLantai();
     } catch (error) {
       console.error("Gagal mengambil data:", error);
-      document.getElementById('kontainerKunciChecklist').innerHTML = '&lt;p style=&quot;color: red; font-size: 13px;&quot;&gt;Gagal memuat data.&lt;/p&gt;';
+      document.getElementById('kontainerKunciChecklist').innerHTML = '<p style="color: red; font-size: 13px;">Gagal memuat data.</p>';
     }
   }
 
@@ -517,13 +517,13 @@
     if (selLantai.options.length === 0) {
       selLantai.innerHTML = '';
       lantaiList.forEach(function(l) {
-        selLantai.innerHTML += '&lt;option value=&quot;' + l + '&quot;&gt;Lantai ' + l + '&lt;/option&gt;';
+        selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
       });
     }
 
-    selZona.innerHTML = '&lt;option value=&quot;&quot;&gt;All Zone&lt;/option&gt;';
+    selZona.innerHTML = '<option value="">All Zone</option>';
     zonaList.forEach(function(z) {
-      selZona.innerHTML += '&lt;option value=&quot;' + z + '&quot;&gt;Zone ' + z + '&lt;/option&gt;';
+      selZona.innerHTML += '<option value="' + z + '">Zone ' + z + '</option>';
     });
   }
 
@@ -553,11 +553,11 @@
       const keyText = ((k.id || '') + ' ' + (k.nama || '')).toLowerCase();
       const matchSearch = keyText.includes(searchQuery);
 
-      return matchFloor &amp;&amp; matchZone &amp;&amp; matchSearch;
+      return matchFloor && matchZone && matchSearch;
     });
 
     if (filteredKeys.length === 0) {
-      container.innerHTML = '&lt;p style=&quot;color: var(--text-muted); font-size: 13px; margin: 0;&quot;&gt;Kunci tidak ditemukan di lantai ini&lt;/p&gt;';
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin: 0;">Kunci tidak ditemukan di lantai ini</p>';
       return;
     }
 
@@ -574,15 +574,15 @@
 
       let adminInsertBtn = '';
       if (isAdminMode) {
-        adminInsertBtn = '&lt;button class=&quot;btn-manual-set&quot; onclick=&quot;inputManualPin(\&apos;' + keyId + '\&apos;, \&apos;' + kunci.nama + '\&apos;)&quot;&gt;📌 Insert Pin&lt;/button&gt;';
+        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Insert Pin</button>';
       }
 
       itemEl.innerHTML = 
-        '&lt;input type=&quot;checkbox&quot; id=&quot;chk-' + keyId + '&quot; value=&quot;' + keyId + '&quot; ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '&gt;' +
-        '&lt;label for=&quot;chk-' + keyId + '&quot; style=&quot;cursor: pointer; width: 100%; display: flex; align-items: center;&quot;&gt;' +
-          '&lt;span class=&quot;key-label&quot;&gt;' + labelTeks + '&lt;/span&gt;' +
-          '&lt;span class=&quot;key-tag&quot;&gt;' + tagTeks + '&lt;/span&gt;' +
-        '&lt;/label&gt;' +
+        '<input type="checkbox" id="chk-' + keyId + '" value="' + keyId + '" ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '>' +
+        '<label for="chk-' + keyId + '" style="cursor: pointer; width: 100%; display: flex; align-items: center;">' +
+          '<span class="key-label">' + labelTeks + '</span>' +
+          '<span class="key-tag">' + tagTeks + '</span>' +
+        '</label>' +
         adminInsertBtn;
 
       const checkbox = itemEl.querySelector('input');
@@ -595,14 +595,14 @@
       container.appendChild(itemEl);
 
       // --- PEMBACAAN KOORDINAT YANG DIPERBAIKI ---
-      if (kunci.koordinat &amp;&amp; String(kunci.koordinat).trim() !== '') {
+      if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
         let coordStr = String(kunci.koordinat).trim();
         let rawCoords = [];
 
         if (coordStr.includes(',')) {
           rawCoords = coordStr.split(',').map(function(n) { return parseFloat(n.trim()); });
-        } else if (coordStr.length &gt;= 6) {
-          // Antisipasi jika terformat sebagai angka tunggal (misal 18901020 -&gt; Y:1890, X:1020)
+        } else if (coordStr.length >= 6) {
+          // Antisipasi jika terformat sebagai angka tunggal (misal 18901020 -> Y:1890, X:1020)
           const mid = Math.floor(coordStr.length / 2);
           rawCoords = [
             parseFloat(coordStr.substring(0, mid)),
@@ -610,20 +610,20 @@
           ];
         }
 
-        if (rawCoords.length === 2 &amp;&amp; !isNaN(rawCoords[0]) &amp;&amp; !isNaN(rawCoords[1])) {
+        if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           const coords = [rawCoords[0], rawCoords[1]];
 
-          const customIcon = L.divIcon({
-            className: 'custom-marker',
-            html: '&lt;div class=&quot;marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '&quot;&gt;&lt;/div&gt;',
-            iconSize: [18, 18],     // Ukuran fisik marker 18x18 piksel
-            iconAnchor: [9, 9]      // Titik jangkar terkunci tepat di tengah (setengah dari 18)
-          });
+        const customIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
+    iconSize: [18, 18],     // Ukuran fisik marker 18x18 piksel
+    iconAnchor: [9, 9]      // Titik jangkar terkunci tepat di tengah (setengah dari 18)
+  });
 
-          const marker = L.marker(coords, { 
-            icon: customIcon,
-            draggable: isAdminMode
-          });
+  const marker = L.marker(coords, { 
+    icon: customIcon,
+    draggable: isAdminMode
+  });
 
           if (isAdminMode) {
             marker.on('dragend', function(e) {
@@ -634,7 +634,7 @@
             });
           }
 
-          marker.bindTooltip('&lt;b&gt;' + kunci.nama + '&lt;/b&gt;&lt;br&gt;Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '&lt;br&gt;&lt;i style=&quot;color:#d97706&quot;&gt;[Geser Pin Ini]&lt;/i&gt;' : ''), {
+          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Geser Pin Ini]</i>' : ''), {
             direction: 'top',
             className: 'leaflet-tooltip-voyager'
           });
@@ -662,38 +662,38 @@
   }
 
   function simpanKoordinatKeDatabase(keyId, strKoordinat) {
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        aksi: 'simpan_koordinat',
-        id: keyId,
-        koordinat: strKoordinat
-      })
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      aksi: 'simpan_koordinat',
+      id: keyId,
+      koordinat: strKoordinat
     })
-    .then(function(res) { return res.json(); })
-    .then(function(res) {
-      if (res.status === 'success') {
-        alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
-        
-        // Update data di memori lokal secara langsung agar pin langsung muncul
-        const item = globalDataKunci.find(function(k) { 
-          return String(k.id || k.nama) === String(keyId); 
-        });
-        if (item) {
-          item.koordinat = strKoordinat;
-        }
-        
-        // Render ulang daftar &amp; pin peta
-        saringKunci();
-      } else {
-        alert("❌ Gagal menyimpan: " + res.message);
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(res) {
+    if (res.status === 'success') {
+      alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
+      
+      // Update data di memori lokal secara langsung agar pin langsung muncul
+      const item = globalDataKunci.find(function(k) { 
+        return String(k.id || k.nama) === String(keyId); 
+      });
+      if (item) {
+        item.koordinat = strKoordinat;
       }
-    })
-    .catch(function(err) {
-      console.error(err);
-      alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
-    });
-  }
+      
+      // Render ulang daftar & pin peta
+      saringKunci();
+    } else {
+      alert("❌ Gagal menyimpan: " + res.message);
+    }
+  })
+  .catch(function(err) {
+    console.error(err);
+    alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
+  });
+}
 
   function renderMapOverlay(selectedFloor) {
     const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
@@ -742,33 +742,33 @@
     });
 
     let popupContent = 
-      '&lt;div style=&quot;padding: 5px; width: 260px; font-family: sans-serif;&quot;&gt;' +
-        '&lt;div style=&quot;font-weight: bold; font-size: 14px; margin-bottom: 2px;&quot;&gt;📍 Pasang Pin di Koordinat:&lt;/div&gt;' +
-        '&lt;div style=&quot;font-size: 12px; color: #64748b; margin-bottom: 8px;&quot;&gt;Y: ' + roundY + ', X: ' + roundX + ' (Lantai ' + selectedFloor + ')&lt;/div&gt;' +
+      '<div style="padding: 5px; width: 260px; font-family: sans-serif;">' +
+        '<div style="font-weight: bold; font-size: 14px; margin-bottom: 2px;">📍 Pasang Pin di Koordinat:</div>' +
+        '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Y: ' + roundY + ', X: ' + roundX + ' (Lantai ' + selectedFloor + ')</div>' +
         
-        '&lt;!-- Input Pencarian --&gt;' +
-        '&lt;input type=&quot;text&quot; id=&quot;searchPopupKey&quot; placeholder=&quot;🔍 Cari ID atau Nama Kunci...&quot; ' +
-        '  style=&quot;width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 6px; box-sizing: border-box;&quot; ' +
-        '  onkeyup=&quot;filterDropdownPopup()&quot;&gt;' +
+        '<!-- Input Pencarian -->' +
+        '<input type="text" id="searchPopupKey" placeholder="🔍 Cari ID atau Nama Kunci..." ' +
+        '  style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 6px; box-sizing: border-box;" ' +
+        '  onkeyup="filterDropdownPopup()">' +
 
-        '&lt;!-- Dropdown Kunci --&gt;' +
-        '&lt;select id=&quot;selectKeyForPin&quot; size=&quot;5&quot; style=&quot;width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;&quot; onchange=&quot;fokusKePinKunci(this.value)&quot;&gt;';
+        '<!-- Dropdown Kunci -->' +
+        '<select id="selectKeyForPin" size="5" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;" onchange="fokusKePinKunci(this.value)">';
 
     availableForPin.forEach(function(k) {
       const keyId = k.id || k.nama;
-      const hasPin = (k.koordinat &amp;&amp; String(k.koordinat).trim() !== '');
+      const hasPin = (k.koordinat && String(k.koordinat).trim() !== '');
       const pinStatusTag = hasPin ? ' 📍 (Sudah ada pin)' : '';
       
-      popupContent += '&lt;option value=&quot;' + keyId + '&quot;&gt;' + keyId + ' - ' + k.nama + pinStatusTag + '&lt;/option&gt;';
+      popupContent += '<option value="' + keyId + '">' + keyId + ' - ' + k.nama + pinStatusTag + '</option>';
     });
 
     popupContent += 
-        '&lt;/select&gt;' +
-        '&lt;button onclick=&quot;eksekusiSimpanPin(' + roundY + ',' + roundX + ')&quot; ' +
-        '  style=&quot;width: 100%; background: #0084c7; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;&quot;&gt;' +
+        '</select>' +
+        '<button onclick="eksekusiSimpanPin(' + roundY + ',' + roundX + ')" ' +
+        '  style="width: 100%; background: #0084c7; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">' +
         '  Simpan Pin Kunci' +
-        '&lt;/button&gt;' +
-      '&lt;/div&gt;';
+        '</button>' +
+      '</div>';
 
     L.popup()
       .setLatLng(latlng)
@@ -782,7 +782,7 @@
     const select = document.getElementById('selectKeyForPin');
     const options = select.options;
 
-    for (let i = 0; i &lt; options.length; i++) {
+    for (let i = 0; i < options.length; i++) {
       const text = options[i].text.toLowerCase();
       if (text.includes(input)) {
         options[i].style.display = '';
@@ -798,9 +798,9 @@
       return String(k.id || k.nama) === String(keyId);
     });
 
-    if (item &amp;&amp; item.koordinat &amp;&amp; String(item.koordinat).trim() !== '') {
+    if (item && item.koordinat && String(item.koordinat).trim() !== '') {
       let coords = String(item.koordinat).split(',').map(function(n) { return parseFloat(n.trim()); });
-      if (coords.length === 2 &amp;&amp; !isNaN(coords[0])) {
+      if (coords.length === 2 && !isNaN(coords[0])) {
         map.panTo(coords, { animate: true, duration: 0.8 });
       }
     }
