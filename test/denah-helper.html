@@ -327,4 +327,346 @@
           </select>
         </div>
         <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
-        <div id="kontainerKunciChecklist" style="max-height: 220px; overflow-y: auto; border:
+        <div id="kontainerKunciChecklist" style="max-height: 220px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px; background: #fff;">
+          <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Memuat data kunci...</p>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitPilihanKunci()">Pilih Kunci Ini</button>
+    </div>
+
+    <div class="footer-link">
+      <span>Kembali ke <a href="index.html">Form Peminjaman</a></span>
+      <button class="admin-toggle-btn" id="btnAdminToggle" onclick="toggleAdminMode()">🔓 Mode Admin</button>
+    </div>
+  </div>
+
+  <!-- CONTAINER PETA -->
+  <div class="map-wrapper">
+    <div id="map"></div>
+  </div>
+
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  const PASSWORD_ADMIN = "admin123";
+
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: -2,
+    maxZoom: 2,
+    zoomControl: false
+  });
+
+  let currentOverlay = null;
+  let currentFloorLoaded = null;
+  let activeImageBounds = [[0, 0], [1000, 1400]];
+  let markersGroup = L.layerGroup().addTo(map);
+
+  const gambarDenahLantai = {
+    'LG': './LG.jpg',
+    'L1': './L1.jpg',
+    'L2': './L2.jpg',
+    'L3': './L3.jpg',
+    'L4': './L4.jpg'
+  };
+
+  let globalDataKunci = [];
+  let selectedKeyIds = new Set();
+  let isAdminMode = false;
+
+  function toggleAdminMode() {
+    if (!isAdminMode) {
+      const pass = prompt("Masukkan Kata Sandi Admin:");
+      if (pass === PASSWORD_ADMIN) {
+        isAdminMode = true;
+        document.getElementById('btnAdminToggle').classList.add('active');
+        document.getElementById('btnAdminToggle').innerHTML = '🔒 Mode Admin (Aktif)';
+        document.getElementById('adminBanner').style.display = 'block';
+        saringKunci();
+      } else if (pass !== null) {
+        alert("Kata sandi salah!");
+      }
+    } else {
+      isAdminMode = false;
+      document.getElementById('btnAdminToggle').classList.remove('active');
+      document.getElementById('btnAdminToggle').innerHTML = '🔓 Mode Admin';
+      document.getElementById('adminBanner').style.display = 'none';
+      saringKunci();
+    }
+  }
+
+  // EVENT KLIK ADMIN: Pop-up Dropdown Kunci
+  map.on('click', function(e) {
+    if (!isAdminMode) return;
+
+    const clickY = Math.round(e.latlng.lat);
+    const clickX = Math.round(e.latlng.lng);
+    const selectedFloor = document.getElementById('filterLantai').value || 'LG';
+
+    // Ambil semua kunci di lantai saat ini
+    const keysOnCurrentFloor = globalDataKunci.filter(function(k) {
+      return String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase();
+    });
+
+    if (keysOnCurrentFloor.length === 0) {
+      alert("Tidak ada daftar kunci pada lantai " + selectedFloor);
+      return;
+    }
+
+    let optionHtml = '';
+    keysOnCurrentFloor.forEach(function(k) {
+      const idKey = k.id || k.nama;
+      const label = (k.id ? k.id + ' - ' : '') + k.nama;
+      const sudahAdaPin = k.koordinat ? ' 📍' : '';
+      optionHtml += '<option value="' + idKey + '">' + label + sudahAdaPin + '</option>';
+    });
+
+    const popupContent = 
+      '<div class="popup-admin-container">' +
+        '<strong style="font-size: 13px; color: #0f172a;">📍 Pasang Pin di Koordinat:</strong><br>' +
+        '<small style="color:#64748b;">Y: ' + clickY + ', X: ' + clickX + ' (Lantai ' + selectedFloor + ')</small><br>' +
+        '<select id="adminSelectKeyPopup">' + optionHtml + '</select>' +
+        '<button onclick="eksekusiSimpanPinPopup(' + clickY + ',' + clickX + ')">Simpan Pin Kunci</button>' +
+      '</div>';
+
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(popupContent)
+      .openOn(map);
+  });
+
+  // Fungsi yang dipanggil saat tombol di dalam Popup diklik
+  window.eksekusiSimpanPinPopup = function(y, x) {
+    const selectEl = document.getElementById('adminSelectKeyPopup');
+    if (!selectEl) return;
+    const keyIdSelected = selectEl.value;
+    if (keyIdSelected) {
+      map.closePopup();
+      simpanKoordinatKeDatabase(keyIdSelected, y + ',' + x);
+    }
+  };
+
+  async function fetchSpreadsheetData() {
+    try {
+      const response = await fetch(WEB_APP_URL + "?aksi=ambil_status_lengkap");
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        globalDataKunci = data;
+        isiOptionFilter(data);
+      } else {
+        globalDataKunci = [];
+      }
+      gantiLantai();
+    } catch (error) {
+      console.error("Gagal mengambil data:", error);
+      document.getElementById('kontainerKunciChecklist').innerHTML = '<p style="color: red; font-size: 13px;">Gagal memuat data.</p>';
+    }
+  }
+
+  function isiOptionFilter(data) {
+    const selLantai = document.getElementById('filterLantai');
+    const selZona = document.getElementById('filterZona');
+    
+    const daftarLantaiUrut = ['LG', 'L1', 'L2', 'L3', 'L4'];
+    const lantaiSpreasheet = [...new Set(data.map(function(k) { return String(k.lantai || '').toUpperCase(); }).filter(Boolean))];
+    
+    const lantaiList = daftarLantaiUrut.filter(function(l) { return lantaiSpreasheet.includes(l); });
+    if (lantaiList.length === 0) {
+      lantaiSpreasheet.forEach(function(l) { lantaiList.push(l); });
+    }
+
+    const zonaList = [...new Set(data.map(function(k) { return k.zona; }).filter(Boolean))];
+
+    selLantai.innerHTML = '';
+    lantaiList.forEach(function(l) {
+      selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
+    });
+
+    selZona.innerHTML = '<option value="">All Zone</option>';
+    zonaList.forEach(function(z) {
+      selZona.innerHTML += '<option value="' + z + '">Zone ' + z + '</option>';
+    });
+  }
+
+  function gantiLantai() {
+    const selLantai = document.getElementById('filterLantai');
+    const selectedFloor = selLantai.value || 'LG';
+    if (currentFloorLoaded !== selectedFloor) {
+      renderMapOverlay(selectedFloor);
+      currentFloorLoaded = selectedFloor;
+    }
+    saringKunci();
+  }
+
+  function saringKunci() {
+    const selectedFloor = document.getElementById('filterLantai').value || 'LG';
+    const selectedZone = document.getElementById('filterZona').value;
+    const searchQuery = document.getElementById('kotakCari').value.toLowerCase().trim();
+
+    markersGroup.clearLayers();
+    const container = document.getElementById('kontainerKunciChecklist');
+    container.innerHTML = '';
+
+    const filteredKeys = globalDataKunci.filter(function(k) {
+      const matchFloor = (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
+      const matchZone = (!selectedZone) || (String(k.zona || '').toUpperCase() === selectedZone.toUpperCase());
+      const keyText = ((k.id || '') + ' ' + (k.nama || '')).toLowerCase();
+      const matchSearch = keyText.includes(searchQuery);
+
+      return matchFloor && matchZone && matchSearch;
+    });
+
+    if (filteredKeys.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin: 0;">Kunci tidak ditemukan di lantai ini</p>';
+      return;
+    }
+
+    filteredKeys.forEach(function(kunci) {
+      const keyId = kunci.id || kunci.nama;
+      const isAvailable = String(kunci.status || 'Tersedia').toLowerCase() === 'tersedia';
+      const isChecked = selectedKeyIds.has(keyId);
+
+      const itemEl = document.createElement('div');
+      itemEl.className = 'key-item ' + (isAvailable ? '' : 'disabled');
+      
+      const labelTeks = (kunci.id ? kunci.id + ' - ' : '') + kunci.nama;
+      const tagTeks = '[Lantai ' + (kunci.lantai || '-') + ' - ' + (kunci.zona || '-') + ']';
+
+      let adminInsertBtn = '';
+      if (isAdminMode) {
+        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Insert Pin</button>';
+      }
+
+      itemEl.innerHTML = 
+        '<input type="checkbox" id="chk-' + keyId + '" value="' + keyId + '" ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '>' +
+        '<label for="chk-' + keyId + '" style="cursor: pointer; width: 100%; display: flex; align-items: center;">' +
+          '<span class="key-label">' + labelTeks + '</span>' +
+          '<span class="key-tag">' + tagTeks + '</span>' +
+        '</label>' +
+        adminInsertBtn;
+
+      const checkbox = itemEl.querySelector('input');
+      checkbox.addEventListener('change', function(e) {
+        if (e.target.checked) selectedKeyIds.add(keyId);
+        else selectedKeyIds.delete(keyId);
+        saringKunci();
+      });
+
+      container.appendChild(itemEl);
+
+      // Render Pin di Peta
+      if (kunci.koordinat) {
+        const rawCoords = kunci.koordinat.split(',').map(function(n) { return parseFloat(n.trim()); });
+        if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
+          
+          const coords = [rawCoords[0], rawCoords[1]];
+
+          const customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + ' ' + (isAdminMode ? 'admin-draggable' : '') + '"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          });
+
+          const marker = L.marker(coords, { 
+            icon: customIcon,
+            draggable: isAdminMode
+          });
+
+          if (isAdminMode) {
+            marker.on('dragend', function(e) {
+              const newLatLng = e.target.getLatLng();
+              const newY = Math.round(newLatLng.lat);
+              const newX = Math.round(newLatLng.lng);
+              simpanKoordinatKeDatabase(keyId, newY + ',' + newX);
+            });
+          }
+
+          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Geser Pin Ini]</i>' : ''), {
+            direction: 'top',
+            className: 'leaflet-tooltip-voyager'
+          });
+
+          marker.on('click', function() {
+            if (isAdminMode) return;
+            if (!isAvailable) return;
+            if (selectedKeyIds.has(keyId)) selectedKeyIds.delete(keyId);
+            else selectedKeyIds.add(keyId);
+            saringKunci();
+          });
+
+          markersGroup.addLayer(marker);
+        }
+      }
+    });
+  }
+
+  function inputManualPin(id, nama) {
+    const defaultCoords = "500,700";
+    const inputVal = prompt("Masukkan Koordinat (Y, X) untuk [" + nama + "]:\n(Format: angka_Y, angka_X)", defaultCoords);
+    if (inputVal) {
+      simpanKoordinatKeDatabase(id, inputVal.trim());
+    }
+  }
+
+  function simpanKoordinatKeDatabase(keyId, strKoordinat) {
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        aksi: 'simpan_koordinat',
+        id: keyId,
+        koordinat: strKoordinat
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(res) {
+      if (res.status === 'success') {
+        alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
+        fetchSpreadsheetData();
+      } else {
+        alert("❌ Gagal menyimpan: " + res.message);
+      }
+    })
+    .catch(function(err) {
+      console.error(err);
+      alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
+    });
+  }
+
+  function renderMapOverlay(selectedFloor) {
+    const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
+    if (currentOverlay) map.removeLayer(currentOverlay);
+
+    const img = new Image();
+    img.src = imagePath;
+    img.onload = function() {
+      activeImageBounds = [[0, 0], [this.height || 1000, this.width || 1400]];
+      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+      map.fitBounds(activeImageBounds);
+    };
+    img.onerror = function() {
+      activeImageBounds = [[0, 0], [1000, 1400]];
+      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+      map.fitBounds(activeImageBounds);
+    };
+  }
+
+  function submitPilihanKunci() {
+    const keysArray = Array.from(selectedKeyIds);
+    if (keysArray.length === 0) {
+      alert('Silakan pilih minimal satu kunci!');
+      return;
+    }
+    window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+  }
+
+  fetchSpreadsheetData();
+</script>
+</body>
+</html>
