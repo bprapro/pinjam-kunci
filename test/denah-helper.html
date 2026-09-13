@@ -276,7 +276,6 @@
       font-weight: 600;
     }
 
-    /* Style Khusus Popup Dropdown Admin */
     .popup-admin-container {
       min-width: 200px;
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -357,14 +356,14 @@
 
   const map = L.map('map', {
     crs: L.CRS.Simple,
-    minZoom: -2,
-    maxZoom: 2,
+    minZoom: -3,
+    maxZoom: 3,
     zoomControl: false
   });
 
   let currentOverlay = null;
   let currentFloorLoaded = null;
-  let activeImageBounds = [[0, 0], [1000, 1400]];
+  let activeImageBounds = [[0, 0], [2000, 2000]];
   let markersGroup = L.layerGroup().addTo(map);
 
   const gambarDenahLantai = {
@@ -400,7 +399,7 @@
     }
   }
 
-  // EVENT KLIK ADMIN: Pop-up Dropdown Kunci
+  // Klik Admin pada Peta: Buka Dropdown
   map.on('click', function(e) {
     if (!isAdminMode) return;
 
@@ -408,7 +407,6 @@
     const clickX = Math.round(e.latlng.lng);
     const selectedFloor = document.getElementById('filterLantai').value || 'LG';
 
-    // Ambil semua kunci di lantai saat ini
     const keysOnCurrentFloor = globalDataKunci.filter(function(k) {
       return String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase();
     });
@@ -440,7 +438,6 @@
       .openOn(map);
   });
 
-  // Fungsi yang dipanggil saat tombol di dalam Popup diklik
   window.eksekusiSimpanPinPopup = function(y, x) {
     const selectEl = document.getElementById('adminSelectKeyPopup');
     if (!selectEl) return;
@@ -483,10 +480,12 @@
 
     const zonaList = [...new Set(data.map(function(k) { return k.zona; }).filter(Boolean))];
 
-    selLantai.innerHTML = '';
-    lantaiList.forEach(function(l) {
-      selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
-    });
+    if (selLantai.options.length === 0) {
+      selLantai.innerHTML = '';
+      lantaiList.forEach(function(l) {
+        selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
+      });
+    }
 
     selZona.innerHTML = '<option value="">All Zone</option>';
     zonaList.forEach(function(z) {
@@ -500,8 +499,9 @@
     if (currentFloorLoaded !== selectedFloor) {
       renderMapOverlay(selectedFloor);
       currentFloorLoaded = selectedFloor;
+    } else {
+      saringKunci();
     }
-    saringKunci();
   }
 
   function saringKunci() {
@@ -562,7 +562,7 @@
 
       // Render Pin di Peta
       if (kunci.koordinat) {
-        const rawCoords = kunci.koordinat.split(',').map(function(n) { return parseFloat(n.trim()); });
+        const rawCoords = String(kunci.koordinat).split(',').map(function(n) { return parseFloat(n.trim()); });
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           
           const coords = [rawCoords[0], rawCoords[1]];
@@ -646,14 +646,18 @@
     const img = new Image();
     img.src = imagePath;
     img.onload = function() {
-      activeImageBounds = [[0, 0], [this.height || 1000, this.width || 1400]];
+      // Mengatur Bounds dinamis sesuai tinggi dan lebar asli dari gambar denah
+      activeImageBounds = [[0, 0], [this.naturalHeight || 1000, this.naturalWidth || 1400]];
       currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
       map.fitBounds(activeImageBounds);
+      map.setMaxBounds(activeImageBounds);
+      saringKunci();
     };
     img.onerror = function() {
       activeImageBounds = [[0, 0], [1000, 1400]];
       currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
       map.fitBounds(activeImageBounds);
+      saringKunci();
     };
   }
 
