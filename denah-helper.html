@@ -737,13 +737,21 @@
     return;
   }
   
-  // Ambil data nama/ID kunci pertama yang dipilih
-  const kataKunci = keysArray[0];
+  // Ambil ID kunci pertama yang dipilih
+  const keyId = keysArray[0];
   
-  // Kirim ke index.html lewat parameter URL 'cari'
-  window.location.href = 'index.html?cari=' + encodeURIComponent(kataKunci);
-}
+  // Cari data detail kunci berdasarkan ID untuk mengambil NAMA RUANGAN-nya
+  // (Menggunakan daftarKunci / masterDataKunci yang ada di denah-helper.html)
+  const itemKunci = (typeof daftarKunci !== 'undefined') 
+    ? daftarKunci.find(k => String(k.id) === String(keyId)) 
+    : null;
 
+  // Jika nama ruangan ditemukan gunakan nama ruangan, jika tidak gunakan ID kunci
+  const namaRuangan = itemKunci ? (itemKunci.nama_ruangan || itemKunci.nama || itemKunci.label) : keyId;
+  
+  // Kirim nama ruangan ke index.html
+  window.location.href = 'index.html?cari=' + encodeURIComponent(namaRuangan);
+}
 
   let activePopupLatLng = null;
 
