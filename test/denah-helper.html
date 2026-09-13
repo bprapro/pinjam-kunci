@@ -302,6 +302,27 @@
       font-size: 12px;
       cursor: pointer;
     }
+    /* ... CSS lain ... */
+
+    .leaflet-marker-pane {
+      z-index: 600 !important;
+    }
+
+    .custom-marker {
+      position: relative;
+      z-index: 1000 !important;
+    }
+
+    .marker-dot {
+      width: 20px;
+      height: 20px;
+      background: #ffffff;
+      border: 3px solid #375b4f;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
   </style>
 </head>
 <body>
@@ -616,28 +637,38 @@
   }
 
   function simpanKoordinatKeDatabase(keyId, strKoordinat) {
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        aksi: 'simpan_koordinat',
-        id: keyId,
-        koordinat: strKoordinat
-      })
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      aksi: 'simpan_koordinat',
+      id: keyId,
+      koordinat: strKoordinat
     })
-    .then(function(res) { return res.json(); })
-    .then(function(res) {
-      if (res.status === 'success') {
-        alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
-        fetchSpreadsheetData();
-      } else {
-        alert("❌ Gagal menyimpan: " + res.message);
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(res) {
+    if (res.status === 'success') {
+      alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
+      
+      // Update data di memori lokal secara langsung agar pin langsung muncul
+      const item = globalDataKunci.find(function(k) { 
+        return String(k.id || k.nama) === String(keyId); 
+      });
+      if (item) {
+        item.koordinat = strKoordinat;
       }
-    })
-    .catch(function(err) {
-      console.error(err);
-      alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
-    });
-  }
+      
+      // Render ulang daftar & pin peta
+      saringKunci();
+    } else {
+      alert("❌ Gagal menyimpan: " + res.message);
+    }
+  })
+  .catch(function(err) {
+    console.error(err);
+    alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
+  });
+}
 
   function renderMapOverlay(selectedFloor) {
     const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
