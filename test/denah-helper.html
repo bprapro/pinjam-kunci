@@ -1,417 +1,341 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pilih Lokasi Kunci - Denah Mall</title>
-  
-  <!-- Font Modern (Plus Jakarta Sans) seperti di Foto 2 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: #55e0e7; /* Background Cyan sesuai Foto 1 */
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    /* Container Utama 2 Kolom */
-    .app-container {
-      width: 100%;
-      max-width: 1250px;
-      display: flex;
-      gap: 30px;
-      align-items: stretch;
-    }
-
-    /* --- KOLOM KIRI (SIDEBAR FORM) --- */
-    .sidebar {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 15px;
-      padding: 10px;
-      min-width: 300px;
-    }
-
-    .form-group {
-      position: relative;
-    }
-
-    /* Input Pill Shape sesuai Foto 1 & 2 */
-    .select-pill, .btn-cari {
-      width: 100%;
-      padding: 16px 24px;
-      border-radius: 50px; /* Shape kapsul / pill */
-      border: none;
-      outline: none;
-      font-size: 15px;
-      font-weight: 600;
-      color: #2d3748;
-      background: #ffffff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      appearance: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .select-pill:focus {
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
-    }
-
-    /* Custom Arrow untuk Select */
-    .select-wrapper {
-      position: relative;
-    }
-    .select-wrapper::after {
-      content: '▾';
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      color: #718096;
-      font-size: 16px;
-    }
-
-    .btn-cari {
-      background: #b0b0b0; /* Abu-abu sesuai Foto 1 */
-      color: #ffffff;
-      text-align: center;
-      margin-top: 5px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .btn-cari:hover {
-      background: #999999;
-    }
-
-    .back-link {
-      color: #1a202c;
-      text-decoration: none;
-      font-size: 14px;
-      margin-top: 10px;
-      display: inline-block;
-      font-weight: 500;
-    }
-
-    .back-link strong {
-      font-weight: 700;
-    }
-
-    /* --- KOLOM KANAN (DENAH LAYOUT) --- */
-    .map-wrapper {
-      flex: 2.2;
-      background: #ffffff;
-      border-radius: 35px; /* Rounded card super halus sesuai Foto 1 & 2 */
-      padding: 25px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #map {
-      width: 100%;
-      height: 520px;
-      background: #f8fafc;
-      border-radius: 20px;
-      z-index: 1;
-    }
-
-    /* Control Zoom & Fit disesuaikan style Foto 1 */
-    .custom-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 15px;
-      font-size: 20px;
-      font-weight: 600;
-      color: #2d3748;
-    }
-
-    .zoom-btn-group span {
-      cursor: pointer;
-      user-select: none;
-      padding: 0 8px;
-    }
-
-    .btn-fit {
-      font-size: 18px;
-      font-weight: 600;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    /* --- POPUP & MARKER STYLE FOTO 2 (GLASSMORPHISM) --- */
-    /* Marker Pin Pulsing Dot */
-    .custom-marker {
-      width: 16px;
-      height: 16px;
-      background: #ffffff;
-      border: 4px solid #2d3748;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .custom-marker:hover {
-      transform: scale(1.3);
-      border-color: #2563eb;
-    }
-
-    /* Popup/Tooltip Kursor Hover ala Foto 2 */
-    .leaflet-tooltip-custom {
-      background: rgba(255, 255, 255, 0.85) !important;
-      backdrop-filter: blur(8px); /* Efek Buram Glassmorphism */
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.6) !important;
-      border-radius: 20px !important;
-      padding: 10px 18px !important;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-      color: #1e293b !important;
-      font-size: 13px !important;
-      font-weight: 600 !important;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Lokasi Kunci & Layout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    .leaflet-tooltip-custom::before {
-      display: none; /* Hapus panah bawaan tooltip */
-    }
-
-    .tooltip-tag {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tooltip-icon {
-      width: 24px;
-      height: 24px;
-      background: #e2e8f0;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-    }
-
-    .status-badge {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      margin-top: 2px;
-      display: inline-block;
-    }
-    .status-available { background: #dcfce7; color: #166534; }
-    .status-borrowed { background: #fee2e2; color: #991b1b; }
-
-    /* Responsive untuk Tablet / Mobile */
-    @media (max-width: 900px) {
-      .app-container { flex-direction: column; }
-      #map { height: 400px; }
-    }
-  </style>
-</head>
-<body>
-
-<div class="app-container">
-  
-  <!-- KOLOM KIRI (SIDEBAR INPUT) -->
-  <div class="sidebar">
-    <div class="form-group select-wrapper">
-      <select id="select-lantai" class="select-pill" onchange="loadLantaiData()">
-        <option value="LG" selected>Lantai : LG</option>
-        <option value="L1">Lantai : L1</option>
-        <option value="L2">Lantai : L2</option>
-        <option value="L3">Lantai : L3</option>
-        <option value="L4">Lantai : L4</option>
-      </select>
-    </div>
-
-    <div class="form-group select-wrapper">
-      <select id="select-zona" class="select-pill">
-        <option value="A">Zona : A</option>
-        <option value="B">Zona : B</option>
-        <option value="C">Zona : C</option>
-      </select>
-    </div>
-
-    <div class="form-group select-wrapper">
-      <select id="select-kunci" class="select-pill">
-        <option value="">Nomor Kunci : Pilih di Peta</option>
-      </select>
-    </div>
-
-    <button class="btn-cari" onclick="submitPilihanKunci()">Cari</button>
-
-    <div>
-      <a href="index.html" class="back-link">Kembali ke <strong>form peminjaman kunci</strong></a>
-    </div>
-  </div>
-
-  <!-- KOLOM KANAN (DENAH MALL) -->
-  <div class="map-wrapper">
-    <div id="map"></div>
-    
-    <!-- Controls Zoom & Fit Sesuai Foto 1 -->
-    <div class="custom-controls">
-      <div class="zoom-btn-group">
-        <span onclick="map.zoomIn()">+</span>
-        <span>|</span>
-        <span onclick="map.zoomOut()">-</span>
-      </div>
-      <div class="btn-fit" onclick="resetViewMap()">Fit</div>
-    </div>
-  </div>
-
-</div>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-  // 1. Inisialisasi Leaflet Map
-  const map = L.map('map', {
-    crs: L.CRS.Simple,
-    minZoom: -1,
-    maxZoom: 2,
-    zoomControl: false // Sembunyikan tombol zoom default Leaflet
-  });
-
-  const bounds = [[0, 0], [1000, 1400]];
-  let currentOverlay = null;
-  let markersGroup = L.layerGroup().addTo(map);
-
-  // 2. Data Dummy Kunci per Lantai (Ganti file gambar sesuai dengan nama file kamu)
-  const dataLantai = {
-    'LG': {
-      image: 'LG.jpg',
-      keys: [
-        { id: '3 - PINTU KACA', name: 'HERO Supermarket', coords: [480, 430], status: 'available', zone: 'A' },
-        { id: '4 - SELMA', name: 'SELMA Store', coords: [520, 780], status: 'borrowed', zone: 'A' },
-        { id: '5 - AZKO', name: 'AZKO Outlet', coords: [660, 910], status: 'available', zone: 'B' }
-      ]
-    },
-    'L1': {
-      image: 'L1.jpg',
-      keys: [
-        { id: 'L1-01', name: 'NIKE Store', coords: [400, 100], status: 'available', zone: 'A' },
-        { id: 'L1-02', name: 'ADIDAS', coords: [700, 100], status: 'available', zone: 'A' }
-      ]
-    },
-    'L2': { image: 'L2.jpg', keys: [] },
-    'L3': { image: 'L3.jpg', keys: [] },
-    'L4': { image: 'L4.jpg', keys: [] }
-  };
-
-  // 3. Fungsi Render Peta & Marker
-  function loadLantaiData() {
-    const floor = document.getElementById('select-lantai').value;
-    const currentData = dataLantai[floor];
-
-    if (currentOverlay) map.removeLayer(currentOverlay);
-    markersGroup.clearLayers();
-
-    // Render Gambar Denah
-    currentOverlay = L.imageOverlay(currentData.image, bounds).addTo(map);
-    resetViewMap();
-
-    // Reset dropdown pilihan kunci
-    const selectKunci = document.getElementById('select-kunci');
-    selectKunci.innerHTML = '<option value="">Nomor Kunci : Pilih di Peta</option>';
-
-    // Loop Tambahkan Marker ke Peta
-    currentData.keys.forEach(kunci => {
-      // Tambah ke dropdown
-      const opt = document.createElement('option');
-      opt.value = kunci.id;
-      opt.textContent = `Nomor Kunci : ${kunci.id}`;
-      selectKunci.appendChild(opt);
-
-      // Custom Marker Icon
-      const customIcon = L.divIcon({
-        className: 'custom-marker',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8]
-      });
-
-      const marker = L.marker(kunci.coords, { icon: customIcon });
-
-      // HTML Popup/Tooltip Saat Kursor Mengarah (Hover) - Style Foto 2
-      const isAvailable = kunci.status === 'available';
-      const tooltipContent = `
-        <div class="tooltip-tag">
-          <div class="tooltip-icon">🔑</div>
-          <div>
-            <div>${kunci.name}</div>
-            <div style="font-size: 11px; color: #64748b;">Kunci: ${kunci.id}</div>
-            <span class="status-badge ${isAvailable ? 'status-available' : 'status-borrowed'}">
-              ${isAvailable ? '● Tersedia' : '● Dipinjam'}
-            </span>
-          </div>
-        </div>
-      `;
-
-      // Bind Tooltip (Hover)
-      marker.bindTooltip(tooltipContent, {
-        permanent: false,
-        direction: 'top',
-        offset: [0, -10],
-        className: 'leaflet-tooltip-custom'
-      });
-
-      // Event Klik Marker -> Otomatis Memilih di Form Kiri
-      marker.on('click', () => {
-        if (!isAvailable) {
-          alert(`Kunci ${kunci.name} (${kunci.id}) sedang dipinjam!`);
-          return;
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        document.getElementById('select-zona').value = kunci.zone;
-        document.getElementById('select-kunci').value = kunci.id;
-      });
 
-      markersGroup.addLayer(marker);
-    });
-  }
+        body {
+            background-color: #4edcd4;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-  function resetViewMap() {
-    map.fitBounds(bounds);
-  }
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1300px;
+            height: 90vh;
+            background-color: #4edcd4;
+            gap: 20px;
+        }
 
-  function submitPilihanKunci() {
-    const lantai = document.getElementById('select-lantai').value;
-    const zona = document.getElementById('select-zona').value;
-    const kunci = document.getElementById('select-kunci').value;
+        .cidebar {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+            gap: 16px;
+        }
 
-    if (!kunci) {
-      alert('Silakan pilih kunci terlebih dahulu!');
-      return;
-    }
+        .input-group input, 
+        .input-group select {
+            width: 100%;
+            padding: 14px 22px;
+            border: none;
+            border-radius: 35px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            background-color: #ffffff;
+            outline: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
 
-    // Mengirim data terpilih kembali ke halaman utama (index.html)
-    window.location.href = `index.html?lantai=${lantai}&zona=${zona}&kunci=${encodeURIComponent(kunci)}`;
-  }
+        .input-group input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
 
-  // Muat pertama kali
-  loadLantaiData();
-</script>
+        .btn-cari {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 35px;
+            background-color: #afafaf;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
 
+        .btn-cari:hover {
+            background-color: #2e7d6e;
+        }
+
+        .btn-cari:active {
+            transform: scale(0.98);
+        }
+
+        .back-link {
+            text-align: center;
+            font-size: 14px;
+            color: #1a3c40;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+
+        .back-link strong {
+            font-weight: 700;
+        }
+
+        .main-content {
+            flex: 1;
+            background-color: #ffffff;
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        }
+
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-image {
+            max-width: 95%;
+            max-height: 85%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .location-tag {
+            position: absolute;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .tag-dot {
+            width: 14px;
+            height: 14px;
+            background-color: #ffffff;
+            border: 3px solid #365b4e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .tag-dot::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            animation: pulse 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .tag-popup {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateYmpx);
+            background: rgba(45, 62, 53, 0.85);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            white-space: nowrap;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-popup::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0 6px;
+            border-style: solid;
+            border-color: rgba(45, 62, 53, 0.85) transparent transparent transparent;
+        }
+
+        .location-tag:hover .tag-popup {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 25px;
+            left: 30px;
+            right: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .zoom-controls, .fit-control {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .fit-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
+</head>
+ body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="input-group">
+                <input type="text" id="lantai" value="Lantai : LG" placeholder="Lantai">
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="zona" value="Zona : A" placeholder="Zona">
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="kunci" value="Nomor Kunci : 3 - PINTU KACA" placeholder="Nomor Kunci">
+            </div>
+            
+            <button class="btn-cari" onclick="cariLokasi()">Cari</button>
+            
+            <a href="#" class="back-link">Kembali ke <strong>form peminjaman kunci</strong></a>
+        </div>
+
+        <div class="main-content">
+            <div class="map-wrapper">
+                <img src="https://via.placeholder.com/1000x700/f8f9fa/cccccc?text=Denah+Layout+Lantai" alt="Layout Plan" class="map-image" id="mapImage">
+                <div class="location-tag" style="top: 45%; left: 52%;">
+                    <div class="tag-dot"></div>
+                    <div class="tag-popup">
+                        <div>
+                            <strong>Pintu Kaca (3)</strong><br>
+                            <span style="font-size: 11px; opacity: 0.8;">Zona A • LG Floor</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="location-tag" style="top: 30%; left: 35%;">
+                    <div class="tag-dot"></div>
+                    <div class="tag-popup">
+                        <div>
+                            <strong>Ruang Server</strong><br>
+                            <span style="font-size: 11px; opacity: 0.8;">Kunci No. 12</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="location-tag" style="top: 65%; left: 70%;">
+                    <div class="tag-dot"></div>
+                    <div class="tag-popup">
+                        <div>
+                            <strong>Area Alun-Alun</strong><br>
+                            <span style="font-size: 11px; opacity: 0.8;">Atrium Utama</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="zoom-controls">
+                    <button class="control-btn" onclick="zoomIn()">+</button>
+                    <span style="color: #ccc;">|</span>
+                    <button class="control-btn" onclick="zoomOut()">-</button>
+                </div>
+                
+                <div class="fit-control">
+                    <button class="fit-btn" onclick="resetZoom()">Fit</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentScale = 1;
+        const mapImage = document.getElementById('mapImage');
+
+        function zoomIn() {
+            currentScale += 0.15;
+            mapImage.style.transform = `scale(${currentScale});
+        }
+
+        function zoomOut() {
+            if (currentScale > 0.6) {
+                currentScale -= 0.15;
+                mapImage.style.transform = `scale(${currentScale})`;
+            }
+        }
+
+        function resetZoom() {
+            currentScale = 1;
+            mapImage.style.transform = `scale(1)`;
+        }
+
+        function cariLokasi() {
+            alert("Mencari lokasi kunci...");
+        }
+    </script>
 </body>
 </html>
