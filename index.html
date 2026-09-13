@@ -892,6 +892,38 @@ tbody tr:has(.dots-loader-wrapper) {
           <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
           <div id="kontainerKunciChecklist" style="max-height: 200px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px; background: #fff;">
             <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Memuat data kunci...</p>
+          <a href="test/denah-helper.html" class="btn-pilih-denah">
+        Pilih Lewat Denah Mall
+      </a>
+    </div> ```
+
+*(Catatan: Sesuaikan `href="test/denah-helper.html"` jika letak folder/file denah Anda berada di tempat lain, misal `denah-helper.html` saja)*.
+
+---
+
+### 2. Tambahkan CSS Tombol di `<style>` `index.html`
+
+Agar tombolnya tampil rapi dan bagus, tambahkan kode CSS ini di bagian `<style>` dalam file `index.html`:
+
+```css
+.btn-pilih-denah {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  padding: 10px 16px;
+  background-color: #375b4f;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(55, 91, 79, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-pilih-denah:hover {
+  background-color: #2c493f;
+}
           </div>
         </div>
         
@@ -1886,6 +1918,28 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
-  
+  // Otomatis centang kunci dari denah-helper saat kembali ke index.html
+  window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const kunciDipilih = urlParams.get('kunci');
+
+    if (kunciDipilih) {
+      // Tunggu sebentar hingga data kunci selesai dimuat/dirender di index.html
+      setTimeout(function() {
+        const daftarKunciArray = decodeURIComponent(kunciDipilih).split(',');
+        
+        daftarKunciArray.forEach(function(keyId) {
+          const cleanKey = keyId.trim();
+          // Mencari checkbox berdasarkan ID atau value
+          const chk = document.getElementById('chk-' + cleanKey) || 
+                      document.querySelector(input[type="checkbox"][value="${cleanKey}"]);
+          if (chk) {
+            chk.checked = true;
+            chk.dispatchEvent(new Event('change'));
+          }
+        });
+      }, 500);
+    }
+  });
 </body>
 </html>
