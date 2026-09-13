@@ -14,6 +14,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
+    :root {
+      --text-muted: #9ca3af;
+      --primary-color: #375b4f;
+    }
+
     * {
       box-sizing: border-box;
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -53,7 +58,6 @@
       align-items: stretch;
     }
 
-    /* --- SIDEBAR FORM --- */
     .sidebar {
       flex: 1.2;
       padding: 15px 10px 10px 15px;
@@ -65,115 +69,67 @@
     .brand-logo {
       font-size: 16px;
       font-weight: 800;
-      color: #375b4f;
+      color: var(--primary-color);
       letter-spacing: -0.5px;
       margin-bottom: 15px;
     }
 
-    .form-title {
+    .form-group label {
+      display: block;
       font-size: 15px;
       font-weight: 800;
       color: #111827;
       margin-bottom: 12px;
     }
 
-    /* Filter Floor & Zone Row */
     .filter-row {
       display: flex;
       gap: 10px;
       margin-bottom: 12px;
     }
 
-    .select-wrapper {
+    .filter-row select {
       flex: 1;
-      position: relative;
-    }
-
-    .select-pill {
-      width: 100%;
       padding: 12px 16px;
       border-radius: 12px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #E2E8F0;
       outline: none;
       font-size: 13px;
       font-weight: 600;
       color: #0d9488;
       background: #f8fafc;
-      appearance: none;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
-    .select-pill:hover { background: #f1f5f9; }
-
-    .select-wrapper::after {
-      content: '▾';
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      color: #0d9488;
-      font-size: 12px;
-    }
-
-    /* Search Input Box */
-    .search-wrapper {
-      position: relative;
-      margin-bottom: 12px;
-    }
-
-    .search-input {
+    .search-box {
       width: 100%;
-      padding: 12px 16px 12px 42px;
+      padding: 12px 16px;
       border-radius: 12px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #E2E8F0;
       outline: none;
       font-size: 13px;
       color: #374151;
       background: #ffffff;
-    }
-
-    .search-input::placeholder { color: #9ca3af; }
-
-    .search-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 14px;
-      color: #6b7280;
-    }
-
-    /* Multi-select Checkbox Box Container */
-    .checkbox-container {
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      max-height: 260px;
-      overflow-y: auto;
-      background: #ffffff;
-      padding: 6px 0;
+      margin-bottom: 12px;
     }
 
     .key-item {
       display: flex;
       align-items: center;
-      padding: 10px 16px;
+      padding: 8px 6px;
       border-bottom: 1px solid #f3f4f6;
       font-size: 13px;
       cursor: pointer;
-      transition: background 0.15s ease;
       user-select: none;
     }
 
     .key-item:last-child { border-bottom: none; }
-    .key-item:hover { background: #f8fafc; }
 
     .key-item input[type="checkbox"] {
-      margin-right: 12px;
+      margin-right: 10px;
       width: 16px;
       height: 16px;
-      accent-color: #375b4f;
+      accent-color: var(--primary-color);
       cursor: pointer;
     }
 
@@ -184,7 +140,7 @@
 
     .key-tag {
       font-weight: 500;
-      color: #9ca3af;
+      color: var(--text-muted);
       font-size: 12px;
       margin-left: 6px;
     }
@@ -192,7 +148,6 @@
     .key-item.disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      background: #fef2f2;
     }
 
     .btn-submit {
@@ -200,19 +155,13 @@
       padding: 15px;
       border-radius: 50px;
       border: none;
-      background: #375b4f;
+      background: var(--primary-color);
       color: #ffffff;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       margin-top: 15px;
-      transition: all 0.2s ease;
       box-shadow: 0 10px 20px rgba(55, 91, 79, 0.25);
-    }
-
-    .btn-submit:hover {
-      background: #2b473e;
-      transform: translateY(-1px);
     }
 
     .footer-link {
@@ -228,7 +177,6 @@
       text-decoration: none;
     }
 
-    /* --- MAP CONTAINER --- */
     .map-wrapper {
       flex: 1.5;
       border-radius: 32px;
@@ -246,34 +194,13 @@
       z-index: 1;
     }
 
-    .custom-controls {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      z-index: 5;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border-radius: 30px;
-      padding: 8px 18px;
-      display: flex;
-      gap: 15px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #111827;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .custom-controls span { cursor: pointer; user-select: none; }
-    .custom-controls span:hover { color: #375b4f; }
-
-    /* --- MARKER PIN ALA VOYAGER --- */
     .custom-marker { position: relative; }
 
     .marker-dot {
       width: 16px;
       height: 16px;
       background: #ffffff;
-      border: 3px solid #375b4f;
+      border: 3px solid var(--primary-color);
       border-radius: 50%;
       box-shadow: 0 0 12px rgba(0,0,0,0.35);
       cursor: pointer;
@@ -282,8 +209,7 @@
 
     .custom-marker:hover .marker-dot, .marker-dot.selected {
       transform: scale(1.35);
-      background: #375b4f;
-      box-shadow: 0 0 15px rgba(55, 91, 79, 0.8);
+      background: var(--primary-color);
     }
 
     .marker-dot.borrowed { border-color: #ef4444; }
@@ -294,60 +220,8 @@
       border: 1px solid rgba(255, 255, 255, 0.7) !important;
       border-radius: 20px !important;
       padding: 10px 16px !important;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.12) !important;
       color: #111827 !important;
       font-size: 13px !important;
-    }
-    
-    .leaflet-tooltip-voyager::before { display: none; }
-
-    .tooltip-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .tooltip-icon {
-      width: 30px;
-      height: 30px;
-      background: rgba(55, 91, 79, 0.1);
-      color: #375b4f;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-
-    .status-badge {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 700;
-      margin-top: 3px;
-      display: inline-block;
-    }
-    .status-available { background: #dcfce7; color: #15803d; }
-    .status-borrowed { background: #fee2e2; color: #b91c1c; }
-
-    .loading-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(4px);
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      color: #375b4f;
-    }
-
-    @media (max-width: 850px) {
-      .app-card { flex-direction: column; border-radius: 30px; }
-      .sidebar { padding: 10px; }
-      .map-wrapper { min-height: 400px; border-radius: 24px; }
-      #map { min-height: 400px; }
     }
   </style>
 </head>
@@ -355,43 +229,26 @@
 
 <div class="app-card">
   
-  <!-- FORM SIDEBAR KIRI -->
+  <!-- SIDEBAR FORM -->
   <div class="sidebar">
     <div>
       <div class="brand-logo">keymanager</div>
-      <div class="form-title">Pilih Kunci / Ruangan:</div>
 
-      <!-- Filter Floor & Zone Dropdown -->
-      <div class="filter-row">
-        <div class="select-wrapper">
-          <select id="filter-floor" class="select-pill" onchange="onFloorOrZoneChange()">
-            <option value="ALL">All Floor</option>
-            <option value="LG">Lantai LG</option>
-            <option value="L1">Lantai L1</option>
-            <option value="L2">Lantai L2</option>
-            <option value="L3">Lantai L3</option>
-            <option value="L4">Lantai L4</option>
+      <!-- STRUKTUR FORM PERSIS SEPERTI STRUKTUR KAMU -->
+      <div class="form-group">
+        <label>Pilih Kunci / Ruangan:</label>
+        <div class="filter-row">
+          <select id="filterLantai" onchange="saringKunci()">
+            <option value="">All Floor</option>
+          </select>
+          <select id="filterZona" onchange="saringKunci()">
+            <option value="">All Zone</option>
           </select>
         </div>
-        <div class="select-wrapper">
-          <select id="filter-zone" class="select-pill" onchange="renderKeyList()">
-            <option value="ALL">All Zone</option>
-            <option value="A">Zone A</option>
-            <option value="B">Zone B</option>
-            <option value="C">Zone C</option>
-          </select>
+        <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
+        <div id="kontainerKunciChecklist" style="max-height: 200px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px; background: #fff;">
+          <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Memuat data kunci...</p>
         </div>
-      </div>
-
-      <!-- Input Search -->
-      <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" class="search-input" placeholder="Ketik nama ruangan / ID kunci..." oninput="renderKeyList()">
-      </div>
-
-      <!-- Container Checkbox Kunci -->
-      <div class="checkbox-container" id="key-list-container">
-        <!-- Kunci dirender secara dinamis melalui JS -->
       </div>
 
       <button class="btn-submit" onclick="submitPilihanKunci()">Pilih Kunci Ini</button>
@@ -402,18 +259,9 @@
     </div>
   </div>
 
-  <!-- CONTAINER PETA DENAH KANAN -->
+  <!-- CONTAINER PETA -->
   <div class="map-wrapper">
-    <div id="loading-indicator" class="loading-overlay" style="display: none;">Memuat Data Kunci Spreadsheet...</div>
     <div id="map"></div>
-    
-    <div class="custom-controls">
-      <span onclick="map.zoomIn()">+</span>
-      <span style="opacity: 0.3;">|</span>
-      <span onclick="map.zoomOut()">-</span>
-      <span style="opacity: 0.3;">|</span>
-      <span onclick="resetViewMap()">Reset</span>
-    </div>
   </div>
 
 </div>
@@ -455,80 +303,57 @@
   let globalDataKunci = [];
   let selectedKeyIds = new Set();
 
-  // Fetch data Spreadsheet
   async function fetchSpreadsheetData() {
-    toggleLoading(true);
     try {
       const response = await fetch(`${WEB_APP_URL}?aksi=ambil_status_lengkap`);
       const data = await response.json();
       
       if (Array.isArray(data)) {
         globalDataKunci = data;
+        isiOptionFilter(data);
       } else {
         globalDataKunci = [];
       }
-      onFloorOrZoneChange();
+      saringKunci();
     } catch (error) {
-      console.error("Gagal mengambil data dari Apps Script:", error);
-      alert("Gagal memuat data dari Spreadsheet. Menampilkan mode standar.");
-      onFloorOrZoneChange();
-    } finally {
-      toggleLoading(false);
+      console.error("Gagal mengambil data:", error);
+      document.getElementById('kontainerKunciChecklist').innerHTML = '<p style="color: red; font-size: 13px;">Gagal memuat data.</p>';
     }
   }
 
-  // Dipanggil saat Filter Floor diubah
-  function onFloorOrZoneChange() {
-    const floorSelect = document.getElementById('filter-floor').value;
-    const currentFloor = floorSelect === 'ALL' ? 'LG' : floorSelect;
+  // Pengisian Opsi Filter Lantai & Zona Otomatis dari Data
+  function isiOptionFilter(data) {
+    const selLantai = document.getElementById('filterLantai');
+    const selZona = document.getElementById('filterZona');
     
-    renderMapOverlay(currentFloor);
+    const lantaiList = [...new Set(data.map(k => k.lantai).filter(Boolean))];
+    const zonaList = [...new Set(data.map(k => k.zona).filter(Boolean))];
+
+    selLantai.innerHTML = '<option value="">All Floor</option>';
+    lantaiList.forEach(l => {
+      selLantai.innerHTML += `<option value="\({l}">Lantai\){l}</option>`;
+    });
+
+    selZona.innerHTML = '<option value="">All Zone</option>';
+    zonaList.forEach(z => {
+      selZona.innerHTML += `<option value="\({z}">Zone\){z}</option>`;
+    });
   }
 
-  // Render Overlay Peta Denah
-  function renderMapOverlay(selectedFloor) {
-    const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
+  // Fungsi Utama Pemfilteran (Sesuai dengan `onchange` dan `onkeyup`)
+  function saringKunci() {
+    const selectedFloor = document.getElementById('filterLantai').value;
+    const selectedZone = document.getElementById('filterZona').value;
+    const searchQuery = document.getElementById('kotakCari').value.toLowerCase().trim();
 
-    if (currentOverlay) map.removeLayer(currentOverlay);
-    markersGroup.clearLayers();
+    renderMapOverlay(selectedFloor || 'LG');
 
-    const img = new Image();
-    img.src = imagePath;
-    img.onload = function() {
-      const h = this.height || 1000;
-      const w = this.width || 1400;
-      activeImageBounds = [[0, 0], [h, w]];
-      
-      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
-      resetViewMap();
-      renderKeyList();
-    };
-    
-    img.onerror = function() {
-      activeImageBounds = [[0, 0], [1000, 1400]];
-      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
-      resetViewMap();
-      renderKeyList();
-    };
-  }
-
-  // Render Checkbox List dan Pin Peta
-  function renderKeyList() {
-    markersGroup.clearLayers();
-    const container = document.getElementById('key-list-container');
+    const container = document.getElementById('kontainerKunciChecklist');
     container.innerHTML = '';
 
-    const selectedFloor = document.getElementById('filter-floor').value;
-    const selectedZone = document.getElementById('filter-zone').value;
-    const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-
-    const mapH = activeImageBounds[1][0];
-    const mapW = activeImageBounds[1][1];
-
-    // Filter daftar kunci
     const filteredKeys = globalDataKunci.filter(k => {
-      const matchFloor = (selectedFloor === 'ALL') || (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
-      const matchZone = (selectedZone === 'ALL') || (String(k.zona || '').toUpperCase() === selectedZone.toUpperCase());
+      const matchFloor = (!selectedFloor) || (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
+      const matchZone = (!selectedZone) || (String(k.zona || '').toUpperCase() === selectedZone.toUpperCase());
       const keyText = `\({k.id || ''}\){k.nama || ''}`.toLowerCase();
       const matchSearch = keyText.includes(searchQuery);
 
@@ -536,7 +361,7 @@
     });
 
     if (filteredKeys.length === 0) {
-      container.innerHTML = '<div style="padding: 15px; text-align: center; color: #9ca3af; font-size: 13px;">Kunci tidak ditemukan</div>';
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin: 0;">Kunci tidak ditemukan</p>';
       return;
     }
 
@@ -545,7 +370,6 @@
       const isAvailable = String(kunci.status || 'Tersedia').toLowerCase() === 'tersedia';
       const isChecked = selectedKeyIds.has(keyId);
 
-      // 1. Buat Element List Checkbox
       const itemEl = document.createElement('div');
       itemEl.className = `key-item ${isAvailable ? '' : 'disabled'}`;
       
@@ -557,7 +381,6 @@
         </label>
       `;
 
-      // Event Checkbox Click
       const checkbox = itemEl.querySelector('input');
       checkbox.addEventListener('change', (e) => {
         if (e.target.checked) {
@@ -565,20 +388,17 @@
         } else {
           selectedKeyIds.delete(keyId);
         }
-        renderKeyList(); // Re-render untuk meng-update status tampilan pin
+        saringKunci();
       });
 
       container.appendChild(itemEl);
 
-      // 2. Tampilkan Pin Hanya untuk Lantai yang sedang aktif di Peta
-      const currentFloorMap = document.getElementById('filter-floor').value === 'ALL' ? 'LG' : document.getElementById('filter-floor').value;
-      
+      // Render Pin Peta
+      const currentFloorMap = selectedFloor || 'LG';
       if (String(kunci.lantai || '').toUpperCase() === currentFloorMap.toUpperCase()) {
         let coords = koordinatKunciMap[kunci.id] || koordinatKunciMap[kunci.nama];
         if (!coords) {
-          const col = index % 4;
-          const row = Math.floor(index / 4);
-          coords = [mapH * 0.3 + (row * 100), mapW * 0.2 + (col * 200)];
+          coords = [500 + (index * 20), 400 + (index * 30)];
         }
 
         const customIcon = L.divIcon({
@@ -590,40 +410,19 @@
 
         const marker = L.marker(coords, { icon: customIcon });
 
-        const tooltipContent = `
-          <div class="tooltip-card">
-            <div class="tooltip-icon">🔑</div>
-            <div>
-              <div style="font-weight: 700; color: #111827;">${kunci.nama}</div>
-              <div style="font-size: 11px; color: #6b7280;">ID: ${kunci.id || '-'}</div>
-              \({!isAvailable ? `<div style="font-size: 11px; color: #ef4444; font-weight: 600;">Peminjam:\){kunci.peminjam}</div>` : ''}
-              <span class="status-badge ${isAvailable ? 'status-available' : 'status-borrowed'}">
-                ${isAvailable ? '● Tersedia' : '● Dipinjam'}
-              </span>
-            </div>
-          </div>
-        `;
-
-        marker.bindTooltip(tooltipContent, {
-          permanent: false,
+        marker.bindTooltip(`<b>\({kunci.nama}</b><br>Status:\){kunci.status || 'Tersedia'}`, {
           direction: 'top',
-          offset: [0, -10],
           className: 'leaflet-tooltip-voyager'
         });
 
         marker.on('click', () => {
-          if (!isAvailable) {
-            alert(`Kunci \({kunci.nama} (\){kunci.id}) sedang dipinjam oleh ${kunci.peminjam}!`);
-            return;
-          }
-          
-          // Toggle Pilihan Kunci via Klik Marker Pin
+          if (!isAvailable) return;
           if (selectedKeyIds.has(keyId)) {
             selectedKeyIds.delete(keyId);
           } else {
             selectedKeyIds.add(keyId);
           }
-          renderKeyList();
+          saringKunci();
         });
 
         markersGroup.addLayer(marker);
@@ -631,28 +430,34 @@
     });
   }
 
-  function resetViewMap() {
-    map.fitBounds(activeImageBounds);
-  }
+  function renderMapOverlay(selectedFloor) {
+    const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
+    if (currentOverlay) map.removeLayer(currentOverlay);
 
-  function toggleLoading(show) {
-    document.getElementById('loading-indicator').style.display = show ? 'flex' : 'none';
+    const img = new Image();
+    img.src = imagePath;
+    img.onload = function() {
+      activeImageBounds = [[0, 0], [this.height || 1000, this.width || 1400]];
+      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+      map.fitBounds(activeImageBounds);
+    };
+    img.onerror = function() {
+      activeImageBounds = [[0, 0], [1000, 1400]];
+      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+      map.fitBounds(activeImageBounds);
+    };
   }
 
   function submitPilihanKunci() {
     const keysArray = Array.from(selectedKeyIds);
-
     if (keysArray.length === 0) {
-      alert('Silakan pilih minimal satu kunci terlebih dahulu!');
+      alert('Silakan pilih minimal satu kunci!');
       return;
     }
-
-    const kunciQueryParam = keysArray.join(',');
-    window.location.href = `index.html?kunci=${encodeURIComponent(kunciQueryParam)}`;
+    window.location.href = `index.html?kunci=${encodeURIComponent(keysArray.join(','))}`;
   }
 
   fetchSpreadsheetData();
 </script>
-
 </body>
 </html>
