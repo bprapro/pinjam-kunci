@@ -736,9 +736,14 @@
     alert('Silakan pilih minimal satu kunci!');
     return;
   }
-  // Kembali ke index.html utama
-  window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+  
+  // Ambil data nama/ID kunci pertama yang dipilih
+  const kataKunci = keysArray[0];
+  
+  // Kirim ke index.html lewat parameter URL 'cari'
+  window.location.href = 'index.html?cari=' + encodeURIComponent(kataKunci);
 }
+
 
   let activePopupLatLng = null;
 
