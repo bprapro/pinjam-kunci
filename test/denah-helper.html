@@ -369,12 +369,12 @@
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
   const PASSWORD_ADMIN = "admin123";
 
-  // 1. INISIALISASI PETA DENGAN L.CRS.Simple
+  // 1. INISIALISASI PETA DENGAN L.CRS.Simple (SUDAH DITAMBAHKAN setView AGAR TAMPIL)
   const map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -2,
     maxZoom: 2
-  });
+  }).setView([1000, 1000], 0);
 
   let currentOverlay = null;
   let currentFloorLoaded = null;
@@ -499,6 +499,7 @@
       activeImageBounds = [[0, 0], [1500, 2000]];
       currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
       map.fitBounds(activeImageBounds);
+      map.setMaxBounds(activeImageBounds);
       saringKunci();
     };
   }
@@ -566,7 +567,7 @@
 
       container.appendChild(itemEl);
 
-      // --- PEMBACAAN DAN MEMPASANG CIRCLE MARKER PRESI (ANTI GESER) ---
+      // --- CIRCLE MARKER UNTUK MENGUNCI TITIK ANTI GESER ---
       if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
         let coordStr = String(kunci.koordinat).trim();
         let rawCoords = [];
@@ -584,12 +585,10 @@
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           const coords = [rawCoords[0], rawCoords[1]];
 
-          // Pewarnaan Circle Marker Vektor
-          let colorFill = '#10b981'; // Hijau (Tersedia)
-          if (!isAvailable) colorFill = '#ef4444'; // Merah (Dipinjam)
-          if (isChecked) colorFill = '#3b82f6'; // Biru (Dipilih)
+          let colorFill = '#10b981';
+          if (!isAvailable) colorFill = '#ef4444';
+          if (isChecked) colorFill = '#3b82f6';
 
-          // CircleMarker terkunci presisi pada koordinat SVG asli peta
           const marker = L.circleMarker(coords, {
             radius: isChecked ? 9 : 7,
             fillColor: colorFill,
