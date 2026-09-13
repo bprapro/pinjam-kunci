@@ -667,19 +667,13 @@
 
       container.appendChild(itemEl);
 
-      // --- PEMBUATAN CIRCLE MARKER ANTI-GESER ---
+      // --- PEMBUATAN CIRCLE MARKER (STABIL & PRESISI) ---
       if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
         let coordStr = String(kunci.koordinat).trim();
         let rawCoords = [];
 
         if (coordStr.includes(',')) {
           rawCoords = coordStr.split(',').map(function(n) { return parseFloat(n.trim()); });
-        } else if (coordStr.length >= 6) {
-          const mid = Math.floor(coordStr.length / 2);
-          rawCoords = [
-            parseFloat(coordStr.substring(0, mid)),
-            parseFloat(coordStr.substring(mid))
-          ];
         }
 
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
@@ -705,7 +699,6 @@
 
           marker.on('click', function(e) {
             if (isAdminMode) {
-              // Jika Mode Admin aktif, klik pada pin lama akan membuka popup reposisi untuk kunci ini
               bukaPopupPasangPin(e.latlng, keyId);
               return;
             }
@@ -761,13 +754,22 @@
     });
   }
 
+  // FIXED: Mendukung PostMessage (Modal/IFrame) & Direct Link Fallback
   function submitPilihanKunci() {
     const keysArray = Array.from(selectedKeyIds);
     if (keysArray.length === 0) {
       alert('Silakan pilih minimal satu kunci!');
       return;
     }
-    window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        tipe: 'KUNCI_DIPILIH',
+        keys: keysArray
+      }, '*');
+    } else {
+      window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+    }
   }
 
   let activePopupLatLng = null;
@@ -815,6 +817,15 @@
       .setLatLng(latlng)
       .setContent(popupContent)
       .openOn(map);
+
+    // Auto-scroll ke opsi yang terpilih di dropdown popup admin
+    setTimeout(function() {
+      const select = document.getElementById('selectKeyForPin');
+      if (select && select.selectedIndex !== -1) {
+        const selectedOption = select.options[select.selectedIndex];
+        selectedOption.scrollIntoView({ block: 'nearest' });
+      }
+    }, 100);
   }
 
   function filterDropdownPopup() {
