@@ -1914,19 +1914,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const kunciDipilih = urlParams.get('kunci');
 
     if (kunciDipilih) {
-      setTimeout(function() {
-        const daftarKunciArray = decodeURIComponent(kunciDipilih).split(',');
-        
-        daftarKunciArray.forEach(function(keyId) {
+      const daftarKunci = decodeURIComponent(kunciDipilih).split(',');
+
+      // Gunakan setInterval agar script terus mencoba centang sampai data kunci selesai dimuat dari database/Google Sheets
+      let cekkounter = 0;
+      const eksekusiCentang = setInterval(function() {
+        cekkounter++;
+        let adaYangTercentang = false;
+
+        daftarKunci.forEach(function(keyId) {
           const cleanKey = keyId.trim();
-          const chk = document.getElementById('chk-' + cleanKey) || 
-                      document.querySelector(`input[type="checkbox"][value="${cleanKey}"]`);
-          if (chk) {
-            chk.checked = true;
-            chk.dispatchEvent(new Event('change'));
+
+          // Cek berdasarkan ID elemen, attribute value, atau data-id
+          const targetInput = document.getElementById('chk-' + cleanKey) || 
+                              document.querySelector(`input[value="${cleanKey}"]`) ||
+                              document.querySelector(`input[id="${cleanKey}"]`);
+
+          if (targetInput) {
+            targetInput.checked = true;
+            targetInput.dispatchEvent(new Event('change', { bubbles: true }));
+            adaYangTercentang = true;
           }
         });
-      }, 500);
+
+        // Hentikan pencarian jika kunci sudah tercentang atau sudah mencoba selama 5 detik
+        if (adaYangTercentang || cekkounter > 10) {
+          clearInterval(eksekusiCentang);
+        }
+      }, 500); // Mengecek setiap 0.5 detik
     }
   });
 </script>
