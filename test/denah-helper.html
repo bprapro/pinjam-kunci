@@ -317,6 +317,61 @@
       cursor: move !important;
       box-shadow: 0 0 12px rgba(245, 158, 11, 0.9) !important;
     }
+    /* ==========================================
+   PENYESUAIAN KHUSUS TAMPILAN HP (MOBILE)
+   ========================================== */
+@media (max-width: 768px) {
+  body {
+    padding: 10px; /* Kurangi padding outer body */
+  }
+
+  .app-card {
+    flex-direction: column; /* Ubah layout dari samping ke atas-bawah */
+    border-radius: 20px;    /* Pertajam sudut card agar muat banyak */
+    padding: 16px;
+    gap: 15px;
+  }
+
+  /* Susunan: Peta di atas, Form/Sidebar di bawah */
+  .map-wrapper {
+    order: 1;               /* Taruh Peta di posisi atas */
+    width: 100%;
+    min-height: 350px;      /* Beri tinggi minimal yang cukup di HP */
+    height: 350px;
+    border-radius: 16px;
+  }
+
+  #map {
+    min-height: 350px;
+    height: 100%;
+  }
+
+  .sidebar {
+    order: 2;               /* Taruh Sidebar/Form di posisi bawah */
+    padding: 0;
+    flex: none;             /* Matikan flex ratio desktop */
+  }
+
+  .filter-row {
+    flex-direction: row;    /* Jaga filter lantai & zona tetap berdampingan */
+    gap: 8px;
+  }
+
+  .filter-row select {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  #kontainerKunciChecklist {
+    max-height: 180px;      /* Kurangi sedikit tinggi list agar tidak perlu scroll jauh */
+  }
+
+  .footer-link {
+    margin-top: 12px;
+    flex-direction: row;
+    gap: 10px;
+  }
+}
 </style>
 </head>
 <body>
@@ -483,26 +538,38 @@
   }
 
   function renderMapOverlay(selectedFloor) {
-    const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
-    if (currentOverlay) map.removeLayer(currentOverlay);
+  const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
+  if (currentOverlay) map.removeLayer(currentOverlay);
 
-    const img = new Image();
-    img.src = imagePath;
-    img.onload = function() {
-      activeImageBounds = [[0, 0], [this.naturalHeight || 1500, this.naturalWidth || 2000]];
-      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
-      map.fitBounds(activeImageBounds);
-      map.setMaxBounds(activeImageBounds);
-      saringKunci();
-    };
-    img.onerror = function() {
-      activeImageBounds = [[0, 0], [1500, 2000]];
-      currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
-      map.fitBounds(activeImageBounds);
-      map.setMaxBounds(activeImageBounds);
-      saringKunci();
-    };
-  }
+  const img = new Image();
+  img.src = imagePath;
+  img.onload = function() {
+    activeImageBounds = [[0, 0], [this.naturalHeight || 1500, this.naturalWidth || 2000]];
+    currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+    map.fitBounds(activeImageBounds);
+    map.setMaxBounds(activeImageBounds);
+    
+    // TARUH DI SINI (Setelah map.fitBounds / map.setMaxBounds)
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 300);
+
+    saringKunci();
+  };
+  img.onerror = function() {
+    activeImageBounds = [[0, 0], [1500, 2000]];
+    currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+    map.fitBounds(activeImageBounds);
+    map.setMaxBounds(activeImageBounds);
+    
+    // TARUH DI SINI JUGA (Untuk antisipasi jika gambar gagal load)
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 300);
+
+    saringKunci();
+  };
+}
 
   function saringKunci() {
     const selLantai = document.getElementById('filterLantai');
