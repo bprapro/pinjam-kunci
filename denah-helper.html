@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Lokasi Kunci - Denah Mall</title>
+  
+  <!-- Font Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    :root {
+      --text-muted: #9ca3af;
+      --primary-color: #375b4f;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.25);
+      z-index: 0;
+    }
+
+    .app-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1150px;
+      background: #ffffff;
+      border-radius: 40px;
+      padding: 24px;
+      display: flex;
+      gap: 25px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+      align-items: stretch;
+    }
+
+    .sidebar {
+      flex: 1.2;
+      padding: 15px 10px 10px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary-color);
+      letter-spacing: -0.5px;
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 15px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .filter-row select {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #E2E8F0;
+      outline: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0d9488;
+      background: #f8fafc;
+      cursor: pointer;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #E2E8F0;
+      outline: none;
+      font-size: 13px;
+      color: #374151;
+      background: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .key-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 6px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .key-item:last-child { border-bottom: none; }
+
+    .key-item input[type="checkbox"] {
+      margin-right: 10px;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .key-label {
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .key-tag {
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    .btn-manual-set {
+      margin-left: 8px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .key-item.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      border-radius: 50px;
+      border: none;
+      background: var(--primary-color);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 10px 20px rgba(55, 91, 79, 0.25);
+    }
+
+    .footer-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-link a {
+      color: #111827;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .admin-toggle-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .admin-toggle-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #dc2626;
+    }
+
+    .map-wrapper {
+      flex: 1.5;
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      min-height: 520px;
+      background: #f1f5f9;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      background: #f1f5f9;
+      z-index: 1;
+    }
+
+    .leaflet-tooltip-voyager {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.7) !important;
+      border-radius: 20px !important;
+      padding: 10px 16px !important;
+      color: #111827 !important;
+      font-size: 13px !important;
+    }
+
+    .admin-banner {
+      display: none;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .popup-admin-container {
+      min-width: 200px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .popup-admin-container select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 12px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .popup-admin-container button {
+      width: 100%;
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .leaflet-marker-pane {
+      z-index: 600 !important;
+    }
+
+    /* PERBAIKAN UTAMA MARKER AGAR TETAP BULAT DAN TIDAK GESER */
+    .custom-marker {
+      width: 18px !important;
+      height: 18px !important;
+      margin-left: 0 !important;
+      margin-top: 0 !important;
+      z-index: 1000 !important;
+    }
+
+    .marker-dot {
+      width: 18px;
+      height: 18px;
+      background-color: #ef4444;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      box-sizing: border-box;
+      cursor: pointer;
+      display: block;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .marker-dot.borrowed {
+      background-color: #94a3b8;
+    }
+
+    .marker-dot.selected {
+      background-color: #22c55e;
+      transform: scale(1.3);
+    }
+
+    .marker-dot.admin-draggable {
+      border-color: #ffffff !important;
+      background-color: #f59e0b !important;
+      cursor: move !important;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.9) !important;
+    }
+    /* ==========================================
+   PENYESUAIAN KHUSUS TAMPILAN HP (MOBILE)
+   ========================================== */
+@media (max-width: 768px) {
+  body {
+    padding: 10px; /* Kurangi padding outer body */
+  }
+
+  .app-card {
+    flex-direction: column; /* Ubah layout dari samping ke atas-bawah */
+    border-radius: 20px;    /* Pertajam sudut card agar muat banyak */
+    padding: 16px;
+    gap: 15px;
+  }
+
+  /* Susunan: Peta di atas, Form/Sidebar di bawah */
+  .map-wrapper {
+    order: 1;               /* Taruh Peta di posisi atas */
+    width: 100%;
+    min-height: 350px;      /* Beri tinggi minimal yang cukup di HP */
+    height: 350px;
+    border-radius: 16px;
+  }
+
+  #map {
+    min-height: 350px;
+    height: 100%;
+  }
+
+  .sidebar {
+    order: 2;               /* Taruh Sidebar/Form di posisi bawah */
+    padding: 0;
+    flex: none;             /* Matikan flex ratio desktop */
+  }
+
+  .filter-row {
+    flex-direction: row;    /* Jaga filter lantai & zona tetap berdampingan */
+    gap: 8px;
+  }
+
+  .filter-row select {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  #kontainerKunciChecklist {
+    max-height: 180px;      /* Kurangi sedikit tinggi list agar tidak perlu scroll jauh */
+  }
+
+  .footer-link {
+    margin-top: 12px;
+    flex-direction: row;
+    gap: 10px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-card">
+  
+  <!-- SIDEBAR FORM -->
+  <div class="sidebar">
+    <div>
+      <div class="brand-logo">keymanager</div>
+
+      <div id="adminBanner" class="admin-banner">
+        ⚡ Mode Admin: Klik pada Denah untuk memunculkan Dropdown Kunci &amp; Pasang Pin.
+      </div>
+
+      <div class="form-group">
+        <label>Pilih Kunci / Ruangan:</label>
+        <div class="filter-row">
+          <select id="filterLantai" onchange="gantiLantai()"></select>
+          <select id="filterZona" onchange="saringKunci()">
+            <option value="">All Zone</option>
+          </select>
+        </div>
+        <input type="text" id="kotakCari" class="search-box" onkeyup="saringKunci()" placeholder="🔍 Ketik nama ruangan / ID kunci...">
+        <div id="kontainerKunciChecklist" style="max-height: 220px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px; background: #fff;">
+          <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Memuat data kunci...</p>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitPilihanKunci()">Pilih Kunci Ini</button>
+    </div>
+
+    <div class="footer-link">
+      <span>Kembali ke <a href="index.html">Form Peminjaman</a></span>
+      <button class="admin-toggle-btn" id="btnAdminToggle" onclick="toggleAdminMode()">🔓 Mode Admin</button>
+    </div>
+  </div>
+
+  <!-- CONTAINER PETA -->
+  <div class="map-wrapper">
+    <div id="map"></div>
+  </div>
+
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  const PASSWORD_ADMIN = "admin123";
+
+  // 1. INISIALISASI PETA DENGAN L.CRS.Simple
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: -2,
+    maxZoom: 2
+  }).setView([1000, 1000], 0);
+
+  let currentOverlay = null;
+  let currentFloorLoaded = null;
+  let activeImageBounds = [[0, 0], [2000, 2000]];
+  let markersGroup = L.layerGroup().addTo(map);
+
+  const gambarDenahLantai = {
+    'LG': './LG.jpg',
+    'L1': './L1.jpg',
+    'L2': './L2.jpg',
+    'L3': './L3.jpg',
+    'L4': './L4.jpg'
+  };
+
+  let globalDataKunci = [];
+  let selectedKeyIds = new Set();
+  let isAdminMode = false;
+
+  function toggleAdminMode() {
+    if (!isAdminMode) {
+      const pass = prompt("Masukkan Kata Sandi Admin:");
+      if (pass === PASSWORD_ADMIN) {
+        isAdminMode = true;
+        const btn = document.getElementById('btnAdminToggle');
+        if (btn) {
+          btn.classList.add('active');
+          btn.innerHTML = '🔒 Mode Admin (Aktif)';
+        }
+        const banner = document.getElementById('adminBanner');
+        if (banner) banner.style.display = 'block';
+        saringKunci();
+      } else if (pass !== null) {
+        alert("Kata sandi salah!");
+      }
+    } else {
+      isAdminMode = false;
+      const btn = document.getElementById('btnAdminToggle');
+      if (btn) {
+        btn.classList.remove('active');
+        btn.innerHTML = '🔓 Mode Admin';
+      }
+      const banner = document.getElementById('adminBanner');
+      if (banner) banner.style.display = 'none';
+      saringKunci();
+    }
+  }
+
+  async function fetchSpreadsheetData() {
+    try {
+      const response = await fetch(WEB_APP_URL + "?aksi=ambil_status_lengkap");
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        globalDataKunci = data;
+        isiOptionFilter(data);
+      } else {
+        globalDataKunci = [];
+      }
+      gantiLantai();
+    } catch (error) {
+      console.error("Gagal mengambil data:", error);
+      const container = document.getElementById('kontainerKunciChecklist');
+      if (container) {
+        container.innerHTML = '<p style="color: red; font-size: 13px;">Gagal memuat data.</p>';
+      }
+    }
+  }
+
+  function isiOptionFilter(data) {
+    const selLantai = document.getElementById('filterLantai');
+    const selZona = document.getElementById('filterZona');
+    if (!selLantai || !selZona) return;
+    
+    const daftarLantaiUrut = ['LG', 'L1', 'L2', 'L3', 'L4'];
+    const lantaiSpreasheet = [...new Set(data.map(function(k) { return String(k.lantai || '').toUpperCase(); }).filter(Boolean))];
+    
+    const lantaiList = daftarLantaiUrut.filter(function(l) { return lantaiSpreasheet.includes(l); });
+    if (lantaiList.length === 0) {
+      lantaiSpreasheet.forEach(function(l) { lantaiList.push(l); });
+    }
+
+    const zonaList = [...new Set(data.map(function(k) { return k.zona; }).filter(Boolean))];
+
+    if (selLantai.options.length === 0) {
+      selLantai.innerHTML = '';
+      lantaiList.forEach(function(l) {
+        selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
+      });
+    }
+
+    selZona.innerHTML = '<option value="">All Zone</option>';
+    zonaList.forEach(function(z) {
+      selZona.innerHTML += '<option value="' + z + '">Zone ' + z + '</option>';
+    });
+  }
+
+  function gantiLantai() {
+    const selLantai = document.getElementById('filterLantai');
+    const selectedFloor = selLantai ? (selLantai.value || 'LG') : 'LG';
+    if (currentFloorLoaded !== selectedFloor) {
+      renderMapOverlay(selectedFloor);
+      currentFloorLoaded = selectedFloor;
+    } else {
+      saringKunci();
+    }
+  }
+
+  function renderMapOverlay(selectedFloor) {
+  const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
+  if (currentOverlay) map.removeLayer(currentOverlay);
+
+  const img = new Image();
+  img.src = imagePath;
+  img.onload = function() {
+    activeImageBounds = [[0, 0], [this.naturalHeight || 1500, this.naturalWidth || 2000]];
+    currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+    map.fitBounds(activeImageBounds);
+    map.setMaxBounds(activeImageBounds);
+    
+    // TARUH DI SINI (Setelah map.fitBounds / map.setMaxBounds)
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 300);
+
+    saringKunci();
+  };
+  img.onerror = function() {
+    activeImageBounds = [[0, 0], [1500, 2000]];
+    currentOverlay = L.imageOverlay(imagePath, activeImageBounds).addTo(map);
+    map.fitBounds(activeImageBounds);
+    map.setMaxBounds(activeImageBounds);
+    
+    // TARUH DI SINI JUGA (Untuk antisipasi jika gambar gagal load)
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 300);
+
+    saringKunci();
+  };
+}
+
+  function saringKunci() {
+    const selLantai = document.getElementById('filterLantai');
+    const selZona = document.getElementById('filterZona');
+    const kotakCari = document.getElementById('kotakCari');
+
+    const selectedFloor = selLantai ? (selLantai.value || 'LG') : 'LG';
+    const selectedZone = selZona ? selZona.value : '';
+    const searchQuery = kotakCari ? kotakCari.value.toLowerCase().trim() : '';
+
+    markersGroup.clearLayers();
+    const container = document.getElementById('kontainerKunciChecklist');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const filteredKeys = globalDataKunci.filter(function(k) {
+      const matchFloor = (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
+      const matchZone = (!selectedZone) || (String(k.zona || '').toUpperCase() === selectedZone.toUpperCase());
+      const keyText = ((k.id || '') + ' ' + (k.nama || '')).toLowerCase();
+      const matchSearch = keyText.includes(searchQuery);
+
+      return matchFloor && matchZone && matchSearch;
+    });
+
+    if (filteredKeys.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-muted, #64748b); font-size: 13px; margin: 0;">Kunci tidak ditemukan di lantai ini</p>';
+      return;
+    }
+
+    filteredKeys.forEach(function(kunci) {
+      const keyId = kunci.id || kunci.nama;
+      const isAvailable = String(kunci.status || 'Tersedia').toLowerCase() === 'tersedia';
+      const isChecked = selectedKeyIds.has(keyId);
+
+      const itemEl = document.createElement('div');
+      itemEl.className = 'key-item ' + (isAvailable ? '' : 'disabled');
+      
+      const labelTeks = (kunci.id ? kunci.id + ' - ' : '') + kunci.nama;
+      const tagTeks = '[Lantai ' + (kunci.lantai || '-') + ' - ' + (kunci.zona || '-') + ']';
+
+      let adminInsertBtn = '';
+      if (isAdminMode) {
+        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Set Pin</button>';
+      }
+
+      itemEl.innerHTML = 
+        '<input type="checkbox" id="chk-' + keyId + '" value="' + keyId + '" ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '>' +
+        '<label for="chk-' + keyId + '" style="cursor: pointer; width: 100%; display: flex; align-items: center;">' +
+          '<span class="key-label">' + labelTeks + '</span>' +
+          '<span class="key-tag">' + tagTeks + '</span>' +
+        '</label>' +
+        adminInsertBtn;
+
+      const checkbox = itemEl.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.addEventListener('change', function(e) {
+          if (e.target.checked) selectedKeyIds.add(keyId);
+          else selectedKeyIds.delete(keyId);
+          saringKunci();
+        });
+      }
+
+      container.appendChild(itemEl);
+
+      // --- PEMBUATAN CIRCLE MARKER ANTI-GESER ---
+      if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
+        let coordStr = String(kunci.koordinat).trim();
+        let rawCoords = [];
+
+        if (coordStr.includes(',')) {
+          rawCoords = coordStr.split(',').map(function(n) { return parseFloat(n.trim()); });
+        } else if (coordStr.length >= 6) {
+          const mid = Math.floor(coordStr.length / 2);
+          rawCoords = [
+            parseFloat(coordStr.substring(0, mid)),
+            parseFloat(coordStr.substring(mid))
+          ];
+        }
+
+        if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
+          const coords = [rawCoords[0], rawCoords[1]];
+
+          let colorFill = '#10b981';
+          if (!isAvailable) colorFill = '#ef4444';
+          if (isChecked) colorFill = '#3b82f6';
+
+          const marker = L.circleMarker(coords, {
+            radius: isChecked ? 9 : 7,
+            fillColor: colorFill,
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.95
+          });
+
+          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia'), {
+            direction: 'top',
+            className: 'leaflet-tooltip-voyager'
+          });
+
+          marker.on('click', function(e) {
+            if (isAdminMode) {
+              // Jika Mode Admin aktif, klik pada pin lama akan membuka popup reposisi untuk kunci ini
+              bukaPopupPasangPin(e.latlng, keyId);
+              return;
+            }
+            if (!isAvailable) return;
+            if (selectedKeyIds.has(keyId)) selectedKeyIds.delete(keyId);
+            else selectedKeyIds.add(keyId);
+            saringKunci();
+          });
+
+          markersGroup.addLayer(marker);
+        }
+      }
+    });
+  }
+
+  function inputManualPin(id, nama) {
+    const defaultCoords = "500,700";
+    const inputVal = prompt("Masukkan Koordinat (Y, X) untuk [" + nama + "]:\n(Format: angka_Y, angka_X)", defaultCoords);
+    if (inputVal) {
+      simpanKoordinatKeDatabase(id, inputVal.trim());
+    }
+  }
+
+  function simpanKoordinatKeDatabase(keyId, strKoordinat) {
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        aksi: 'simpan_koordinat',
+        id: keyId,
+        koordinat: strKoordinat
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(res) {
+      if (res.status === 'success') {
+        alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
+        
+        const item = globalDataKunci.find(function(k) { 
+          return String(k.id || k.nama) === String(keyId); 
+        });
+        if (item) {
+          item.koordinat = strKoordinat;
+        }
+        
+        saringKunci();
+      } else {
+        alert("❌ Gagal menyimpan: " + (res.message || "Error server"));
+      }
+    })
+    .catch(function(err) {
+      console.error(err);
+      alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
+    });
+  }
+
+  function submitPilihanKunci() {
+    const keysArray = Array.from(selectedKeyIds);
+    if (keysArray.length === 0) {
+      alert('Silakan pilih minimal satu kunci!');
+      return;
+    }
+    window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+  }
+
+  let activePopupLatLng = null;
+
+  function bukaPopupPasangPin(latlng, preSelectedKeyId = null) {
+    activePopupLatLng = latlng;
+    const roundY = Math.round(latlng.lat);
+    const roundX = Math.round(latlng.lng);
+    const selLantai = document.getElementById('filterLantai');
+    const selectedFloor = selLantai ? (selLantai.value || 'LG') : 'LG';
+
+    const availableForPin = globalDataKunci.filter(function(k) {
+      return String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase();
+    });
+
+    let popupContent = 
+      '<div style="padding: 5px; width: 260px; font-family: sans-serif;">' +
+        '<div style="font-weight: bold; font-size: 14px; margin-bottom: 2px;">📍 Reposisi / Pasang Pin:</div>' +
+        '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Y: ' + roundY + ', X: ' + roundX + ' (Lantai ' + selectedFloor + ')</div>' +
+        
+        '<input type="text" id="searchPopupKey" placeholder="🔍 Cari ID atau Nama Kunci..." ' +
+        '  style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 6px; box-sizing: border-box;" ' +
+        '  onkeyup="filterDropdownPopup()">' +
+
+        '<select id="selectKeyForPin" size="5" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;">';
+
+    availableForPin.forEach(function(k) {
+      const keyId = k.id || k.nama;
+      const hasPin = (k.koordinat && String(k.koordinat).trim() !== '');
+      const pinStatusTag = hasPin ? ' 📍 (Ubah Lokasi)' : '';
+      const isSelected = (preSelectedKeyId && String(preSelectedKeyId) === String(keyId)) ? 'selected' : '';
+      
+      popupContent += '<option value="' + keyId + '" ' + isSelected + '>' + keyId + ' - ' + k.nama + pinStatusTag + '</option>';
+    });
+
+    popupContent += 
+        '</select>' +
+        '<button onclick="eksekusiSimpanPin(' + roundY + ',' + roundX + ')" ' +
+        '  style="width: 100%; background: #0084c7; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">' +
+        '  Simpan Posisi Baru' +
+        '</button>' +
+      '</div>';
+
+    L.popup()
+      .setLatLng(latlng)
+      .setContent(popupContent)
+      .openOn(map);
+  }
+
+  function filterDropdownPopup() {
+    const inputEl = document.getElementById('searchPopupKey');
+    const selectEl = document.getElementById('selectKeyForPin');
+    if (!inputEl || !selectEl) return;
+    
+    const input = inputEl.value.toLowerCase();
+    const options = selectEl.options;
+
+    for (let i = 0; i < options.length; i++) {
+      const text = options[i].text.toLowerCase();
+      if (text.includes(input)) {
+        options[i].style.display = '';
+      } else {
+        options[i].style.display = 'none';
+      }
+    }
+  }
+
+  function eksekusiSimpanPin(y, x) {
+    const select = document.getElementById('selectKeyForPin');
+    if (!select) return;
+    const selectedKeyId = select.value;
+
+    if (!selectedKeyId) {
+      alert("⚠️ Silakan pilih kunci terlebih dahulu dari daftar!");
+      return;
+    }
+
+    const strKoordinat = y + ',' + x;
+    simpanKoordinatKeDatabase(selectedKeyId, strKoordinat);
+    map.closePopup();
+  }
+
+  map.on('click', function(e) {
+    if (isAdminMode) {
+      bukaPopupPasangPin(e.latlng);
+    }
+  });
+
+  fetchSpreadsheetData();
+</script>
+</body>
+</html>
