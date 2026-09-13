@@ -380,7 +380,7 @@
       // Event Klik Marker -> Otomatis Memilih di Form Kiri
       marker.on('click', () => {
         if (!isAvailable) {
-          alert(`Kunci ${kunci.name} (${kunci.id}) sedang dipinjam!`);
+          alert(`Kunci \({kunci.name} (\){kunci.id}) sedang dipinjam!`);
           return;
         }
         document.getElementById('select-zona').value = kunci.zone;
@@ -406,7 +406,7 @@
     }
 
     // Mengirim data terpilih kembali ke halaman utama (index.html)
-    window.location.href = `index.html?lantai=${lantai}&zona=${zona}&kunci=${encodeURIComponent(kunci)}`;
+    window.location.href = `index.html?lantai=\({lantai}&zona=\){zona}&kunci=${encodeURIComponent(kunci)}`;
   }
 
   // Muat pertama kali
