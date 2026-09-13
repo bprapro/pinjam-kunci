@@ -405,7 +405,9 @@
     </div>
 
     <div class="footer-link">
-      <span>Kembali ke <a href="index.html">Form Peminjaman</a></span>
+      <span>Kembali ke <a href="index.html" class="link-kembali">
+  Kembali ke <b>Form Peminjaman</b>
+</a></span>
       <button class="admin-toggle-btn" id="btnAdminToggle" onclick="toggleAdminMode()">🔓 Mode Admin</button>
     </div>
   </div>
@@ -729,13 +731,14 @@
   }
 
   function submitPilihanKunci() {
-    const keysArray = Array.from(selectedKeyIds);
-    if (keysArray.length === 0) {
-      alert('Silakan pilih minimal satu kunci!');
-      return;
-    }
-    window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+  const keysArray = Array.from(selectedKeyIds);
+  if (keysArray.length === 0) {
+    alert('Silakan pilih minimal satu kunci!');
+    return;
   }
+  // Kembali ke index.html utama
+  window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
+}
 
   let activePopupLatLng = null;
 
