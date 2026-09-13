@@ -1916,21 +1916,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (kataCari) {
       const inputCari = document.getElementById('kotakCari');
 
-      // Memantau sampai elemen 'kotakCari' dan fungsi 'saringKunci' siap
       let kounter = 0;
       const intervalCari = setInterval(function() {
         kounter++;
 
         if (inputCari) {
-          // 1. Isikan teks kunci ke kotak pencarian
+          // Isikan nama ruangan ke kotak pencarian
           inputCari.value = decodeURIComponent(kataCari);
 
-          // 2. Jalankan fungsi filter bawaan index.html jika ada
+          // Jalankan fungsi filter
           if (typeof saringKunci === 'function') {
             saringKunci();
           }
 
-          // 3. Simulasi ketikan keyboard agar event listener filter otomatis jalan
           inputCari.dispatchEvent(new Event('keyup', { bubbles: true }));
           inputCari.dispatchEvent(new Event('input', { bubbles: true }));
 
