@@ -317,6 +317,76 @@
       cursor: move !important;
       box-shadow: 0 0 12px rgba(245, 158, 11, 0.9) !important;
     }
+    /* CSS RESPONSIVE UNTUK TAMPILAN HP */
+
+  /* Kontainer Utama Wrapper (Menggunakan Flexbox) */
+  .main-container {
+    display: flex;
+    flex-direction: column; /* Default HP: Susun ke bawah (vertikal) */
+    gap: 15px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Section Kiri: Panel Filter & Daftar Kunci */
+  .sidebar-panel {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Section Kanan: Area Peta Denah */
+  .map-container {
+    width: 100%;
+    height: 380px; /* Tinggi peta yang pas untuk HP */
+    border-radius: 16px;
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* KETIKA DIBUKA DI DESKTOP / LAPTOP (> 768px) */
+  @media (min-width: 769px) {
+    .main-container {
+      flex-direction: row; /* Berubah jadi 2 Kolom (Kiri & Kanan) */
+      align-items: stretch;
+    }
+
+    .sidebar-panel {
+      width: 380px;
+      flex-shrink: 0;
+    }
+
+    .map-container {
+      flex-grow: 1;
+      height: 550px; /* Lebih tinggi untuk layar besar */
+    }
+  }
+
+  /* OPTIMASI KHUSUS TAMPILAN HP (<= 768px) */
+  @media (max-width: 768px) {
+    body {
+      padding: 8px;
+    }
+
+    /* Penyesuaian ukuran input & tombol agar mudah ditekan di HP */
+    select, input, button {
+      font-size: 14px !important;
+      padding: 10px !important;
+    }
+
+    .key-item {
+      padding: 10px;
+      margin-bottom: 6px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -362,8 +432,38 @@
 
 </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- TARUH HTML PEMBUNGKUS DI SINI (DI DALAM BODY) -->
+  <div class="main-container">
+    
+    <!-- PANEL KIRI: FILTER & CHECKLIST KUNCI -->
+    <div class="sidebar-panel">
+      <h2 style="margin-top:0;">keymanager</h2>
+      
+      <!-- Tempatkan Filter Lantai, Zona, Searchbar & Kontainer Kunci Anda -->
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <select id="filterLantai" onchange="gantiLantai()" style="flex:1;"></select>
+        <select id="filterZona" onchange="saringKunci()" style="flex:1;"></select>
+      </div>
+
+      <input type="text" id="kotakCari" placeholder="🔍 Ketik nama ruangan / ID kunci..." onkeyup="saringKunci()" style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
+
+      <div id="kontainerKunciChecklist" style="max-height: 300px; overflow-y: auto;">
+        Memuat data kunci...
+      </div>
+
+      <button onclick="submitPilihanKunci()" style="width:100%; margin-top:10px; padding:10px; background:#2d5a4c; color:white; border:none; border-radius:8px; cursor:pointer;">Pilih Kunci Ini</button>
+      <button id="btnAdminToggle" onclick="toggleAdminMode()" style="margin-top:10px; padding:6px 12px; border-radius:20px; border:1px solid #ccc; cursor:pointer;">🔓 Mode Admin</button>
+    </div>
+
+    <!-- PANEL KANAN: DENAH PETA LEAFLET -->
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
