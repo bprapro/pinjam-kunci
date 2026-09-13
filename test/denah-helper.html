@@ -6,12 +6,12 @@
   <title>Pilih Lokasi Kunci - Denah Mall</title>
   
   <!-- Font Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+  <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap&quot](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap&quot); rel="stylesheet">
   
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.css&quot](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css&quot); />
   
   <style>
     :root {
@@ -27,7 +27,7 @@
     }
 
     body {
-      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+      background: url('[https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop](https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop)') no-repeat center center fixed;
       background-size: cover;
       min-height: 100vh;
       display: flex;
@@ -287,15 +287,13 @@
       <div class="brand-logo">keymanager</div>
 
       <div id="adminBanner" class="admin-banner">
-        ⚡ Mode Admin Aktif: Klik pada Peta atau gunakan tombol "Insert Pin" untuk input koordinat manual.
+        ⚡ Mode Admin Aktif: Klik pada Peta atau gunakan tombol &quot;Insert Pin&quot; untuk input koordinat manual.
       </div>
 
       <div class="form-group">
         <label>Pilih Kunci / Ruangan:</label>
         <div class="filter-row">
-          <select id="filterLantai" onchange="gantiLantai()">
-            <option value="">All Floor</option>
-          </select>
+          <select id="filterLantai" onchange="gantiLantai()"></select>
           <select id="filterZona" onchange="saringKunci()">
             <option value="">All Zone</option>
           </select>
@@ -323,10 +321,10 @@
 </div>
 
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script&gt](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script&gt);
 
 <script>
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  const WEB_APP_URL = "[https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec&quot](https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec&quot);;
   const PASSWORD_ADMIN = "admin123";
 
   const map = L.map('map', {
@@ -374,7 +372,7 @@
     }
   }
 
-  // Event Klik pada Peta untuk Admin (Auto-detect Koordinat saat klik denah)
+  // Event Klik pada Peta untuk Admin
   map.on('click', function(e) {
     if (!isAdminMode) return;
     const clickY = Math.round(e.latlng.lat);
@@ -408,22 +406,32 @@
     const selLantai = document.getElementById('filterLantai');
     const selZona = document.getElementById('filterZona');
     
-    const lantaiList = [...new Set(data.map(k => k.lantai).filter(Boolean))];
-    const zonaList = [...new Set(data.map(k => k.zona).filter(Boolean))];
+    // Urutan lantai default jika data kosong
+    const daftarLantaiUrut = ['LG', 'L1', 'L2', 'L3', 'L4'];
+    const lantaiSpreasheet = [...new Set(data.map(function(k) { return String(k.lantai || '').toUpperCase(); }).filter(Boolean))];
+    
+    const lantaiList = daftarLantaiUrut.filter(function(l) { return lantaiSpreasheet.includes(l); });
+    if (lantaiList.length === 0) {
+      lantaiSpreasheet.forEach(function(l) { lantaiList.push(l); });
+    }
 
-    selLantai.innerHTML = '<option value="">All Floor</option>';
-    lantaiList.forEach(l => {
-      selLantai.innerHTML += `<option value="\({l}">Lantai\){l}</option>`;
+    const zonaList = [...new Set(data.map(function(k) { return k.zona; }).filter(Boolean))];
+
+    // Opsi All Floor telah dihapus, opsi pertama langsung berupa lantai aktif
+    selLantai.innerHTML = '';
+    lantaiList.forEach(function(l) {
+      selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
     });
 
     selZona.innerHTML = '<option value="">All Zone</option>';
-    zonaList.forEach(z => {
-      selZona.innerHTML += `<option value="\({z}">Zone\){z}</option>`;
+    zonaList.forEach(function(z) {
+      selZona.innerHTML += '<option value="' + z + '">Zone ' + z + '</option>';
     });
   }
 
   function gantiLantai() {
-    const selectedFloor = document.getElementById('filterLantai').value || 'LG';
+    const selLantai = document.getElementById('filterLantai');
+    const selectedFloor = selLantai.value || 'LG';
     if (currentFloorLoaded !== selectedFloor) {
       renderMapOverlay(selectedFloor);
       currentFloorLoaded = selectedFloor;
@@ -432,7 +440,7 @@
   }
 
   function saringKunci() {
-    const selectedFloor = document.getElementById('filterLantai').value;
+    const selectedFloor = document.getElementById('filterLantai').value || 'LG';
     const selectedZone = document.getElementById('filterZona').value;
     const searchQuery = document.getElementById('kotakCari').value.toLowerCase().trim();
 
@@ -440,8 +448,8 @@
     const container = document.getElementById('kontainerKunciChecklist');
     container.innerHTML = '';
 
-    const filteredKeys = globalDataKunci.filter(k => {
-      const matchFloor = (!selectedFloor) || (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
+    const filteredKeys = globalDataKunci.filter(function(k) {
+      const matchFloor = (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
       const matchZone = (!selectedZone) || (String(k.zona || '').toUpperCase() === selectedZone.toUpperCase());
       const keyText = ((k.id || '') + ' ' + (k.nama || '')).toLowerCase();
       const matchSearch = keyText.includes(searchQuery);
@@ -450,11 +458,11 @@
     });
 
     if (filteredKeys.length === 0) {
-      container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin: 0;">Kunci tidak ditemukan</p>';
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin: 0;">Kunci tidak ditemukan di lantai ini</p>';
       return;
     }
 
-    filteredKeys.forEach((kunci) => {
+    filteredKeys.forEach(function(kunci) {
       const keyId = kunci.id || kunci.nama;
       const isAvailable = String(kunci.status || 'Tersedia').toLowerCase() === 'tersedia';
       const isChecked = selectedKeyIds.has(keyId);
@@ -467,17 +475,16 @@
 
       let adminInsertBtn = '';
       if (isAdminMode) {
-        adminInsertBtn = `<button class="btn-manual-set" onclick="inputManualPin('\({keyId}', '\){kunci.nama}')">📌 Insert Pin</button>`;
+        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Insert Pin</button>';
       }
 
-      itemEl.innerHTML = `
-        <input type="checkbox" id="chk-\({keyId}" value="\){keyId}" \({isChecked ? 'checked' : ''}\){isAvailable ? '' : 'disabled'}>
-        <label for="chk-${keyId}" style="cursor: pointer; width: 100%; display: flex; align-items: center;">
-          <span class="key-label">${labelTeks}</span>
-          <span class="key-tag">${tagTeks}</span>
-        </label>
-        ${adminInsertBtn}
-      `;
+      itemEl.innerHTML = 
+        '<input type="checkbox" id="chk-' + keyId + '" value="' + keyId + '" ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '>' +
+        '<label for="chk-' + keyId + '" style="cursor: pointer; width: 100%; display: flex; align-items: center;">' +
+          '<span class="key-label">' + labelTeks + '</span>' +
+          '<span class="key-tag">' + tagTeks + '</span>' +
+        '</label>' +
+        adminInsertBtn;
 
       const checkbox = itemEl.querySelector('input');
       checkbox.addEventListener('change', function(e) {
@@ -488,17 +495,16 @@
 
       container.appendChild(itemEl);
 
-      // Render Pin hanya jika kunci memiliki koordinat dari Google Sheets
-      const currentFloorMap = selectedFloor || 'LG';
-      if (String(kunci.lantai || '').toUpperCase() === currentFloorMap.toUpperCase() && kunci.koordinat) {
-        const rawCoords = kunci.koordinat.split(',').map(n => parseFloat(n.trim()));
+      // Render Pin jika ada koordinat di spreadsheet
+      if (kunci.koordinat) {
+        const rawCoords = kunci.koordinat.split(',').map(function(n) { return parseFloat(n.trim()); });
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           
           const coords = [rawCoords[0], rawCoords[1]];
 
           const customIcon = L.divIcon({
             className: 'custom-marker',
-            html: `<div class="marker-dot \({isAvailable ? '' : 'borrowed'}\){isChecked ? 'selected' : ''} ${isAdminMode ? 'admin-draggable' : ''}"></div>`,
+            html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + ' ' + (isAdminMode ? 'admin-draggable' : '') + '"></div>',
             iconSize: [18, 18],
             iconAnchor: [9, 9]
           });
@@ -517,7 +523,7 @@
             });
           }
 
-          marker.bindTooltip(`<b>\({kunci.nama}</b><br>Status:\){kunci.status || 'Tersedia'}${isAdminMode ? '<br><i style="color:#d97706">[Geser Pin Ini]</i>' : ''}`, {
+          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Geser Pin Ini]</i>' : ''), {
             direction: 'top',
             className: 'leaflet-tooltip-voyager'
           });
@@ -538,7 +544,7 @@
 
   function inputManualPin(id, nama) {
     const defaultCoords = "500,700";
-    const inputVal = prompt(`Masukkan Koordinat (Y, X) untuk [${nama}]:\n(Format: angka_Y, angka_X)`, defaultCoords);
+    const inputVal = prompt("Masukkan Koordinat (Y, X) untuk [" + nama + "]:\n(Format: angka_Y, angka_X)", defaultCoords);
     if (inputVal) {
       simpanKoordinatKeDatabase(id, inputVal.trim());
     }
@@ -553,18 +559,18 @@
         koordinat: strKoordinat
       })
     })
-    .then(res => res.json())
-    .then(res => {
+    .then(function(res) { return res.json(); })
+    .then(function(res) {
       if (res.status === 'success') {
-        alert(`✅ Koordinat untuk [\({keyId}] berhasil disimpan: (\){strKoordinat})`);
-        fetchSpreadsheetData(); // Re-fetch agar data lokal langsung update secara otomatis
+        alert("✅ Koordinat untuk [" + keyId + "] berhasil disimpan: (" + strKoordinat + ")");
+        fetchSpreadsheetData();
       } else {
-        alert('❌ Gagal menyimpan: ' + res.message);
+        alert("❌ Gagal menyimpan: " + res.message);
       }
     })
-    .catch(err => {
+    .catch(function(err) {
       console.error(err);
-      alert('❌ Terjadi kesalahan jaringan saat menyimpan koordinat.');
+      alert("❌ Terjadi kesalahan jaringan saat menyimpan koordinat.");
     });
   }
 
