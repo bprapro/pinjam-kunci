@@ -374,6 +374,15 @@
     crs: L.CRS.Simple,
     minZoom: -2,
     maxZoom: 2
+  });<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  const PASSWORD_ADMIN = "admin123";
+
+  // 1. INISIALISASI PETA DENGAN L.CRS.Simple
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: -2,
+    maxZoom: 2
   });
 
   let currentOverlay = null;
@@ -566,6 +575,7 @@
 
       container.appendChild(itemEl);
 
+      // --- PEMBACAAN DAN MEMPASANG CIRCLE MARKER PRESI (ANTI GESER) ---
       if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
         let coordStr = String(kunci.koordinat).trim();
         let rawCoords = [];
@@ -583,28 +593,22 @@
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           const coords = [rawCoords[0], rawCoords[1]];
 
-          const customIcon = L.divIcon({
-            className: 'custom-marker',
-            html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
-            iconSize: [18, 18],
-            iconAnchor: [9, 9]
+          // Pewarnaan Circle Marker Vektor
+          let colorFill = '#10b981'; // Hijau (Tersedia)
+          if (!isAvailable) colorFill = '#ef4444'; // Merah (Dipinjam)
+          if (isChecked) colorFill = '#3b82f6'; // Biru (Dipilih)
+
+          // CircleMarker terkunci presisi pada koordinat SVG asli peta
+          const marker = L.circleMarker(coords, {
+            radius: isChecked ? 9 : 7,
+            fillColor: colorFill,
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.95
           });
 
-          const marker = L.marker(coords, { 
-            icon: customIcon,
-            draggable: isAdminMode
-          });
-
-          if (isAdminMode) {
-            marker.on('dragend', function(e) {
-              const newLatLng = e.target.getLatLng();
-              const newY = Math.round(newLatLng.lat);
-              const newX = Math.round(newLatLng.lng);
-              simpanKoordinatKeDatabase(keyId, newY + ',' + newX);
-            });
-          }
-
-          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:#d97706">[Geser Pin Ini]</i>' : ''), {
+          marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia'), {
             direction: 'top',
             className: 'leaflet-tooltip-voyager'
           });
