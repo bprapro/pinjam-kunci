@@ -21,7 +21,7 @@
       padding: 0;
     }
 
-    /* Background Fullscreen Hutan/Alam sesuai sampel gambar */
+    /* Background Fullscreen Hutan/Alam */
     body {
       background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
       background-size: cover;
@@ -32,7 +32,6 @@
       padding: 30px 20px;
     }
 
-    /* Overlay gelap tipis agar container lebih menyala */
     body::before {
       content: '';
       position: fixed;
@@ -41,7 +40,6 @@
       z-index: 0;
     }
 
-    /* Container Utama (Card Melayang Putih Bersih) */
     .app-card {
       position: relative;
       z-index: 1;
@@ -56,7 +54,6 @@
       align-items: stretch;
     }
 
-    /* --- KOLOM KIRI (SIDEBAR FORM) --- */
     .sidebar {
       flex: 1.1;
       padding: 30px 20px 20px 30px;
@@ -88,7 +85,6 @@
       gap: 14px;
     }
 
-    /* Label Input Tipis & Elegan */
     .form-label {
       font-size: 12px;
       font-weight: 700;
@@ -98,7 +94,6 @@
       margin-left: 12px;
     }
 
-    /* Select Box Bentuk Pill Sesuai Gambar */
     .select-wrapper {
       position: relative;
     }
@@ -118,10 +113,7 @@
       transition: all 0.2s ease;
     }
 
-    .select-pill:hover {
-      background: #e5e7eb;
-    }
-
+    .select-pill:hover { background: #e5e7eb; }
     .select-pill:focus {
       background: #ffffff;
       box-shadow: 0 0 0 2px #375b4f;
@@ -138,7 +130,6 @@
       font-size: 14px;
     }
 
-    /* Tombol Utama Hijau Forest (#375b4f) */
     .btn-submit {
       width: 100%;
       padding: 16px;
@@ -172,11 +163,6 @@
       text-decoration: none;
     }
 
-    .footer-link a:hover {
-      text-decoration: underline;
-    }
-
-    /* --- KOLOM KANAN (DENAH LAYOUT) --- */
     .map-wrapper {
       flex: 1.4;
       border-radius: 32px;
@@ -190,11 +176,10 @@
       width: 100%;
       height: 100%;
       min-height: 520px;
-      background: #2d3748;
+      background: #f3f4f6;
       z-index: 1;
     }
 
-    /* Custom Zoom Controls Ala Minimalis */
     .custom-controls {
       position: absolute;
       bottom: 20px;
@@ -219,15 +204,9 @@
       user-select: none;
     }
 
-    .custom-controls span:hover {
-      color: #375b4f;
-    }
+    .custom-controls span:hover { color: #375b4f; }
 
-    /* --- MARKER PIN & FLOATING TOOLTIP ALA VOIGER (GAMBAR) --- */
-    /* Marker Ring Glowing Dot */
-    .custom-marker {
-      position: relative;
-    }
+    .custom-marker { position: relative; }
 
     .marker-dot {
       width: 14px;
@@ -245,11 +224,8 @@
       background: #375b4f;
     }
 
-    .marker-dot.borrowed {
-      border-color: #ef4444;
-    }
+    .marker-dot.borrowed { border-color: #ef4444; }
 
-    /* Glassmorphism Floating Card Tooltip persis Gambar */
     .leaflet-tooltip-voyager {
       background: rgba(255, 255, 255, 0.85) !important;
       backdrop-filter: blur(12px) !important;
@@ -263,9 +239,7 @@
       font-weight: 600 !important;
     }
     
-    .leaflet-tooltip-voyager::before {
-      display: none;
-    }
+    .leaflet-tooltip-voyager::before { display: none; }
 
     .tooltip-card {
       display: flex;
@@ -296,7 +270,6 @@
     .status-available { background: #dcfce7; color: #15803d; }
     .status-borrowed { background: #fee2e2; color: #b91c1c; }
 
-    /* Overlay Loading */
     .loading-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -310,7 +283,6 @@
       color: #375b4f;
     }
 
-    /* Responsive untuk Layar Kecil */
     @media (max-width: 850px) {
       .app-card {
         flex-direction: column;
@@ -326,7 +298,7 @@
 
 <div class="app-card">
   
-  <!-- KOLOM KIRI (FORM INPUT) -->
+  <!-- FORM SIDEBAR -->
   <div class="sidebar">
     <div>
       <div class="brand-logo">keymanager</div>
@@ -353,7 +325,6 @@
               <option value="A">Zona A</option>
               <option value="B">Zona B</option>
               <option value="C">Zona C</option>
-              <option value="C">Zona D</option>
             </select>
           </div>
         </div>
@@ -376,12 +347,11 @@
     </div>
   </div>
 
-  <!-- KOLOM KANAN (MAP LAYOUT VOYAGER STYLE) -->
+  <!-- MAP CONTAINER -->
   <div class="map-wrapper">
     <div id="loading-indicator" class="loading-overlay" style="display: none;">Memuat Data Kunci...</div>
     <div id="map"></div>
     
-    <!-- Controls Zoom & Fit Floating -->
     <div class="custom-controls">
       <span onclick="map.zoomIn()">+</span>
       <span style="opacity: 0.3;">|</span>
@@ -397,12 +367,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // =========================================================
-  // 1. ISIKAN URL APPS SCRIPT ANDA DI SINI
-  // =========================================================
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx...AKAN_DISEUAIKAN.../exec";
 
-  // Inisialisasi Map Leaflet (CRS Simple untuk denah image)
   const map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -1,
@@ -414,16 +380,15 @@
   let currentOverlay = null;
   let markersGroup = L.layerGroup().addTo(map);
 
-  // Mapping File Gambar Denah Lantai
+  // MAPPING PATH LOKAL SESUAI DENGAN FILE GAMBAR ANDA
   const gambarDenahLantai = {
-    'LG': 'LG.jpg',
-    'L1': 'L1.jpg',
-    'L2': 'L2.jpg',
-    'L3': 'L3.jpg',
-    'L4': 'L4.jpg'
+    'LG': './LG.jpg',
+    'L1': './L1.jpg',
+    'L2': './L2.jpg',
+    'L3': './L3.jpg',
+    'L4': './L4.jpg'
   };
 
-  // Titik Koordinat Posisi Pin Marker di Peta
   const koordinatKunciMap = {
     '3 - PINTU KACA': [480, 430],
     '4 - SELMA': [520, 780],
@@ -434,7 +399,6 @@
 
   let globalDataKunci = [];
 
-  // 2. AMBIL DATA REALTIME DARI GOOGLE APPS SCRIPT
   async function fetchSpreadsheetData() {
     toggleLoading(true);
     try {
@@ -443,44 +407,39 @@
       globalDataKunci = data;
       renderCurrentLantai();
     } catch (error) {
-      console.error("Gagal mengambil data Spreadsheet:", error);
-      alert("Gagal memuat data dari database spreadsheet.");
+      console.warn("Spreadsheet belum terhubung/error, menggunakan mode fallback denah lokal.");
+      renderCurrentLantai();
     } finally {
       toggleLoading(false);
     }
   }
 
-  // 3. RENDER MAP & MARKER PARALLEL UI VOYAGER
   function renderCurrentLantai() {
     const selectedFloor = document.getElementById('select-lantai').value;
-    const imagePath = gambarDenahLantai[selectedFloor] || 'LG.jpg';
+    const imagePath = gambarDenahLantai[selectedFloor] || './LG.jpg';
 
     if (currentOverlay) map.removeLayer(currentOverlay);
     markersGroup.clearLayers();
 
-    // Set Denah Gambar
+    // Memuat overlay gambar denah
     currentOverlay = L.imageOverlay(imagePath, bounds).addTo(map);
     resetViewMap();
 
-    // Reset Select Option Kunci
+    // Update Dropdown Kunci
     const selectKunci = document.getElementById('select-kunci');
     selectKunci.innerHTML = '<option value="">Pilih via Peta / Dropdown</option>';
 
-    // Filter Kunci Berdasarkan Lantai yang Dipilih
     const keysOnFloor = globalDataKunci.filter(k => String(k.lantai).trim().toUpperCase() === selectedFloor.toUpperCase());
 
     keysOnFloor.forEach(kunci => {
-      // Masukkan ke dropdown
       const opt = document.createElement('option');
       opt.value = kunci.id || kunci.nama;
       opt.textContent = `\({kunci.id} -\){kunci.nama}`;
       selectKunci.appendChild(opt);
 
-      // Cari koordinat atau default di tengah denah
       const coords = koordinatKunciMap[kunci.id] || koordinatKunciMap[kunci.nama] || [500, 700];
-      const isAvailable = (kunci.status.toLowerCase() === 'tersedia');
+      const isAvailable = (kunci.status && kunci.status.toLowerCase() === 'tersedia');
 
-      // Custom Ring Marker Dot
       const customIcon = L.divIcon({
         className: 'custom-marker',
         html: `<div class="marker-dot ${isAvailable ? '' : 'borrowed'}"></div>`,
@@ -490,14 +449,12 @@
 
       const marker = L.marker(coords, { icon: customIcon });
 
-      // PopUp Floating Card ala Voyager App
       const tooltipContent = `
         <div class="tooltip-card">
           <div class="tooltip-icon">🔑</div>
           <div>
             <div style="font-weight: 700;">${kunci.nama}</div>
             <div style="font-size: 11px; color: #6b7280;">Kode: ${kunci.id}</div>
-            \({!isAvailable ? `<div style="font-size: 10px; color: #ef4444; margin-top: 2px;">Peminjam:\){kunci.peminjam}</div>` : ''}
             <span class="status-badge ${isAvailable ? 'status-available' : 'status-borrowed'}">
               ${isAvailable ? 'Tersedia' : 'Dipinjam'}
             </span>
@@ -512,10 +469,9 @@
         className: 'leaflet-tooltip-voyager'
       });
 
-      // Event Klik Marker
       marker.on('click', () => {
         if (!isAvailable) {
-          alert(`Kunci \({kunci.nama} (\){kunci.id}) sedang dipinjam oleh ${kunci.peminjam}!`);
+          alert(`Kunci \({kunci.nama} (\){kunci.id}) sedang dipinjam!`);
           return;
         }
         if (kunci.zona) document.getElementById('select-zona').value = kunci.zona;
@@ -544,11 +500,9 @@
       return;
     }
 
-    // Redirect Kembali ke index.html membawa Parameter Terpilih
     window.location.href = `index.html?lantai=\({lantai}&zona=\){zona}&kunci=${encodeURIComponent(kunci)}`;
   }
 
-  // Load Data Pertama Kali
   fetchSpreadsheetData();
 </script>
 
