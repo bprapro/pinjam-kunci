@@ -169,12 +169,33 @@
       margin-top: 15px;
       font-size: 12px;
       color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .footer-link a {
       color: #111827;
       font-weight: 700;
       text-decoration: none;
+    }
+
+    .admin-toggle-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .admin-toggle-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #dc2626;
     }
 
     .map-wrapper {
@@ -213,6 +234,14 @@
     }
 
     .marker-dot.borrowed { border-color: #ef4444; }
+
+    /* Visual Indicator pas Pin bisa digeser */
+    .marker-dot.admin-draggable {
+      border-color: #f59e0b !important;
+      background: #fef3c7 !important;
+      cursor: move !important;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.8) !important;
+    }
 
     .leaflet-tooltip-voyager {
       background: rgba(255, 255, 255, 0.9) !important;
@@ -254,7 +283,8 @@
     </div>
 
     <div class="footer-link">
-      Kembali ke <a href="index.html">Form Peminjaman</a>
+      <span>Kembali ke <a href="index.html">Form Peminjaman</a></span>
+      <button class="admin-toggle-btn" id="btnAdminToggle" onclick="toggleAdminMode()">🔓 Mode Admin</button>
     </div>
   </div>
 
@@ -270,6 +300,7 @@
 
 <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  const PASSWORD_ADMIN = "admin123"; // Ganti password admin di sini
 
   const map = L.map('map', {
     crs: L.CRS.Simple,
@@ -301,6 +332,29 @@
 
   let globalDataKunci = [];
   let selectedKeyIds = new Set();
+  let isAdminMode = false;
+
+  function toggleAdminMode() {
+    if (!isAdminMode) {
+      const pass = prompt("Masukkan Kata Sandi Admin untuk menggeser Pin:");
+      if (pass === PASSWORD_ADMIN) {
+        isAdminMode = true;
+        const btn = document.getElementById('btnAdminToggle');
+        btn.classList.add('active');
+        btn.innerHTML = '🔒 Mode Admin (Aktif)';
+        alert("Mode Admin Aktif! Sekarang Anda dapat menggeser pin di peta. Koordinat baru akan otomatis disalin.");
+        saringKunci();
+      } else if (pass !== null) {
+        alert("Kata sandi salah!");
+      }
+    } else {
+      isAdminMode = false;
+      const btn = document.getElementById('btnAdminToggle');
+      btn.classList.remove('active');
+      btn.innerHTML = '🔓 Mode Admin';
+      saringKunci();
+    }
+  }
 
   async function fetchSpreadsheetData() {
     try {
@@ -401,19 +455,39 @@
 
         const customIcon = L.divIcon({
           className: 'custom-marker',
-          html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
+          html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + ' ' + (isAdminMode ? 'admin-draggable' : '') + '"></div>',
           iconSize: [16, 16],
           iconAnchor: [8, 8]
         });
 
-        const marker = L.marker(coords, { icon: customIcon });
+        const marker = L.marker(coords, { 
+          icon: customIcon,
+          draggable: isAdminMode
+        });
 
-        marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia'), {
+        // Event Drag Selesai untuk Admin
+        marker.on('dragend', function(e) {
+          const newLatLng = e.target.getLatLng();
+          const newY = Math.round(newLatLng.lat);
+          const newX = Math.round(newLatLng.lng);
+          const formattedCoords = '[' + newY + ', ' + newX + ']';
+
+          koordinatKunciMap[keyId] = [newY, newX];
+          
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText("'" + keyId + "': " + formattedCoords);
+          }
+          
+          alert("Koordinat Baru " + kunci.nama + ":\n" + formattedCoords + "\n\n(Koordinat telah disalin ke Clipboard!)");
+        });
+
+        marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia') + (isAdminMode ? '<br><i style="color:orange">[Geser untuk pindahkan]</i>' : ''), {
           direction: 'top',
           className: 'leaflet-tooltip-voyager'
         });
 
         marker.on('click', function() {
+          if (isAdminMode) return;
           if (!isAvailable) return;
           if (selectedKeyIds.has(keyId)) {
             selectedKeyIds.delete(keyId);
