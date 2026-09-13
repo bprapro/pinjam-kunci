@@ -6,12 +6,12 @@
   <title>Pilih Lokasi Kunci - Denah Mall</title>
   
   <!-- Font Plus Jakarta Sans -->
-  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-  <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap&quot](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap&quot); rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.css&quot](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css&quot); />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
     :root {
@@ -27,7 +27,7 @@
     }
 
     body {
-      background: url('[https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop](https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop)') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
       background-size: cover;
       min-height: 100vh;
       display: flex;
@@ -287,7 +287,7 @@
       <div class="brand-logo">keymanager</div>
 
       <div id="adminBanner" class="admin-banner">
-        ⚡ Mode Admin Aktif: Klik pada Peta atau gunakan tombol &quot;Insert Pin&quot; untuk input koordinat manual.
+        ⚡ Mode Admin Aktif: Klik pada Peta atau gunakan tombol "Insert Pin" untuk input koordinat manual.
       </div>
 
       <div class="form-group">
@@ -321,10 +321,10 @@
 </div>
 
 <!-- Leaflet JS -->
-<script src="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script&gt](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script&gt);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  const WEB_APP_URL = "[https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec&quot](https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec&quot);;
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
   const PASSWORD_ADMIN = "admin123";
 
   const map = L.map('map', {
@@ -372,13 +372,13 @@
     }
   }
 
-  // Event Klik pada Peta untuk Admin
+  // Event Klik Peta Admin
   map.on('click', function(e) {
     if (!isAdminMode) return;
     const clickY = Math.round(e.latlng.lat);
     const clickX = Math.round(e.latlng.lng);
     
-    const keyInput = prompt("KOORDINAT TERDETEKSI: " + clickY + ", " + clickX + "\n\nMasukkan ID / Nama Kunci untuk dipasang pada titik ini:");
+    const keyInput = prompt("KOORDINAT TERDETEKSI: " + clickY + ", " + clickX + "\n\nMasukkan ID / Nama Kunci untuk dipasang titik ini:");
     if (keyInput) {
       simpanKoordinatKeDatabase(keyInput.trim(), clickY + ',' + clickX);
     }
@@ -406,7 +406,6 @@
     const selLantai = document.getElementById('filterLantai');
     const selZona = document.getElementById('filterZona');
     
-    // Urutan lantai default jika data kosong
     const daftarLantaiUrut = ['LG', 'L1', 'L2', 'L3', 'L4'];
     const lantaiSpreasheet = [...new Set(data.map(function(k) { return String(k.lantai || '').toUpperCase(); }).filter(Boolean))];
     
@@ -417,7 +416,7 @@
 
     const zonaList = [...new Set(data.map(function(k) { return k.zona; }).filter(Boolean))];
 
-    // Opsi All Floor telah dihapus, opsi pertama langsung berupa lantai aktif
+    // Opsi All Floor telah dihapus
     selLantai.innerHTML = '';
     lantaiList.forEach(function(l) {
       selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
@@ -495,7 +494,7 @@
 
       container.appendChild(itemEl);
 
-      // Render Pin jika ada koordinat di spreadsheet
+      // Render Pin
       if (kunci.koordinat) {
         const rawCoords = kunci.koordinat.split(',').map(function(n) { return parseFloat(n.trim()); });
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
