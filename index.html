@@ -1908,42 +1908,40 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
-  <script>
+<script>
   window.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const kunciDipilih = urlParams.get('kunci');
+    const kataCari = urlParams.get('cari');
 
-    if (kunciDipilih) {
-      const daftarKunci = decodeURIComponent(kunciDipilih).split(',');
+    if (kataCari) {
+      const inputCari = document.getElementById('kotakCari');
 
-      // Gunakan setInterval agar script terus mencoba centang sampai data kunci selesai dimuat dari database/Google Sheets
-      let cekkounter = 0;
-      const eksekusiCentang = setInterval(function() {
-        cekkounter++;
-        let adaYangTercentang = false;
+      // Memantau sampai elemen 'kotakCari' dan fungsi 'saringKunci' siap
+      let kounter = 0;
+      const intervalCari = setInterval(function() {
+        kounter++;
 
-        daftarKunci.forEach(function(keyId) {
-          const cleanKey = keyId.trim();
+        if (inputCari) {
+          // 1. Isikan teks kunci ke kotak pencarian
+          inputCari.value = decodeURIComponent(kataCari);
 
-          // Cek berdasarkan ID elemen, attribute value, atau data-id
-          const targetInput = document.getElementById('chk-' + cleanKey) || 
-                              document.querySelector(`input[value="${cleanKey}"]`) ||
-                              document.querySelector(`input[id="${cleanKey}"]`);
-
-          if (targetInput) {
-            targetInput.checked = true;
-            targetInput.dispatchEvent(new Event('change', { bubbles: true }));
-            adaYangTercentang = true;
+          // 2. Jalankan fungsi filter bawaan index.html jika ada
+          if (typeof saringKunci === 'function') {
+            saringKunci();
           }
-        });
 
-        // Hentikan pencarian jika kunci sudah tercentang atau sudah mencoba selama 5 detik
-        if (adaYangTercentang || cekkounter > 10) {
-          clearInterval(eksekusiCentang);
+          // 3. Simulasi ketikan keyboard agar event listener filter otomatis jalan
+          inputCari.dispatchEvent(new Event('keyup', { bubbles: true }));
+          inputCari.dispatchEvent(new Event('input', { bubbles: true }));
+
+          clearInterval(intervalCari);
         }
-      }, 500); // Mengecek setiap 0.5 detik
+
+        if (kounter > 10) clearInterval(intervalCari);
+      }, 300);
     }
   });
 </script>
+
 </body>
 </html>
