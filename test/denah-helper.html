@@ -142,7 +142,7 @@
       font-weight: 500;
       color: var(--text-muted);
       font-size: 12px;
-      margin-left: 6px;
+      margin-left: auto;
     }
 
     .key-item.disabled {
@@ -234,7 +234,6 @@
     <div>
       <div class="brand-logo">keymanager</div>
 
-      <!-- STRUKTUR FORM PERSIS SEPERTI STRUKTUR KAMU -->
       <div class="form-group">
         <label>Pilih Kunci / Ruangan:</label>
         <div class="filter-row">
@@ -305,7 +304,7 @@
 
   async function fetchSpreadsheetData() {
     try {
-      const response = await fetch(`${WEB_APP_URL}?aksi=ambil_status_lengkap`);
+      const response = await fetch(WEB_APP_URL + "?aksi=ambil_status_lengkap");
       const data = await response.json();
       
       if (Array.isArray(data)) {
@@ -321,26 +320,24 @@
     }
   }
 
-  // Pengisian Opsi Filter Lantai & Zona Otomatis dari Data
   function isiOptionFilter(data) {
     const selLantai = document.getElementById('filterLantai');
     const selZona = document.getElementById('filterZona');
     
-    const lantaiList = [...new Set(data.map(k => k.lantai).filter(Boolean))];
-    const zonaList = [...new Set(data.map(k => k.zona).filter(Boolean))];
+    const lantaiList = [...new Set(data.map(function(k) { return k.lantai; }).filter(Boolean))];
+    const zonaList = [...new Set(data.map(function(k) { return k.zona; }).filter(Boolean))];
 
     selLantai.innerHTML = '<option value="">All Floor</option>';
-    lantaiList.forEach(l => {
-      selLantai.innerHTML += `<option value="\({l}">Lantai\){l}</option>`;
+    lantaiList.forEach(function(l) {
+      selLantai.innerHTML += '<option value="' + l + '">Lantai ' + l + '</option>';
     });
 
     selZona.innerHTML = '<option value="">All Zone</option>';
-    zonaList.forEach(z => {
-      selZona.innerHTML += `<option value="\({z}">Zone\){z}</option>`;
+    zonaList.forEach(function(z) {
+      selZona.innerHTML += '<option value="' + z + '">Zone ' + z + '</option>';
     });
   }
 
-  // Fungsi Utama Pemfilteran (Sesuai dengan `onchange` dan `onkeyup`)
   function saringKunci() {
     const selectedFloor = document.getElementById('filterLantai').value;
     const selectedZone = document.getElementById('filterZona').value;
@@ -351,10 +348,10 @@
     const container = document.getElementById('kontainerKunciChecklist');
     container.innerHTML = '';
 
-    const filteredKeys = globalDataKunci.filter(k => {
+    const filteredKeys = globalDataKunci.filter(function(k) {
       const matchFloor = (!selectedFloor) || (String(k.lantai || '').toUpperCase() === selectedFloor.toUpperCase());
       const matchZone = (!selectedZone) || (String(k.zona || '').toUpperCase() === selectedZone.toUpperCase());
-      const keyText = `\({k.id || ''}\){k.nama || ''}`.toLowerCase();
+      const keyText = ((k.id || '') + ' ' + (k.nama || '')).toLowerCase();
       const matchSearch = keyText.includes(searchQuery);
 
       return matchFloor && matchZone && matchSearch;
@@ -365,24 +362,26 @@
       return;
     }
 
-    filteredKeys.forEach((kunci, index) => {
+    filteredKeys.forEach(function(kunci, index) {
       const keyId = kunci.id || kunci.nama;
       const isAvailable = String(kunci.status || 'Tersedia').toLowerCase() === 'tersedia';
       const isChecked = selectedKeyIds.has(keyId);
 
       const itemEl = document.createElement('div');
-      itemEl.className = `key-item ${isAvailable ? '' : 'disabled'}`;
+      itemEl.className = 'key-item ' + (isAvailable ? '' : 'disabled');
       
-      itemEl.innerHTML = `
-        <input type="checkbox" id="chk-\({keyId}" value="\){keyId}" \({isChecked ? 'checked' : ''}\){isAvailable ? '' : 'disabled'}>
-        <label for="chk-${keyId}" style="cursor: pointer; width: 100%; display: flex; align-items: center;">
-          <span class="key-label">\({kunci.id ? kunci.id + ' - ' : ''}\){kunci.nama}</span>
-          <span class="key-tag">[Lantai \({kunci.lantai || '-'} -\){kunci.zona || '-'}]</span>
-        </label>
-      `;
+      const labelTeks = (kunci.id ? kunci.id + ' - ' : '') + kunci.nama;
+      const tagTeks = '[Lantai ' + (kunci.lantai || '-') + ' - ' + (kunci.zona || '-') + ']';
+
+      itemEl.innerHTML = 
+        '<input type="checkbox" id="chk-' + keyId + '" value="' + keyId + '" ' + (isChecked ? 'checked' : '') + ' ' + (isAvailable ? '' : 'disabled') + '>' +
+        '<label for="chk-' + keyId + '" style="cursor: pointer; width: 100%; display: flex; align-items: center;">' +
+          '<span class="key-label">' + labelTeks + '</span>' +
+          '<span class="key-tag">' + tagTeks + '</span>' +
+        '</label>';
 
       const checkbox = itemEl.querySelector('input');
-      checkbox.addEventListener('change', (e) => {
+      checkbox.addEventListener('change', function(e) {
         if (e.target.checked) {
           selectedKeyIds.add(keyId);
         } else {
@@ -393,7 +392,6 @@
 
       container.appendChild(itemEl);
 
-      // Render Pin Peta
       const currentFloorMap = selectedFloor || 'LG';
       if (String(kunci.lantai || '').toUpperCase() === currentFloorMap.toUpperCase()) {
         let coords = koordinatKunciMap[kunci.id] || koordinatKunciMap[kunci.nama];
@@ -403,19 +401,19 @@
 
         const customIcon = L.divIcon({
           className: 'custom-marker',
-          html: `<div class="marker-dot \({isAvailable ? '' : 'borrowed'}\){isChecked ? 'selected' : ''}"></div>`,
+          html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
           iconSize: [16, 16],
           iconAnchor: [8, 8]
         });
 
         const marker = L.marker(coords, { icon: customIcon });
 
-        marker.bindTooltip(`<b>\({kunci.nama}</b><br>Status:\){kunci.status || 'Tersedia'}`, {
+        marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia'), {
           direction: 'top',
           className: 'leaflet-tooltip-voyager'
         });
 
-        marker.on('click', () => {
+        marker.on('click', function() {
           if (!isAvailable) return;
           if (selectedKeyIds.has(keyId)) {
             selectedKeyIds.delete(keyId);
@@ -454,7 +452,7 @@
       alert('Silakan pilih minimal satu kunci!');
       return;
     }
-    window.location.href = `index.html?kunci=${encodeURIComponent(keysArray.join(','))}`;
+    window.location.href = 'index.html?kunci=' + encodeURIComponent(keysArray.join(','));
   }
 
   fetchSpreadsheetData();
