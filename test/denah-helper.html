@@ -635,12 +635,11 @@
         if (rawCoords.length === 2 && !isNaN(rawCoords[0]) && !isNaN(rawCoords[1])) {
           const coords = [rawCoords[0], rawCoords[1]];
 
-         // Di dalam loop rendering marker pada fungsi saringKunci():
-  const customIcon = L.divIcon({
+        const customIcon = L.divIcon({
     className: 'custom-marker',
-    html: '<div class="marker-dot ' + (isChecked ? 'selected' : '') + '"></div>',
-    iconSize: [0, 0],     // Ukuran container diset 0 agar tidak mengganggu kalkulasi posisi
-    iconAnchor: [0, 0]    // Titik jangkar terkunci tepat di tengah koordinat
+    html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
+    iconSize: [18, 18],     // Ukuran fisik marker 18x18 piksel
+    iconAnchor: [9, 9]      // Titik jangkar terkunci tepat di tengah (setengah dari 18)
   });
 
   const marker = L.marker(coords, { 
