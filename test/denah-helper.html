@@ -369,7 +369,7 @@
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
   const PASSWORD_ADMIN = "admin123";
 
-  // 1. INISIALISASI PETA DENGAN L.CRS.Simple (SUDAH DITAMBAHKAN setView AGAR TAMPIL)
+  // 1. INISIALISASI PETA DENGAN L.CRS.Simple
   const map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -2,
@@ -545,7 +545,7 @@
 
       let adminInsertBtn = '';
       if (isAdminMode) {
-        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Insert Pin</button>';
+        adminInsertBtn = '<button class="btn-manual-set" onclick="inputManualPin(\'' + keyId + '\', \'' + kunci.nama + '\')">📌 Set Pin</button>';
       }
 
       itemEl.innerHTML = 
@@ -567,7 +567,7 @@
 
       container.appendChild(itemEl);
 
-      // --- CIRCLE MARKER UNTUK MENGUNCI TITIK ANTI GESER ---
+      // --- PEMBUATAN CIRCLE MARKER ANTI-GESER ---
       if (kunci.koordinat && String(kunci.koordinat).trim() !== '') {
         let coordStr = String(kunci.koordinat).trim();
         let rawCoords = [];
@@ -603,8 +603,12 @@
             className: 'leaflet-tooltip-voyager'
           });
 
-          marker.on('click', function() {
-            if (isAdminMode) return;
+          marker.on('click', function(e) {
+            if (isAdminMode) {
+              // Jika Mode Admin aktif, klik pada pin lama akan membuka popup reposisi untuk kunci ini
+              bukaPopupPasangPin(e.latlng, keyId);
+              return;
+            }
             if (!isAvailable) return;
             if (selectedKeyIds.has(keyId)) selectedKeyIds.delete(keyId);
             else selectedKeyIds.add(keyId);
@@ -668,7 +672,7 @@
 
   let activePopupLatLng = null;
 
-  function bukaPopupPasangPin(latlng) {
+  function bukaPopupPasangPin(latlng, preSelectedKeyId = null) {
     activePopupLatLng = latlng;
     const roundY = Math.round(latlng.lat);
     const roundX = Math.round(latlng.lng);
@@ -681,28 +685,29 @@
 
     let popupContent = 
       '<div style="padding: 5px; width: 260px; font-family: sans-serif;">' +
-        '<div style="font-weight: bold; font-size: 14px; margin-bottom: 2px;">📍 Pasang Pin di Koordinat:</div>' +
+        '<div style="font-weight: bold; font-size: 14px; margin-bottom: 2px;">📍 Reposisi / Pasang Pin:</div>' +
         '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Y: ' + roundY + ', X: ' + roundX + ' (Lantai ' + selectedFloor + ')</div>' +
         
         '<input type="text" id="searchPopupKey" placeholder="🔍 Cari ID atau Nama Kunci..." ' +
         '  style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 6px; box-sizing: border-box;" ' +
         '  onkeyup="filterDropdownPopup()">' +
 
-        '<select id="selectKeyForPin" size="5" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;" onchange="fokusKePinKunci(this.value)">';
+        '<select id="selectKeyForPin" size="5" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; margin-bottom: 8px; box-sizing: border-box;">';
 
     availableForPin.forEach(function(k) {
       const keyId = k.id || k.nama;
       const hasPin = (k.koordinat && String(k.koordinat).trim() !== '');
-      const pinStatusTag = hasPin ? ' 📍 (Sudah ada pin)' : '';
+      const pinStatusTag = hasPin ? ' 📍 (Ubah Lokasi)' : '';
+      const isSelected = (preSelectedKeyId && String(preSelectedKeyId) === String(keyId)) ? 'selected' : '';
       
-      popupContent += '<option value="' + keyId + '">' + keyId + ' - ' + k.nama + pinStatusTag + '</option>';
+      popupContent += '<option value="' + keyId + '" ' + isSelected + '>' + keyId + ' - ' + k.nama + pinStatusTag + '</option>';
     });
 
     popupContent += 
         '</select>' +
         '<button onclick="eksekusiSimpanPin(' + roundY + ',' + roundX + ')" ' +
         '  style="width: 100%; background: #0084c7; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">' +
-        '  Simpan Pin Kunci' +
+        '  Simpan Posisi Baru' +
         '</button>' +
       '</div>';
 
@@ -726,19 +731,6 @@
         options[i].style.display = '';
       } else {
         options[i].style.display = 'none';
-      }
-    }
-  }
-
-  function fokusKePinKunci(keyId) {
-    const item = globalDataKunci.find(function(k) {
-      return String(k.id || k.nama) === String(keyId);
-    });
-
-    if (item && item.koordinat && String(item.koordinat).trim() !== '') {
-      let coords = String(item.koordinat).split(',').map(function(n) { return parseFloat(n.trim()); });
-      if (coords.length === 2 && !isNaN(coords[0])) {
-        map.panTo(coords, { animate: true, duration: 0.8 });
       }
     }
   }
