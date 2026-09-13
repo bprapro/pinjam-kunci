@@ -369,11 +369,30 @@
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
   const PASSWORD_ADMIN = "admin123";
 
+  // 1. INSISIALISASI PETA DENGAN L.CRS.Simple (WAJIB UNTUK DENAH GAMBAR)
   const map = L.map('map', {
-    crs: L.CRS.Simple,
-    minZoom: -3,
-    maxZoom: 3,
-    zoomControl: false
+    crs: L.CRS.Simple, // Mengunci sistem koordinat piksel gambar agar pin TIDAK GESER saat zoom
+    minZoom: -2,
+    maxZoom: 2
+  });
+
+  // Ujuran Asli Gambar Denah Anda (misal: lebar 2000px, tinggi 1500px)
+  const bounds = [[0, 0], [1500, 2000]]; 
+  const image = L.imageOverlay('URL_GAMBAR_DENAH_ANDA.jpg', bounds).addTo(map);
+  map.fitBounds(bounds);
+
+
+  // 2. PEMBUATAN ICON PIN YANG PRESISI
+  const customIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div class="marker-dot ' + (isAvailable ? '' : 'borrowed') + ' ' + (isChecked ? 'selected' : '') + '"></div>',
+    iconSize: [18, 18],   // Ukuran elemen icon (18px x 18px)
+    iconAnchor: [9, 9]    // PENTING: Titik kunci tepat di tengah (setengah dari 18)
+  });
+
+  const marker = L.marker(coords, { 
+    icon: customIcon,
+    draggable: isAdminMode
   });
 
   let currentOverlay = null;
