@@ -1850,18 +1850,61 @@ function toggleFoto(idRow) {
     pasangSubmitForm('formKembali', 'btnSubmitKembali', 'Proses Pengembalian Kunci', 'kembali');
   };
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const video = document.getElementById('bgVideo');
-    if (video) {
-      video.play().catch(error => {
-        const putarVideo = () => {
-          video.play();
-          document.removeEventListener('click', putarVideo);
-          document.removeEventListener('touchstart', putarVideo);
-        };
-        document.addEventListener('click', putarVideo);
-        document.addEventListener('touchstart', putarVideo);
-      });
+  // ==========================================
+  // 3. PULIHKAN DATA & CENTANG KUNCI DARI DENAH
+  // ==========================================
+  window.addEventListener('DOMContentLoaded', function() {
+    // A. Pulihkan Nama & No HP
+    const savedNama = sessionStorage.getItem('temp_nama_pinjam');
+    const savedNohp = sessionStorage.getItem('temp_nohp');
+
+    const inputNama = document.getElementById('nama_pinjam');
+    const inputNohp = document.getElementById('nohp');
+
+    if (savedNama && inputNama) inputNama.value = savedNama;
+    if (savedNohp && inputNohp) inputNohp.value = savedNohp;
+
+    // B. Centang Kunci Otomatis dari Denah
+    const urlParams = new URLSearchParams(window.location.search);
+    const kunciMulti = urlParams.get('kunci_multi') || urlParams.get('kunci');
+
+    if (kunciMulti) {
+      const daftarID = decodeURIComponent(kunciMulti).split('|');
+      let kounter = 0;
+
+      // Terus memantau hingga daftar kunci selesai dimuat
+      const intervalCheck = setInterval(function() {
+        kounter++;
+        let adaYangDitemukan = false;
+
+        // Ambil seluruh checkbox yang ada di daftar kunci
+        const allCheckboxes = document.querySelectorAll('#kontainerKunciChecklist input[type="checkbox"], input[type="checkbox"]');
+
+        if (allCheckboxes.length > 0) {
+          daftarID.forEach(function(idKunci) {
+            const cleanID = idKunci.trim();
+
+            allCheckboxes.forEach(function(chk) {
+              const val = String(chk.value || chk.id).trim();
+              const parentText = chk.parentElement ? chk.parentElement.textContent : '';
+
+              // Cocokkan ID angka (misal: 124) atau teks nama ruang di baris tersebut
+              if (val === cleanID || val === 'chk-' + cleanID || parentText.includes(cleanID + ' -')) {
+                if (!chk.checked) {
+                  chk.checked = true;
+                  chk.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                adaYangDitemukan = true;
+              }
+            });
+          });
+        }
+
+        // Hentikan pemantauan jika kunci berhasil tercentang atau waktu habis (10 detik)
+        if (adaYangDitemukan || kounter > 30) {
+          clearInterval(intervalCheck);
+        }
+      }, 300);
     }
   });
    
