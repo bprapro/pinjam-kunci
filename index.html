@@ -1880,78 +1880,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
- // Fungsi menutup modal
-  function closeModal() {
-    if (modal) {
-      modal.classList.remove('show');
+ <script>
+  // ==========================================
+  // 1. KODE PREVIEW FOTO MODAL
+  // ==========================================
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    const closeBtn = document.querySelector('.modal-close');
+
+    function closeModal() {
+      if (modal) {
+        modal.classList.remove('show');
+      }
     }
-  }
-}); // Penutup event listener preview foto (baris 1888)
 
-  // Klik tombol X atau klik area latar blur untuk menutup
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (modal) {
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal || e.target === closeBtn) {
-        closeModal();
-      }
-    });
-</script>
-
-<video id="bgVideo" loop muted playsinline class="video-bg">
-  <source src="drone.mp4" type="video/mp4">
-</video>
-
-  <!-- MODAL PREVIEW FOTO -->
-<div id="imageModal" class="image-modal">
-  <span class="modal-close">&times;</span>
-  <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
-</div>
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const kunciMulti = urlParams.get('kunci_multi');
-    const kataCari = urlParams.get('cari');
-
-    // Jika datang membawa banyak kunci dari denah
-    if (kunciMulti) {
-      const daftarNama = decodeURIComponent(kunciMulti).split('|');
-
-      let kounter = 0;
-      const intervalCheck = setInterval(function() {
-        kounter++;
-        const checkboxes = document.querySelectorAll('#kontainerKunciChecklist input[type="checkbox"]');
-
-        if (checkboxes.length > 0) {
-          checkboxes.forEach(chk => {
-            // Cek apakah label atau teks elemen terdekat cocok dengan nama ruangan
-            const parentText = chk.parentElement ? chk.parentElement.textContent : '';
-            daftarNama.forEach(nama => {
-              if (parentText.toLowerCase().includes(nama.toLowerCase())) {
-                chk.checked = true;
-                chk.dispatchEvent(new Event('change', { bubbles: true }));
-              }
-            });
-          });
-          clearInterval(intervalCheck);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal || e.target === closeBtn) {
+          closeModal();
         }
-
-        if (kounter > 15) clearInterval(intervalCheck);
-      }, 300);
-    } 
-    // Jika hanya membawa 1 kunci pencarian biasa
-    else if (kataCari) {
-      const inputCari = document.getElementById('kotakCari');
-      if (inputCari) {
-        inputCari.value = decodeURIComponent(kataCari);
-        if (typeof saringKunci === 'function') saringKunci();
-        inputCari.dispatchEvent(new Event('keyup', { bubbles: true }));
-      }
+      });
     }
   });
-</script>
-<script>
-  // 1. Simpan Nama & No HP secara otomatis tiap kali diketik/diubah
+
+  // ==========================================
+  // 2. SIMPAN NAMA & NO HP SAAT DIKETIK
+  // ==========================================
   document.addEventListener('input', function(e) {
     if (e.target.id === 'nama_pinjam') {
       sessionStorage.setItem('temp_nama_pinjam', e.target.value);
@@ -1961,7 +1916,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // 2. Pulihkan Nama, No HP, dan Centang Kunci saat halaman dimuat ulang
+  // ==========================================
+  // 3. PULIHKAN DATA & CENTANG KUNCI DARI DENAH
+  // ==========================================
   window.addEventListener('DOMContentLoaded', function() {
     // A. Pulihkan Nama & No HP
     const savedNama = sessionStorage.getItem('temp_nama_pinjam');
@@ -1976,6 +1933,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // B. Centang Kunci Otomatis dari Denah Helper
     const urlParams = new URLSearchParams(window.location.search);
     const kunciMulti = urlParams.get('kunci_multi') || urlParams.get('kunci');
+    const kataCari = urlParams.get('cari');
 
     if (kunciMulti) {
       const daftarID = decodeURIComponent(kunciMulti).split('|');
@@ -1987,25 +1945,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
         daftarID.forEach(function(idKunci) {
           const cleanID = idKunci.trim();
+          
+          // Cari berdasarkan ID checkbox, Value ID, atau Teks Nama Ruangan
           const chk = document.getElementById('chk-' + cleanID) || 
                       document.querySelector(`input[type="checkbox"][value="${cleanID}"]`) ||
                       document.querySelector(`input[type="checkbox"][id="${cleanID}"]`);
 
-          if (chk && !chk.checked) {
-            chk.checked = true;
-            chk.dispatchEvent(new Event('change', { bubbles: true }));
+          if (chk) {
+            if (!chk.checked) {
+              chk.checked = true;
+              chk.dispatchEvent(new Event('change', { bubbles: true }));
+            }
             tercentang++;
+          } else {
+            // Pencarian cadangan berdasarkan teks nama ruangan jika ID tidak ketemu
+            const checkboxes = document.querySelectorAll('#kontainerKunciChecklist input[type="checkbox"]');
+            checkboxes.forEach(c => {
+              const parentText = c.parentElement ? c.parentElement.textContent : '';
+              if (parentText.toLowerCase().includes(cleanID.toLowerCase())) {
+                if (!c.checked) {
+                  c.checked = true;
+                  c.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                tercentang++;
+              }
+            });
           }
         });
 
-        if (tercentang === daftarID.length || kounter > 15) {
+        if (tercentang >= daftarID.length || kounter > 15) {
           clearInterval(intervalCheck);
         }
       }, 300);
+    } 
+    else if (kataCari) {
+      const inputCari = document.getElementById('kotakCari');
+      if (inputCari) {
+        inputCari.value = decodeURIComponent(kataCari);
+        if (typeof saringKunci === 'function') saringKunci();
+        inputCari.dispatchEvent(new Event('keyup', { bubbles: true }));
+      }
     }
   });
 
-  // 3. Bersihkan memori sementara setelah form berhasil di-submit (opsional)
+  // ==========================================
+  // 4. BERSIHKAN PENYIMPANAN SETELAH SUBMIT
+  // ==========================================
   const formPinjam = document.getElementById('formPinjam');
   if (formPinjam) {
     formPinjam.addEventListener('submit', function() {
@@ -2014,5 +1999,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 </script>
+
+<video id="bgVideo" loop muted playsinline class="video-bg">
+  <source src="drone.mp4" type="video/mp4">
+</video>
+
+<div id="imageModal" class="image-modal">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
+</div>
 </body>
 </html>
