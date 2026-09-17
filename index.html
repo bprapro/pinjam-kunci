@@ -1853,7 +1853,31 @@ function toggleFoto(idRow) {
   // ==========================================
   // 3. PULIHKAN DATA & CENTANG KUNCI DARI DENAH
   // ==========================================
-  window.addEventListener('DOMContentLoaded', function() {
+ window.addEventListener('DOMContentLoaded', function() {
+    
+    // ==========================================
+    // 1. PAKSA VIDEO BACKGROUND BERJALAN AUTOMATIS (TARO DI SINI)
+    // ==========================================
+    const bgVideo = document.getElementById('bgVideo');
+    if (bgVideo) {
+      bgVideo.muted = true; // Wajib muted agar diizinkan autoplay oleh browser
+      
+      const playPromise = bgVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(function(error) {
+          console.log("Autoplay diblokir browser, diputar setelah interaksi pengguna.");
+          
+          const putarVideo = function() {
+            bgVideo.play();
+            document.removeEventListener('click', putarVideo);
+            document.removeEventListener('touchstart', putarVideo);
+          };
+          
+          document.addEventListener('click', putarVideo);
+          document.addEventListener('touchstart', putarVideo);
+        });
+      }
+    }
     // A. Pulihkan Nama & No HP
     const savedNama = sessionStorage.getItem('temp_nama_pinjam');
     const savedNohp = sessionStorage.getItem('temp_nohp');
@@ -2027,7 +2051,7 @@ function toggleFoto(idRow) {
   }
 </script>
 
-<video id="bgVideo" loop muted playsinline class="video-bg">
+<video id="bgVideo" autoplay loop muted playsinline class="video-bg">
   <source src="drone.mp4" type="video/mp4">
 </video>
 
