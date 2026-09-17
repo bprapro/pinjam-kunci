@@ -1880,12 +1880,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Fungsi menutup modal
+ // Fungsi menutup modal
   function closeModal() {
     if (modal) {
       modal.classList.remove('show');
     }
   }
+}); // Penutup event listener preview foto (baris 1888)
+
+// ==========================================================
+// TAMBAHKAN KODE INI DI BARIS 1889
+// ==========================================================
+
+// 1. Simpan Nama & No HP secara otomatis tiap kali diketik/diubah
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'nama_pinjam') {
+    sessionStorage.setItem('temp_nama_pinjam', e.target.value);
+  }
+  if (e.target.id === 'nohp') {
+    sessionStorage.setItem('temp_nohp', e.target.value);
+  }
+});
+
+// 2. Pulihkan Nama, No HP, dan Centang Kunci saat halaman dimuat ulang
+window.addEventListener('DOMContentLoaded', function() {
+  // Pulihkan Nama & No HP
+  const savedNama = sessionStorage.getItem('temp_nama_pinjam');
+  const savedNohp = sessionStorage.getItem('temp_nohp');
+
+  const inputNama = document.getElementById('nama_pinjam');
+  const inputNohp = document.getElementById('nohp');
+
+  if (savedNama && inputNama) inputNama.value = savedNama;
+  if (savedNohp && inputNohp) inputNohp.value = savedNohp;
+
+  // Centang Kunci Otomatis dari Denah Helper
+  const urlParams = new URLSearchParams(window.location.search);
+  const kunciMulti = urlParams.get('kunci_multi') || urlParams.get('kunci');
+
+  if (kunciMulti) {
+    const daftarID = decodeURIComponent(kunciMulti).split('|');
+
+    let kounter = 0;
+    const intervalCheck = setInterval(function() {
+      kounter++;
+      let tercentang = 0;
+
+      daftarID.forEach(function(idKunci) {
+        const cleanID = idKunci.trim();
+        const chk = document.getElementById('chk-' + cleanID) || 
+                    document.querySelector(`input[type="checkbox"][value="${cleanID}"]`) ||
+                    document.querySelector(`input[type="checkbox"][id="${cleanID}"]`);
+
+        if (chk && !chk.checked) {
+          chk.checked = true;
+          chk.dispatchEvent(new Event('change', { bubbles: true }));
+          tercentang++;
+        }
+      });
+
+      if (tercentang === daftarID.length || kounter > 15) {
+        clearInterval(intervalCheck);
+      }
+    }, 300);
+  }
+});
+
+// 3. Bersihkan memori sementara setelah form di-submit
+const formPinjam = document.getElementById('formPinjam');
+if (formPinjam) {
+  formPinjam.addEventListener('submit', function() {
+    sessionStorage.removeItem('temp_nama_pinjam');
+    sessionStorage.removeItem('temp_nohp');
+  });
+}
 
   // Klik tombol X atau klik area latar blur untuk menutup
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
