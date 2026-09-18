@@ -430,7 +430,8 @@
   const map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -2,
-    maxZoom: 2
+    maxZoom: 2,
+    tap: false
   }).setView([1000, 1000], 0);
 
   let currentOverlay = null;
@@ -668,10 +669,15 @@
           });
 
           marker.bindTooltip('<b>' + kunci.nama + '</b><br>Status: ' + (kunci.status || 'Tersedia'), {
-            direction: 'top',
-            className: 'leaflet-tooltip-voyager'
-          });
+  direction: 'top',
+  className: 'leaflet-tooltip-voyager'
+});
 
+// TAMBAHKAN DI SINI:
+marker.on('touchstart click', function(e) {
+  this.openTooltip();
+});
+          
           marker.on('click', function(e) {
             if (isAdminMode) {
               // Jika Mode Admin aktif, klik pada pin lama akan membuka popup reposisi untuk kunci ini
