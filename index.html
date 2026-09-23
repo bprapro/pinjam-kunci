@@ -1933,27 +1933,36 @@ function toggleFoto(idRow) {
   });
    
   // ==========================================
-// 1. KODE PREVIEW FOTO MODAL (HP & DESKTOP)
+// 1. KODE PREVIEW FOTO MODAL (SUPPORT HP & PC)
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('imageModal');
   const modalImg = document.getElementById('imgModalTarget');
   const closeBtn = document.querySelector('.modal-close');
 
-  // Buka Foto saat diklik/disentuh
-  function openPhotoModal(e) {
-    if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget') {
-      if (e.target.src && e.target.src !== '') {
-        if (modalImg) modalImg.src = e.target.src;
+  // Fungsi untuk Buka Modal Foto
+  function handleImageClick(e) {
+    // Cari apakah elemen yang disentuh/diklik adalah IMG atau memiliki anak elemen IMG
+    const targetImg = e.target.closest('img');
+    
+    if (targetImg && targetImg.id !== 'imgModalTarget') {
+      const src = targetImg.getAttribute('src') || targetImg.src;
+      if (src && src.trim() !== '' && !src.includes('data:image/gif')) {
+        e.preventDefault(); // Mencegah perilaku default browser HP
+        if (modalImg) modalImg.src = src;
         if (modal) modal.classList.add('show');
       }
     }
   }
 
-  document.body.addEventListener('click', openPhotoModal);
-  document.body.addEventListener('touchstart', openPhotoModal, { passive: true });
+  // Pasang listener pada dokumen untuk mendeteksi klik & sentuhan
+  document.addEventListener('click', handleImageClick, true);
+  document.addEventListener('touchend', function(e) {
+    // Jalankan jika bukan dalam posisi memutar/scrolling layar
+    handleImageClick(e);
+  }, { passive: false });
 
-  // Tutup Modal
+  // Fungsi Menutup Modal
   function closeModal() {
     if (modal) modal.classList.remove('show');
   }
@@ -1961,7 +1970,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
   if (modal) {
     modal.addEventListener('click', function(e) {
-      if (e.target === modal || e.target === closeBtn) {
+      if (e.target === modal || e.target === closeBtn || e.target.classList.contains('modal-close')) {
         closeModal();
       }
     });
