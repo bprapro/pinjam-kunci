@@ -1933,27 +1933,40 @@ function toggleFoto(idRow) {
   });
    
   // ==========================================
-  // 1. KODE PREVIEW FOTO MODAL
-  // ==========================================
-  document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('imageModal');
-    const closeBtn = document.querySelector('.modal-close');
+// 1. KODE PREVIEW FOTO MODAL (HP & DESKTOP)
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('imgModalTarget');
+  const closeBtn = document.querySelector('.modal-close');
 
-    function closeModal() {
-      if (modal) {
-        modal.classList.remove('show');
+  // Buka Foto saat diklik/disentuh
+  function openPhotoModal(e) {
+    if (e.target.tagName === 'IMG' && e.target.id !== 'imgModalTarget') {
+      if (e.target.src && e.target.src !== '') {
+        if (modalImg) modalImg.src = e.target.src;
+        if (modal) modal.classList.add('show');
       }
     }
+  }
 
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (modal) {
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal || e.target === closeBtn) {
-          closeModal();
-        }
-      });
-    }
-  });
+  document.body.addEventListener('click', openPhotoModal);
+  document.body.addEventListener('touchstart', openPhotoModal, { passive: true });
+
+  // Tutup Modal
+  function closeModal() {
+    if (modal) modal.classList.remove('show');
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal || e.target === closeBtn) {
+        closeModal();
+      }
+    });
+  }
+});
 
   // ==========================================
   // 2. SIMPAN NAMA & NO HP SAAT DIKETIK
