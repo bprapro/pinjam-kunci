@@ -1186,23 +1186,36 @@ tbody tr:has(.dots-loader-wrapper) {
   // OPTIMASI: Buat string HTML utuh di memori lebih dulu
   let html = '';
   hasilSaring.forEach(k => {
-    const isDipinjam = k.status && k.status.toLowerCase() !== 'tersedia';
+    const statusStr = (k.status || 'Tersedia').toString().trim().toLowerCase();
+    
+    // Tentukan Kategori Status
+    const isDipinjam = statusStr === 'dipinjam' || statusStr === 'sedang dipinjam';
+    const isTidakAda = statusStr === 'tidak ada' || statusStr === 'hilang';
+    const isDisabled = isDipinjam || isTidakAda;
+
+    // Tentukan Label Teks Keterangan
+    let badgeStatus = '';
+    if (isDipinjam) {
+      badgeStatus = '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>';
+    } else if (isTidakAda) {
+      badgeStatus = '<span style="color: #64748b; font-size: 11px; font-weight: 600; margin-left: 6px;">(Tidak Ada)</span>';
+    }
 
     html += `
-      <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDipinjam ? 'opacity: 0.55; cursor: not-allowed;' : ''}">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; ${isDisabled ? 'opacity: 0.55; cursor: not-allowed;' : ''}">
         <input type="checkbox" name="kunci" value="${k.id}" id="chk_${k.id}" 
-               ${isDipinjam ? 'disabled' : ''} 
-               style="width: auto; ${isDipinjam ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
+               ${isDisabled ? 'disabled' : ''} 
+               style="width: auto; ${isDisabled ? 'cursor: not-allowed;' : 'cursor: pointer;'}">
         
-        <label for="chk_${k.id}" style="margin: 0; font-weight: normal; ${isDipinjam ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
+        <label for="chk_${k.id}" style="margin: 0; font-weight: normal; ${isDisabled ? 'cursor: not-allowed; color: #64748b;' : 'cursor: pointer; font-size: 14px;'}">
           <b>${k.id}</b> - ${k.nama} <small style="color:var(--text-muted);">[Lantai ${k.lantai} - ${k.zona}]</small>
-          ${isDipinjam ? '<span style="color: #ef4444; font-size: 11px; font-weight: 600; margin-left: 6px;">(Sedang Dipinjam)</span>' : ''}
+          ${badgeStatus}
         </label>
       </div>
     `;
   });
 
-  // Render ke DOM hanya 1x (Sangat Cepat)
+  // Render ke DOM
   kontainer.innerHTML = html;
 }
 
