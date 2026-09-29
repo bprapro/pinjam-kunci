@@ -1087,68 +1087,61 @@ tbody tr:has(.dots-loader-wrapper) {
   // FUNGSI FORMAT WAKTU "13:58 WIB, 9 September 2026"
 function getFormatWaktuResi() {
   const d = new Date();
-  const jam = String(d.getHours()).padStart(2, '0');
-  const menit = String(d.getMinutes()).padStart(2, '0');
-  
-  const bulanIndo = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ];
-  
-  return `${jam}:${menit} WIB, ${d.getDate()} ${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;
+  const jam = String(d.getHours()).padStart(2, "0");
+  const menit = String(d.getMinutes()).padStart(2, "0");
+  const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  return jam + ":" + menit + " WIB, " + d.getDate() + " " + bulanIndo[d.getMonth()] + " " + d.getFullYear();
 }
 
-// FUNGSI TAMPILKAN RESI
 function tampilkanResi(judul, nama, nohp, daftarKunciDetail, fotoSrc) {
-  document.getElementById('resiBadgeStatus').innerText = judul;
-  document.getElementById('resiNama').innerText = nama || '-';
-  document.getElementById('resiNohp').innerText = nohp || '-';
-  document.getElementById('resiWaktu').innerText = getFormatWaktuResi();
+  document.getElementById("resiBadgeStatus").innerText = judul;
+  document.getElementById("resiNama").innerText = nama || "-";
+  document.getElementById("resiNohp").innerText = nohp || "-";
+  document.getElementById("resiWaktu").innerText = getFormatWaktuResi();
 
-  // Tampilkan Foto Bukti
-  const imgTarget = document.getElementById('resiFotoTarget');
-  if (imgTarget) {
-    imgTarget.src = fotoSrc || '23smg.png';
+  const imgTarget = document.getElementById("resiFotoTarget");
+  if (imgTarget && fotoSrc) {
+    imgTarget.src = fotoSrc;
   }
 
-  // Tampilkan Detail Kunci (no kunci - nama ruang - lantai - zona)
-  const listContainer = document.getElementById('resiDaftarKunci');
+  const listContainer = document.getElementById("resiDaftarKunci");
   if (Array.isArray(daftarKunciDetail) && daftarKunciDetail.length > 0) {
-    listContainer.innerHTML = daftarKunciDetail.map(k => `<div>• (${k.id} - ${k.nama} - ${k.lantai} - ${k.zona})</div>`).join('');
+    listContainer.innerHTML = daftarKunciDetail
+      .map(function(k) {
+        return "<div>&bull; (" + k.id + " - " + k.nama + " - " + k.lantai + " - " + k.zona + ")</div>";
+      })
+      .join("");
   } else {
-    listContainer.innerHTML = '<div>-</div>';
+    listContainer.innerHTML = "<div>-</div>";
   }
 
-  const modalResi = document.getElementById('modalResi');
-  if (modalResi) modalResi.style.display = 'flex';
+  const modalResi = document.getElementById("modalResi");
+  if (modalResi) modalResi.style.display = "flex";
 }
 
 function tutupModalResi() {
-  const modalResi = document.getElementById('modalResi');
-  if (modalResi) modalResi.style.display = 'none';
+  const modalResi = document.getElementById("modalResi");
+  if (modalResi) modalResi.style.display = "none";
 }
 
-// FUNGSI UNDUH PDF (DENGAN TIKET CLONE MENCEGAH HASIL BLANK/KOSONG)
 function downloadResiPDF() {
-  const element = document.getElementById('areaResi');
+  const element = document.getElementById("areaResi");
   const opt = {
-    margin:       0,
-    filename:     'Resi_Kunci_' + Date.now() + '.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'px', format: [340, 480], orientation: 'portrait' }
+    margin: 0,
+    filename: "Resi_Kunci_" + Date.now() + ".pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: "px", format: [340, 480], orientation: "portrait" }
   };
-
   html2pdf().set(opt).from(element).save();
 }
 
-// FUNGSI UNDUH JPG
 function downloadResiJPG() {
-  const element = document.getElementById('areaResi');
-  html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'Resi_Kunci_' + Date.now() + '.jpg';
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
+  const element = document.getElementById("areaResi");
+  html2canvas(element, { scale: 2, useCORS: true }).then(function(canvas) {
+    const link = document.createElement("a");
+    link.download = "Resi_Kunci_" + Date.now() + ".jpg";
+    link.href = canvas.toDataURL("image/jpeg", 0.95);
     link.click();
   });
 }
@@ -2192,51 +2185,52 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
-  <!-- ========================================== -->
-<!-- MODAL RESI STYLE ID CARD / BADGE           -->
-<!-- ========================================== -->
-<div id="modalResi" class="image-modal" style="display: none; align-items: center; justify-content: center; z-index: 9999; background: rgba(0,0,0,0.6);">
+  <!-- MODAL RESI BADGE -->
+<div id="modalResi" class="image-modal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.6);">
   <div style="background: #ffffff; border-radius: 16px; width: 340px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;">
     
-    <!-- Tombol Silang Tutup Modal -->
-    <span onclick="tutupModalResi()" style="position: absolute; top: 10px; right: 14px; font-size: 24px; font-weight: bold; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); cursor: pointer; z-index: 10;">&times;</span>
+    <!-- Tombol Tutup Silang -->
+    <span onclick="tutupModalResi()" style="position: absolute; top: 8px; right: 12px; font-size: 24px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.7); cursor: pointer; z-index: 20;">&times;</span>
 
-    <!-- AREA RESI YANG DI-EXPORT KE PDF & JPG -->
-    <div id="areaResi" style="background: #e2e8f0; width: 340px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position: relative; overflow: hidden;">
+    <!-- AREA YANG DI-RENDER KE PDF / JPG -->
+    <div id="areaResi" style="background: #ffffff; width: 340px; font-family: &quot;Segoe UI&quot;, Roboto, sans-serif; position: relative; overflow: hidden;">
       
-      <!-- LOGO 23SMG DI ATAS KIRI -->
-      <img src="23smg.png" alt="Logo 23" style="position: absolute; top: 12px; left: 12px; height: 38px; z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">
+      <!-- LOGO 23SMG POJOK KIRI ATAS -->
+      <img src="23smg.png" alt="Logo 23" style="position: absolute; top: 12px; left: 12px; height: 36px; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
 
-      <!-- FOTO PEMINJAM / PENGEMBALIAN (PORSI ATAS BADGE) -->
+      <!-- FOTO DOKUMENTASI (PORSI ATAS) -->
       <div style="width: 100%; height: 260px; background: #cbd5e1; overflow: hidden; position: relative;">
-        <img id="resiFotoTarget" src="" alt="Foto Bukti" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        <img id="resiFotoTarget" src="" alt="Foto Dokumentasi" style="width: 100%; height: 100%; object-fit: cover; display: block;">
       </div>
 
-      <!-- PANEL PUTIH DATA PEMINJAM (PORSI BAWAH BADGE) -->
-      <div style="background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; margin-top: -20px; padding: 18px 16px 14px 16px; position: relative; z-index: 2; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);">
+      <!-- PANEL DETAIL PEMINJAM (PORSI BAWAH) -->
+      <div style="background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; margin-top: -20px; padding: 16px; position: relative; z-index: 5; box-shadow: 0 -4px 10px rgba(0,0,0,0.08);">
         
-        <div id="resiBadgeStatus" style="display: inline-block; background: #0284c7; color: white; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-          PEMINJAMAN KUNCI
+        <!-- BADGE STATUS -->
+        <div id="resiBadgeStatus" style="display: inline-block; background: #0284c7; color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+          BUKTI PEMINJAMAN
         </div>
 
+        <!-- NAMA & NOHP -->
         <h2 id="resiNama" style="margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; line-height: 1.2;">-</h2>
-        <p id="resiNohp" style="margin: 2px 0 10px 0; font-size: 12px; color: #64748b; font-weight: 500;">-</p>
+        <p id="resiNohp" style="margin: 2px 0 10px 0; font-size: 13px; color: #64748b; font-weight: 500;">-</p>
 
+        <!-- DETAIL KUNCI -->
         <div style="border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 6px;">
-          <p style="margin: 0 0 4px 0; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Daftar Kunci:</p>
-          <div id="resiDaftarKunci" style="font-size: 12px; color: #1e293b; font-weight: 600; line-height: 1.4;">-</div>
+          <div id="resiDaftarKunci" style="font-size: 12px; color: #1e293b; font-weight: 600; line-height: 1.5;">-</div>
         </div>
 
+        <!-- WAKTU TRANSAKSI -->
         <div style="margin-top: 10px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 6px;">
-          <span id="resiWaktu" style="font-size: 10px; color: #94a3b8; font-weight: 500;">-</span>
+          <span id="resiWaktu" style="font-size: 11px; color: #94a3b8; font-weight: 500;">-</span>
         </div>
       </div>
     </div>
 
-    <!-- TOMBOL AKSI UNDUH -->
+    <!-- TOMBOL UNDUH -->
     <div style="display: flex; gap: 8px; padding: 12px; background: #ffffff; border-top: 1px solid #f1f5f9;">
-      <button type="button" onclick="downloadResiPDF()" style="flex: 1; padding: 9px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer;">📄 Unduh PDF</button>
-      <button type="button" onclick="downloadResiJPG()" style="flex: 1; padding: 9px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer;">🖼️ Unduh JPG</button>
+      <button type="button" onclick="downloadResiPDF()" style="flex: 1; padding: 9px; background: #0284c7; color: #ffffff; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer;">Unduh PDF</button>
+      <button type="button" onclick="downloadResiJPG()" style="flex: 1; padding: 9px; background: #059669; color: #ffffff; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer;">Unduh JPG</button>
     </div>
 
   </div>
