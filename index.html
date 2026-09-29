@@ -1846,6 +1846,19 @@ function toggleFoto(idRow) {
         .then(res => res.json())
         .then(res => {
           if(res.status === 'success') { 
+            // 1. Ambil data input SEBELUM form di-reset
+            const nama = document.getElementById('nama_pinjam')?.value || document.getElementById('nama')?.value || '-';
+            const nohp = document.getElementById('nohp')?.value || '-';
+            const kunciChecked = Array.from(document.querySelectorAll('input[name="kunci"]:checked'))
+                                      .map(cb => cb.value);
+
+            // 2. Tentukan judul resi (Peminjaman / Pengembalian)
+            const judulResi = (konteksAksi === 'pinjam') ? 'BUKTI PEMINJAMAN KUNCI' : 'BUKTI PENGEMBALIAN KUNCI';
+
+            // 3. Tampilkan Modal Resi Digital
+            tampilkanResi(judulResi, nama, nohp, kunciChecked);
+
+            // 4. Reset form & bersihkan UI bawaan
             document.getElementById(idForm).reset();
             matikanKamera();
             muatKunciTersedia();
