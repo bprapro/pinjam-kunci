@@ -1020,13 +1020,20 @@ tbody tr:has(.dots-loader-wrapper) {
     </div>
 
     <div id="screenSukses" class="success-screen">
-      <h3>✨ Terima Kasih!</h3>
-      <p id="pesanSukses">Aktivitas Anda telah berhasil direkam ke dalam sistem database.</p>
-      <button type="button" class="btn-kembali-form" onclick="resetKeHalamanForm()">
-        <svg viewBox="0 0 24 24" style="fill:white; width:16px; height:16px;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        Kembali ke Formulir
-      </button>
-    </div>
+  <h3>✨ Terima Kasih!</h3>
+  <p id="pesanSukses">Aktivitas Anda telah berhasil direkam ke dalam sistem database.</p>
+  
+  <!-- TOMBOL AKSI UNDUH RESI -->
+  <div style="display: flex; gap: 10px; justify-content: center; margin: 15px 0;">
+    <button type="button" onclick="downloadResiPDF()" style="padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Unduh PDF</button>
+    <button type="button" onclick="downloadResiJPG()" style="padding: 8px 16px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Unduh JPG</button>
+  </div>
+
+  <button type="button" class="btn-kembali-form" onclick="resetKeHalamanForm()">
+    <svg viewBox="0 0 24 24" style="fill:white; width:16px; height:16px;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Kembali ke Formulir
+  </button>
+</div>
   </div>
 
   <div class="monitor-container">
@@ -1103,26 +1110,26 @@ tbody tr:has(.dots-loader-wrapper) {
   }
 
   function downloadResiPDF() {
-    const element = document.getElementById('areaResi');
-    const opsi = {
-      margin:       10,
-      filename:     'Resi_Kunci_' + Date.now() + '.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
-    };
-    html2pdf().set(opsi).from(element).save();
-  }
+  const element = document.getElementById('areaResi') || document.getElementById('screenSukses');
+  const opt = {
+    margin:       10,
+    filename:     'Resi_Kunci_' + Date.now() + '.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
+}
 
-  function downloadResiJPG() {
-    const element = document.getElementById('areaResi');
-    html2canvas(element).then(canvas => {
-      const link = document.createElement('a');
-      link.download = 'Resi_Kunci_' + Date.now() + '.jpg';
-      link.href = canvas.toDataURL('image/jpeg', 0.9);
-      link.click();
-    });
-  }
+function downloadResiJPG() {
+  const element = document.getElementById('areaResi') || document.getElementById('screenSukses');
+  html2canvas(element).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'Resi_Kunci_' + Date.now() + '.jpg';
+    link.href = canvas.toDataURL('image/jpeg');
+    link.click();
+  });
+}
 
   /* ==========================================
      1. NAVIGASI TAB & TRANSISI FORM
