@@ -128,6 +128,100 @@
       background-color: #F8FAFC; 
     }
 
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+  .resi-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    background-color: #2D584C;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .top-number {
+    position: absolute;
+    top: 12px;
+    left: 18px;
+    font-size: 42px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+  }
+
+  .resi-image {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .resi-overlay {
+    position: relative;
+    margin-top: -100px;
+    padding: 80px 20px 20px 20px;
+    background: linear-gradient(
+      to bottom, 
+      rgba(45, 88, 76, 0) 0%, 
+      rgba(45, 88, 76, 0.85) 35%, 
+      #2D584C 70%
+    );
+    color: #FFFFFF;
+  }
+
+  .status-badge {
+    display: inline-block;
+    background-color: #FFFFFF;
+    color: #2D584C;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .resi-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .info-text h3 {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+
+  .info-text p {
+    margin: 2px 0;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .qr-code {
+    background: #FFFFFF;
+    padding: 4px;
+    border-radius: 4px;
+    width: 68px;
+    height: 68px;
+    flex-shrink: 0;
+  }
+
+  .qr-code img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+    
     .video-background-container iframe {
       position: absolute;
       top: 50%;
@@ -2205,49 +2299,32 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Tombol Tutup Silang -->
     <span onclick="tutupModalResi()" style="position: absolute; top: 8px; right: 12px; font-size: 24px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; z-index: 30;">&times;</span>
 
-    <!-- AREA YANG DI-RENDER KE PDF / JPG -->
-    <div id="areaResi" style="background: #2f5044; width: 340px; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; position: relative; overflow: hidden;">
-      
-      <!-- FOTO DOKUMENTASI & LOGO (PORSI ATAS) -->
-      <div style="width: 100%; height: 320px; position: relative; overflow: hidden; background: #1e293b;">
-        <!-- LOGO 23SMG DI POJOK KIRI ATAS FOTO -->
-        <img src="23smg.png" alt="23" style="position: absolute; top: 12px; left: 12px; height: 42px; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));">
-        
-        <!-- FOTO KAMERA / DOKUMENTASI -->
-        <img id="resiFotoTarget" src="" alt="Foto Bukti" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+    <div class="resi-card" id="areaResi">
+  <!-- Elemen Angka di Pojok Kiri Atas -->
+  <div class="top-number">23</div>
+
+  <!-- Foto Bukti Kamera/Kunci -->
+  <img id="resiFotoTarget" src="" alt="Foto Bukti" class="resi-image">
+
+  <!-- Bagian Informasi & Overlay Gradasi Hijau -->
+  <div class="resi-overlay">
+    <!-- Badge Status Peminjaman -->
+    <div class="status-badge" id="resiBadgeStatus">DIPINJAM OLEH :</div>
+
+    <div class="resi-content">
+      <div class="info-text">
+        <h3 id="resiNama">-</h3>
+        <p id="resiDaftarKunci">-</p>
+        <p id="resiWaktu">-</p>
       </div>
 
-      <!-- PANEL HIJAU GELAP DATA (PORSI BAWAH) -->
-      <div style="background: #2f5044; padding: 14px 16px 16px 16px; position: relative; color: #ffffff;">
-        
-        <!-- ROW UTAMA: TEKS KIRI, QR CODE KANAN -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 10px;">
-          
-          <!-- KIRI: TEKS DETAIL -->
-          <div style="flex: 1;">
-            <!-- PILL BADGE PUTIH -->
-            <div id="resiBadgeStatus" style="display: inline-block; background: #ffffff; color: #2f5044; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-              DIPINJAM OLEH :
-            </div>
-
-            <!-- NAMA PEMINJAM -->
-            <h2 id="resiNama" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.2;">-</h2>
-            
-            <!-- DETAIL KUNCI -->
-            <div id="resiDaftarKunci" style="font-size: 13px; color: #e2e8f0; font-weight: 500; line-height: 1.4; margin-bottom: 6px;">-</div>
-
-            <!-- WAKTU TRANSAKSI -->
-            <div id="resiWaktu" style="font-size: 11px; color: #cbd5e1; font-weight: 400;">-</div>
-          </div>
-
-          <!-- KANAN: QR CODE LINK GDRIVE -->
-          <div style="background: #ffffff; padding: 4px; border-radius: 6px; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <div id="resiQrCode"></div>
-          </div>
-
-        </div>
+      <!-- Kode QR di Pojok Kanan Bawah -->
+      <div class="qr-code">
+        <div id="resiQrCode"></div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- TOMBOL UNDUH -->
     <div style="display: flex; gap: 8px; padding: 12px; background: #243f36; border-top: 1px solid rgba(255,255,255,0.1);">
