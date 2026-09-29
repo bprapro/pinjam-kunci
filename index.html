@@ -1084,7 +1084,7 @@ tbody tr:has(.dots-loader-wrapper) {
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
 
-  // FUNGSI FORMAT WAKTU "13:58 WIB, 9 September 2026"
+  <script>
 function getFormatWaktuResi() {
   const d = new Date();
   const jam = String(d.getHours()).padStart(2, "0");
@@ -1093,10 +1093,9 @@ function getFormatWaktuResi() {
   return jam + ":" + menit + " WIB, " + d.getDate() + " " + bulanIndo[d.getMonth()] + " " + d.getFullYear();
 }
 
-function tampilkanResi(judul, nama, nohp, daftarKunciDetail, fotoSrc) {
-  document.getElementById("resiBadgeStatus").innerText = judul;
+function tampilkanResi(judulStatus, nama, daftarKunciDetail, fotoSrc, gdriveUrl) {
+  document.getElementById("resiBadgeStatus").innerText = judulStatus;
   document.getElementById("resiNama").innerText = nama || "-";
-  document.getElementById("resiNohp").innerText = nohp || "-";
   document.getElementById("resiWaktu").innerText = getFormatWaktuResi();
 
   const imgTarget = document.getElementById("resiFotoTarget");
@@ -1108,11 +1107,26 @@ function tampilkanResi(judul, nama, nohp, daftarKunciDetail, fotoSrc) {
   if (Array.isArray(daftarKunciDetail) && daftarKunciDetail.length > 0) {
     listContainer.innerHTML = daftarKunciDetail
       .map(function(k) {
-        return "<div>&bull; (" + k.id + " - " + k.nama + " - " + k.lantai + " - " + k.zona + ")</div>";
+        return "<div>" + k.id + " - " + k.nama + " - " + k.lantai + " - " + k.zona + "</div>";
       })
       .join("");
   } else {
     listContainer.innerHTML = "<div>-</div>";
+  }
+
+  const qrContainer = document.getElementById("resiQrCode");
+  qrContainer.innerHTML = "";
+  
+  const targetUrl = gdriveUrl || fotoSrc || window.location.href;
+  if (typeof QRCode !== "undefined") {
+    new QRCode(qrContainer, {
+      text: targetUrl,
+      width: 62,
+      height: 62,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
   }
 
   const modalResi = document.getElementById("modalResi");
@@ -1145,6 +1159,7 @@ function downloadResiJPG() {
     link.click();
   });
 }
+</script>
 
   /* ==========================================
      1. NAVIGASI TAB & TRANSISI FORM
@@ -2185,50 +2200,59 @@ document.addEventListener('DOMContentLoaded', function() {
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
-  <!-- MODAL RESI BADGE -->
-<div id="modalResi" class="image-modal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.6);">
-  <div style="background: #ffffff; border-radius: 16px; width: 340px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;">
+  <!-- MODAL RESI BADGE SAMA PERSIS DESAIN FOTO 2 -->
+<div id="modalResi" class="image-modal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.7);">
+  <div style="background: #2f5044; border-radius: 12px; width: 340px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative;">
     
     <!-- Tombol Tutup Silang -->
-    <span onclick="tutupModalResi()" style="position: absolute; top: 8px; right: 12px; font-size: 24px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.7); cursor: pointer; z-index: 20;">&times;</span>
+    <span onclick="tutupModalResi()" style="position: absolute; top: 8px; right: 12px; font-size: 24px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; z-index: 30;">&times;</span>
 
     <!-- AREA YANG DI-RENDER KE PDF / JPG -->
-    <div id="areaResi" style="background: #ffffff; width: 340px; font-family: &quot;Segoe UI&quot;, Roboto, sans-serif; position: relative; overflow: hidden;">
+    <div id="areaResi" style="background: #2f5044; width: 340px; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; position: relative; overflow: hidden;">
       
-      <!-- LOGO 23SMG POJOK KIRI ATAS -->
-      <img src="23smg.png" alt="Logo 23" style="position: absolute; top: 12px; left: 12px; height: 36px; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-
-      <!-- FOTO DOKUMENTASI (PORSI ATAS) -->
-      <div style="width: 100%; height: 260px; background: #cbd5e1; overflow: hidden; position: relative;">
-        <img id="resiFotoTarget" src="" alt="Foto Dokumentasi" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+      <!-- FOTO DOKUMENTASI & LOGO (PORSI ATAS) -->
+      <div style="width: 100%; height: 320px; position: relative; overflow: hidden; background: #1e293b;">
+        <!-- LOGO 23SMG DI POJOK KIRI ATAS FOTO -->
+        <img src="23smg.png" alt="23" style="position: absolute; top: 12px; left: 12px; height: 42px; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));">
+        
+        <!-- FOTO KAMERA / DOKUMENTASI -->
+        <img id="resiFotoTarget" src="" alt="Foto Bukti" style="width: 100%; height: 100%; object-fit: cover; display: block;">
       </div>
 
-      <!-- PANEL DETAIL PEMINJAM (PORSI BAWAH) -->
-      <div style="background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; margin-top: -20px; padding: 16px; position: relative; z-index: 5; box-shadow: 0 -4px 10px rgba(0,0,0,0.08);">
+      <!-- PANEL HIJAU GELAP DATA (PORSI BAWAH) -->
+      <div style="background: #2f5044; padding: 14px 16px 16px 16px; position: relative; color: #ffffff;">
         
-        <!-- BADGE STATUS -->
-        <div id="resiBadgeStatus" style="display: inline-block; background: #0284c7; color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-          BUKTI PEMINJAMAN
-        </div>
+        <!-- ROW UTAMA: TEKS KIRI, QR CODE KANAN -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 10px;">
+          
+          <!-- KIRI: TEKS DETAIL -->
+          <div style="flex: 1;">
+            <!-- PILL BADGE PUTIH -->
+            <div id="resiBadgeStatus" style="display: inline-block; background: #ffffff; color: #2f5044; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+              DIPINJAM OLEH :
+            </div>
 
-        <!-- NAMA & NOHP -->
-        <h2 id="resiNama" style="margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; line-height: 1.2;">-</h2>
-        <p id="resiNohp" style="margin: 2px 0 10px 0; font-size: 13px; color: #64748b; font-weight: 500;">-</p>
+            <!-- NAMA PEMINJAM -->
+            <h2 id="resiNama" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #ffffff; line-height: 1.2;">-</h2>
+            
+            <!-- DETAIL KUNCI -->
+            <div id="resiDaftarKunci" style="font-size: 13px; color: #e2e8f0; font-weight: 500; line-height: 1.4; margin-bottom: 6px;">-</div>
 
-        <!-- DETAIL KUNCI -->
-        <div style="border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 6px;">
-          <div id="resiDaftarKunci" style="font-size: 12px; color: #1e293b; font-weight: 600; line-height: 1.5;">-</div>
-        </div>
+            <!-- WAKTU TRANSAKSI -->
+            <div id="resiWaktu" style="font-size: 11px; color: #cbd5e1; font-weight: 400;">-</div>
+          </div>
 
-        <!-- WAKTU TRANSAKSI -->
-        <div style="margin-top: 10px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 6px;">
-          <span id="resiWaktu" style="font-size: 11px; color: #94a3b8; font-weight: 500;">-</span>
+          <!-- KANAN: QR CODE LINK GDRIVE -->
+          <div style="background: #ffffff; padding: 4px; border-radius: 6px; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div id="resiQrCode"></div>
+          </div>
+
         </div>
       </div>
     </div>
 
     <!-- TOMBOL UNDUH -->
-    <div style="display: flex; gap: 8px; padding: 12px; background: #ffffff; border-top: 1px solid #f1f5f9;">
+    <div style="display: flex; gap: 8px; padding: 12px; background: #243f36; border-top: 1px solid rgba(255,255,255,0.1);">
       <button type="button" onclick="downloadResiPDF()" style="flex: 1; padding: 9px; background: #0284c7; color: #ffffff; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer;">Unduh PDF</button>
       <button type="button" onclick="downloadResiJPG()" style="flex: 1; padding: 9px; background: #059669; color: #ffffff; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer;">Unduh JPG</button>
     </div>
