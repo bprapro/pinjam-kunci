@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <!-- Library Konversi HTML ke PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- Library Konversi HTML ke Gambar (Opsional untuk JPG/PNG) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pinjam Kunci</title>
@@ -1061,8 +1066,8 @@ tbody tr:has(.dots-loader-wrapper) {
   </div>
 
   <script>
-    // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxGoHYvbAnvd3IjS1eQrUUiChTY--AFqCzQoTHtfg97k5hreaTqEnruiF5MmaqqXFyrQA/exec";
+  // URL Web App Resmi Anda yang Sudah Terkoneksi 100%
+  const scriptUrl = "https://script.google.com/macros/s/...";
 
   let semuaDataKunci = [];
   let dataMonitorTerpinjam = [];
@@ -1071,6 +1076,53 @@ tbody tr:has(.dots-loader-wrapper) {
 
   let halamanSekarang = 1;
   const barisPerHalaman = 10;
+
+  // ==========================================
+  // KODE PENDUKUNG RESI TRANSAKSI KUNCI
+  // ==========================================
+  function tampilkanResi(judul, nama, nohp, daftarKunciArray) {
+    document.getElementById('resiJudul').innerText = judul;
+    document.getElementById('resiNama').innerText = nama;
+    document.getElementById('resiNohp').innerText = nohp;
+    document.getElementById('resiTanggal').innerText = new Date().toLocaleString('id-ID');
+
+    const listContainer = document.getElementById('resiDaftarKunci');
+    listContainer.innerHTML = '';
+    
+    daftarKunciArray.forEach(kunci => {
+      listContainer.innerHTML += `<li><b>${kunci}</b></li>`;
+    });
+
+    const modalResi = document.getElementById('modalResi');
+    if (modalResi) modalResi.style.display = 'flex';
+  }
+
+  function tutupModalResi() {
+    const modalResi = document.getElementById('modalResi');
+    if (modalResi) modalResi.style.display = 'none';
+  }
+
+  function downloadResiPDF() {
+    const element = document.getElementById('areaResi');
+    const opsi = {
+      margin:       10,
+      filename:     'Resi_Kunci_' + Date.now() + '.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+    };
+    html2pdf().set(opsi).from(element).save();
+  }
+
+  function downloadResiJPG() {
+    const element = document.getElementById('areaResi');
+    html2canvas(element).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'Resi_Kunci_' + Date.now() + '.jpg';
+      link.href = canvas.toDataURL('image/jpeg', 0.9);
+      link.click();
+    });
+  }
 
   /* ==========================================
      1. NAVIGASI TAB & TRANSISI FORM
@@ -2093,6 +2145,43 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="imageModal" class="image-modal">
   <span class="modal-close">&times;</span>
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
+</div>
+  <!-- ========================================== -->
+<!-- MODAL POP-UP RESI TRANSAKSI KUNCI           -->
+<!-- ========================================== -->
+<div id="modalResi" class="image-modal" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
+  <div style="background: #ffffff; padding: 20px; border-radius: 12px; max-width: 420px; width: 90%; max-height: 90vh; overflow-y: auto; color: #333; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+    
+    <!-- Tombol Silang (Tutup) -->
+    <span onclick="tutupModalResi()" style="position: absolute; top: 12px; right: 16px; font-size: 24px; font-weight: bold; cursor: pointer; color: #666;">&times;</span>
+
+    <!-- AREA RESI YANG AKAN DI-DOWNLOAD -->
+    <div id="areaResi" style="padding: 15px; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 8px; font-family: sans-serif;">
+      <div style="text-align: center; margin-bottom: 10px;">
+        <h3 id="resiJudul" style="margin: 0; color: #1e293b; font-size: 18px;">BUKTI PEMINJAMAN KUNCI</h3>
+        <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">FORM KUNCI 23 SEMARANG</p>
+      </div>
+      
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+
+      <p style="margin: 5px 0; font-size: 13px;"><strong>Tanggal/Jam:</strong> <span id="resiTanggal">-</span></p>
+      <p style="margin: 5px 0; font-size: 13px;"><strong>Nama Peminjam:</strong> <span id="resiNama">-</span></p>
+      <p style="margin: 5px 0; font-size: 13px;"><strong>No. HP (WA):</strong> <span id="resiNohp">-</span></p>
+      
+      <p style="margin: 10px 0 5px 0; font-size: 13px;"><strong>Daftar Kunci:</strong></p>
+      <ul id="resiDaftarKunci" style="margin: 0; padding-left: 20px; font-size: 13px; color: #334155;"></ul>
+
+      <hr style="border: none; border-top: 1px dashed #e2e8f0; margin: 12px 0;">
+      <p style="margin: 0; font-size: 11px; text-align: center; color: #94a3b8;">Simpan resi ini sebagai bukti transaksi resmi.</p>
+    </div>
+
+    <!-- TOMBOL AKSI UNDUH -->
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+      <button type="button" onclick="downloadResiPDF()" style="flex: 1; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Unduh PDF</button>
+      <button type="button" onclick="downloadResiJPG()" style="flex: 1; padding: 10px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Unduh JPG</button>
+    </div>
+
+  </div>
 </div>
 </body>
 </html>
