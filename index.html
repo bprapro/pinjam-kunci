@@ -1021,7 +1021,10 @@ tbody tr:has(.dots-loader-wrapper) {
         <svg viewBox="0 0 24 24" style="fill:white; width:16px; height:16px;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         Kembali ke Formulir
       </button>
-      <button type="button" class="btn-submit" onclick="unduhTiket('pinjam', document.getElementById('nama_peminjam').value, document.getElementById('select_kunci').value, canvasPinjam.toDataURL('image/png'))">
+      <button type="button" class="btn-submit-pinjam" style="margin-left: 8px;" onclick="unduhTiket('pinjam', namaPeminjamTerakhir, kunciTerakhir, fotoTerakhir)">
+    <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+    </svg>
     Unduh Tiket Bukti
 </button>
     </div>
@@ -2141,6 +2144,21 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
   <script>
+    // Variabel global untuk menampung data peminjaman terakhir
+let namaPeminjamTerakhir = "";
+let kunciTerakhir = "";
+let fotoTerakhir = "";
+
+function simpanPinjam() {
+    // 1. Simpan nilai dari form ke variabel global SEBELUM form di-reset
+    namaPeminjamTerakhir = document.getElementById('nama_peminjam').value;
+    kunciTerakhir = document.getElementById('select_kunci').value;
+    fotoTerakhir = canvasPinjam.toDataURL('image/png');
+
+    // 2. Tampilkan layar sukses
+    document.getElementById('sectionPinjam').style.display = 'none';
+    document.getElementById('screenSukses').style.display = 'block';
+}
     function unduhTiket(tipe, nama, kunci, fotoBase64) {
         // 1. Format Waktu Saat Ini
         const skrg = new Date();
