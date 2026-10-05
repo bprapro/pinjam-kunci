@@ -2160,40 +2160,52 @@ function simpanPinjam() {
     document.getElementById('screenSukses').style.display = 'block';
 }
     function unduhTiket(tipe, nama, kunci, fotoBase64) {
-        // 1. Format Waktu Saat Ini
-        const skrg = new Date();
-        const opsiTgl = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-        const waktuFormatted = skrg.toLocaleDateString('id-ID', opsiTgl).replace('.', ':');
-        
-        // 2. Isi Data ke Template Tiket
-        document.getElementById('ticket-nama').innerText = nama;
-        document.getElementById('ticket-kunci').innerText = kunci;
-        document.getElementById('ticket-waktu').innerText = waktuFormatted;
-        document.getElementById('ticket-foto').src = fotoBase64;
-        document.getElementById('ticket-id').innerText = '#TK-' + Math.floor(1000 + Math.random() * 9000);
+    // 1. Format Waktu
+    const skrg = new Date();
+    const opsiTgl = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const waktuFormatted = skrg.toLocaleDateString('id-ID', opsiTgl).replace('.', ':');
+    
+    // 2. Isi Data ke Template Tiket
+    document.getElementById('ticket-nama').innerText = nama || 'Peminjam';
+    document.getElementById('ticket-kunci').innerText = kunci || '-';
+    document.getElementById('ticket-waktu').innerText = waktuFormatted;
+    document.getElementById('ticket-id').innerText = '#TK-' + Math.floor(1000 + Math.random() * 9000);
 
-        const badge = document.getElementById('ticket-badge');
-        if (tipe === 'pinjam') {
-            badge.innerText = 'PEMINJAMAN';
-            badge.style.backgroundColor = '#0052FF';
-        } else {
-            badge.innerText = 'PENGEMBALIAN';
-            badge.style.backgroundColor = '#22C55E';
-        }
-
-        // 3. Konversi Elemen Menjadi Gambar PNG & Unduh
-        const target = document.querySelector('#ticket-capture > div');
-        
-        html2canvas(target, {
-            scale: 2, // Meningkatkan resolusi gambar
-            useCORS: true
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Tiket_\({tipe.toUpperCase()}_\){nama.replace(/\s+/g, '_')}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        });
+    // Mencegah error jika fotoBase64 kosong/null
+    const imgElem = document.getElementById('ticket-foto');
+    if (fotoBase64 && fotoBase64.length > 100) {
+        imgElem.src = fotoBase64;
+    } else {
+        // Gambar placeholder jika kamera tidak dipakai
+        imgElem.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%23cbd5e1"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>';
     }
+
+    const badge = document.getElementById('ticket-badge');
+    if (tipe === 'pinjam') {
+        badge.innerText = 'PEMINJAMAN';
+        badge.style.backgroundColor = '#0052FF';
+    } else {
+        badge.innerText = 'PENGEMBALIAN';
+        badge.style.backgroundColor = '#22C55E';
+    }
+
+    // 3. Konversi ke PNG & Unduh
+    const target = document.querySelector('#ticket-capture > div');
+    
+    html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Tiket_\({tipe.toUpperCase()}_\){(nama || 'Kunci').replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }).catch(err => {
+        console.error("Gagal membuat gambar tiket:", err);
+    });
+}
     </script>
 
     <!-- Library html2canvas wajib berada SEBELUM dipanggil oleh script di atas -->
