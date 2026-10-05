@@ -2144,7 +2144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Variabel global untuk menampung data peminjaman terakhir
 let namaPeminjamTerakhir = "";
 let kunciTerakhir = "";
-let fotoTerakhir = ""; 
+let rowTerakhir = "";
 
 function ambilFoto(tipe) {
     const canvas = document.getElementById(tipe === 'pinjam' ? 'canvas-pinjam' : 'canvas-kembali');
@@ -2170,7 +2170,7 @@ function simpanPinjam() {
     document.getElementById('screenSukses').style.display = 'block';
 }
     function unduhTiket(tipe, nama, kunci, nomorRow) {
-    // 1. Ambil Foto Kamera dari Canvas secara langsung
+    // 1. Ambil foto langsung dari canvas
     const canvasElem = document.getElementById(tipe === 'pinjam' ? 'canvas-pinjam' : 'canvas-kembali');
     let fotoData = "";
     if (canvasElem) {
@@ -2182,11 +2182,11 @@ function simpanPinjam() {
     const opsiTgl = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
     const waktuFormatted = skrg.toLocaleDateString('id-ID', opsiTgl).replace('.', ':');
     
-    // 3. Masukkan Data Teks & Nomor Log Spreadsheet
+    // 3. Masukkan Data Teks
     document.getElementById('ticket-nama').innerText = nama || 'Peminjam';
     document.getElementById('ticket-kunci').innerText = kunci || '-';
     document.getElementById('ticket-waktu').innerText = waktuFormatted;
-    document.getElementById('ticket-id').innerText = nomorRow ? `#LOG-${nomorRow}` : '#LOG-AKTIF';
+    document.getElementById('ticket-id').innerText = (nomorRow && nomorRow !== "") ? `#LOG-${nomorRow}` : '#LOG-AKTIF';
 
     // 4. Set Foto Bukti Kamera
     const imgElem = document.getElementById('ticket-foto');
