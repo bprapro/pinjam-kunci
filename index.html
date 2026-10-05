@@ -1021,10 +1021,7 @@ tbody tr:has(.dots-loader-wrapper) {
         <svg viewBox="0 0 24 24" style="fill:white; width:16px; height:16px;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         Kembali ke Formulir
       </button>
-      <button type="button" class="btn-submit-pinjam" style="margin-left: 8px;" onclick="unduhTiket('pinjam', namaPeminjamTerakhir, kunciTerakhir, fotoTerakhir)">
-    <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-    </svg>
+      <button type="button" class="btn-submit-pinjam" style="margin-left: 8px;" onclick="unduhTiket('pinjam', namaPeminjamTerakhir, kunciTerakhir, rowTerakhir)">
     Unduh Tiket Bukti
 </button>
     </div>
@@ -2101,19 +2098,19 @@ document.addEventListener('DOMContentLoaded', function() {
   <img class="modal-content" id="imgModalTarget" alt="Preview Foto">
 </div>
   <!-- Wadah Tiket Bukti Digital (Disembunyikan dari layar biasa) -->
-<div id="ticket-capture" style="position: absolute; left: -9999px; top: -9999px;">
+<div id="ticket-capture" style="position: fixed; left: -9999px; top: 0; z-index: -9999;">
     <div style="width: 380px; background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; border: 1px solid #e2e8f0; color: #0f172a; box-sizing: border-box;">
         
-        <!-- Header & Logo 23 Semarang -->
+        <!-- Header & Logo -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <img src="23smg.png" alt="Logo 23" style="height: 32px; width: auto; object-fit: contain;">
+                <img id="ticket-logo" src="23smg.png" alt="Logo 23" style="height: 32px; width: auto; object-fit: contain;">
                 <span style="font-weight: 700; font-size: 15px; color: #0052FF;">KUNCI 23 SEMARANG</span>
             </div>
             <span id="ticket-badge" style="background: #0052FF; color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase;">PEMINJAMAN</span>
         </div>
 
-        <!-- Foto Bukti -->
+        <!-- Foto Bukti Kamera -->
         <div style="width: 100%; height: 240px; border-radius: 16px; overflow: hidden; background: #f1f5f9; margin-bottom: 20px; border: 1px solid #cbd5e1;">
             <img id="ticket-foto" src="" alt="Foto Bukti" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
@@ -2138,7 +2135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Footer Tiket -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px dashed #e2e8f0; font-size: 10px; color: #94a3b8;">
             <span>Tiket Resmi Kunci 23 Semarang</span>
-            <span id="ticket-id" style="font-family: monospace; font-weight: 600;">#TK-0000</span>
+            <span id="ticket-id" style="font-family: monospace; font-weight: 600;">#LOG-000</span>
         </div>
 
     </div>
@@ -2172,25 +2169,32 @@ function simpanPinjam() {
     document.getElementById('sectionPinjam').style.display = 'none';
     document.getElementById('screenSukses').style.display = 'block';
 }
-    function unduhTiket(tipe, nama, kunci, fotoBase64) {
-    // 1. Format Waktu
+    function unduhTiket(tipe, nama, kunci, nomorRow) {
+    // 1. Ambil Foto Kamera dari Canvas secara langsung
+    const canvasElem = document.getElementById(tipe === 'pinjam' ? 'canvas-pinjam' : 'canvas-kembali');
+    let fotoData = "";
+    if (canvasElem) {
+        fotoData = canvasElem.toDataURL('image/png');
+    }
+
+    // 2. Format Waktu
     const skrg = new Date();
     const opsiTgl = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
     const waktuFormatted = skrg.toLocaleDateString('id-ID', opsiTgl).replace('.', ':');
     
-    // 2. Isi Data Teks
+    // 3. Masukkan Data Teks & Nomor Log Spreadsheet
     document.getElementById('ticket-nama').innerText = nama || 'Peminjam';
     document.getElementById('ticket-kunci').innerText = kunci || '-';
     document.getElementById('ticket-waktu').innerText = waktuFormatted;
-    document.getElementById('ticket-id').innerText = '#TK-' + Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('ticket-id').innerText = nomorRow ? `#LOG-${nomorRow}` : '#LOG-AKTIF';
 
-    // 3. Set Foto Bukti
+    // 4. Set Foto Bukti Kamera
     const imgElem = document.getElementById('ticket-foto');
-    if (fotoBase64 && fotoBase64.length > 100) {
-        imgElem.src = fotoBase64;
+    if (fotoData && fotoData.length > 100) {
+        imgElem.src = fotoData;
     }
 
-    // 4. Set Warna Badge Tipe
+    // 5. Badge Status
     const badge = document.getElementById('ticket-badge');
     if (tipe === 'pinjam') {
         badge.innerText = 'PEMINJAMAN';
@@ -2200,19 +2204,22 @@ function simpanPinjam() {
         badge.style.backgroundColor = '#22C55E';
     }
 
-    // 5. Unduh via html2canvas
+    // 6. Rendering html2canvas
     const target = document.querySelector('#ticket-capture > div');
     
-    html2canvas(target, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `Tiket_\({tipe.toUpperCase()}_\){(nama || 'Kunci').replace(/\s+/g, '_')}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
+    setTimeout(() => {
+        html2canvas(target, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Tiket_\({tipe.toUpperCase()}_\){(nama || 'Kunci').replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }, 200);
 }
     </script>
 
